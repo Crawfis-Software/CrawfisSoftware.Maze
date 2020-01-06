@@ -1,9 +1,9 @@
-﻿using OhioState.Collections.Graph;
+﻿using CrawfisSoftware.Collections.Graph;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace OhioState.Collections.Maze
+namespace CrawfisSoftware.Collections.Maze
 {
     public class Maze<N, E> : IIndexedGraph<N, E>, ITransposeIndexedGraph<N, E>
     {

@@ -1,9 +1,9 @@
-﻿using OhioState.Collections.Graph;
+﻿using CrawfisSoftware.Collections.Graph;
 using System;
 
-namespace OhioState.Collections.Maze
+namespace CrawfisSoftware.Collections.Maze
 {
-    public class MazeBuilderBitEdges<N, E>
+    public class MazeBuilderBitEdges<N, E> : MazeBuilderAbstract<N,E>
     {
         public MazeBuilderBitEdges(int width, int height, GetGridLabel<N> nodeAccessor, GetEdgeLabel<E> edgeAccessor)
         {
@@ -53,33 +53,12 @@ namespace OhioState.Collections.Maze
             }
             return newVBP;
         }
-        private void CarvePassage(int currentCell, int targetCell)
-        {
-            int currentRow = currentCell / width;
-            int currentColumn = currentCell % width;
-            int selectedRow = targetCell / width;
-            int selectedColumn = targetCell % width;
-            Direction directionToNeighbor, directionToCurrent;
-            if (grid.DirectionLookUp(currentCell, targetCell, out directionToNeighbor))
-            {
-                directions[currentRow, currentColumn] |= directionToNeighbor;
-                if (grid.DirectionLookUp(targetCell, currentCell, out directionToCurrent))
-                    directions[selectedRow, selectedColumn] |= directionToCurrent;
-            }
-        }
-        public Maze<N, E> GetMaze()
+        public override Maze<N, E> GetMaze()
         {
             PassageBits(725552, 5421551);
             directions[0, 0] |= Direction.S;
             directions[height - 1, width - 1] |= Direction.E;
             return new Maze<N, E>(grid, directions);
         }
-
-        #region Member variables
-        private Grid<N, E> grid;
-        private readonly int width;
-        private readonly int height;
-        private Direction[,] directions;
-        #endregion
     }
 }

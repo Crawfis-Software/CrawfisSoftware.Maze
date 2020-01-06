@@ -1,11 +1,11 @@
-﻿using OhioState.Collections.Graph;
+﻿using CrawfisSoftware.Collections.Graph;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace OhioState.Collections.Maze
+namespace CrawfisSoftware.Collections.Maze
 {
-    public class MazeBuilderAldousBroder<N, E>
+    public class MazeBuilderAldousBroder<N, E> : MazeBuilderAbstract<N, E>
     {
         public MazeBuilderAldousBroder(int width, int height, GetGridLabel<N> nodeAccessor, GetEdgeLabel<E> edgeAccessor)
         {
@@ -42,35 +42,12 @@ namespace OhioState.Collections.Maze
             }
         }
 
-        private void CarvePassage(int currentCell, int targetCell)
-        {
-            int currentRow = currentCell / width;
-            int currentColumn = currentCell % width;
-            int selectedRow = targetCell / width;
-            int selectedColumn = targetCell % width;
-            Direction directionToNeighbor, directionToCurrent;
-            if (grid.DirectionLookUp(currentCell, targetCell, out directionToNeighbor))
-            {
-                directions[currentRow, currentColumn] |= directionToNeighbor;
-                if (grid.DirectionLookUp(targetCell, currentCell, out directionToCurrent))
-                    directions[selectedRow, selectedColumn] |= directionToCurrent;
-            }
-        }
-        public Maze<N, E> GetMaze()
+        public override Maze<N, E> GetMaze()
         {
             AldousBroder();
             directions[0, 0] |= Direction.S;
             directions[height - 1, width - 1] |= Direction.E;
             return new Maze<N, E>(grid, directions);
         }
-
-        #region Member variables
-        private Grid<N, E> grid;
-        private int width;
-        private int height;
-        private GetGridLabel<N> nodeFunction;
-        private GetEdgeLabel<E> edgeFunction;
-        private Direction[,] directions;
-        #endregion
     }
 }
