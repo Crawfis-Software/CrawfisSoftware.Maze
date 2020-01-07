@@ -18,9 +18,9 @@ namespace CrawfisSoftware.Collections.Maze
             Direction directionToNeighbor, directionToCurrent;
             if (grid.DirectionLookUp(currentCell, targetCell, out directionToNeighbor))
             {
-                directions[currentRow, currentColumn] |= directionToNeighbor;
+                directions[currentColumn, currentRow] |= directionToNeighbor;
                 if (grid.DirectionLookUp(targetCell, currentCell, out directionToCurrent))
-                    directions[selectedRow, selectedColumn] |= directionToCurrent;
+                    directions[selectedColumn, selectedRow] |= directionToCurrent;
             }
         }
 

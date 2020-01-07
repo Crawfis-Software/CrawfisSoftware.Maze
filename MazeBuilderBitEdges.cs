@@ -10,7 +10,7 @@ namespace CrawfisSoftware.Collections.Maze
             this.width = width;
             this.height = height;
             grid = new Grid<N, E>(width, height, nodeAccessor, edgeAccessor);
-            directions = new Direction[height, width];
+            directions = new Direction[width, height];
         }
 
         private void PassageBits(int VBP, int EBP)
@@ -57,7 +57,7 @@ namespace CrawfisSoftware.Collections.Maze
         {
             PassageBits(725552, 5421551);
             directions[0, 0] |= Direction.S;
-            directions[height - 1, width - 1] |= Direction.E;
+            directions[width - 1, height - 1] |= Direction.E;
             return new Maze<N, E>(grid, directions);
         }
     }

@@ -7,16 +7,19 @@ namespace CrawfisSoftware.Collections.Maze
 {
     public class Maze<N, E> : IIndexedGraph<N, E>, ITransposeIndexedGraph<N, E>
     {
+        public int Width { get { return grid.Width; } }
+        public int Height {  get { return grid.Height; } }
+
         internal Maze(Grid<N, E> grid, Direction[,] directions)
         {
             this.grid = grid;
             this.directions = directions;
             directions[0, 0] |= Direction.S;
-            directions[grid.Height - 1, grid.Width - 1] |= Direction.E;
+            directions[grid.Width - 1, grid.Height - 1] |= Direction.E;
         }
-        internal Direction GetDirection(int row, int column)
+        public Direction GetDirection(int column, int row)
         {
-            return directions[row, column];
+            return directions[column, row];
         }
 
         #region IIndexedGraph<N,E> Members
@@ -86,7 +89,7 @@ namespace CrawfisSoftware.Collections.Maze
                 grid.TryGetGridLocation(toNode, out toColumn, out toRow);
                 Direction dir;
                 grid.DirectionLookUp(fromColumn, fromRow, toColumn, toRow, out dir);
-                if ((directions[fromRow, fromColumn] & dir) == dir)
+                if ((directions[fromColumn, fromRow] & dir) == dir)
                     return true;
             }
             return false;
@@ -136,10 +139,10 @@ namespace CrawfisSoftware.Collections.Maze
                 bottomOfRow.Append("+");
                 for (int column = 0; column < width; column++)
                 {
-                    string eastString = (directions[row, column] & Direction.E) == Direction.E ? " " : "|";
+                    string eastString = (directions[column, row] & Direction.E) == Direction.E ? " " : "|";
                     rowBody.Append(cellSpace);
                     rowBody.Append(eastString);
-                    string southString = (directions[row, column] & Direction.S) == Direction.S ? cellSpace : "---";
+                    string southString = (directions[column, row] & Direction.S) == Direction.S ? cellSpace : "---";
                     bottomOfRow.Append(southString);
                     bottomOfRow.Append("+");
                 }

@@ -14,7 +14,7 @@ namespace CrawfisSoftware.Collections.Maze
             nodeFunction = nodeAccessor;
             edgeFunction = edgeAccessor;
             grid = new Grid<N, E>(width, height, nodeAccessor, edgeAccessor);
-            directions = new Direction[height, width];
+            directions = new Direction[width, height];
         }
         private void AldousBroder() // Random Walk, may take an infinite amount of time.
         {
@@ -46,7 +46,7 @@ namespace CrawfisSoftware.Collections.Maze
         {
             AldousBroder();
             directions[0, 0] |= Direction.S;
-            directions[height - 1, width - 1] |= Direction.E;
+            directions[width - 1, height - 1] |= Direction.E;
             return new Maze<N, E>(grid, directions);
         }
     }

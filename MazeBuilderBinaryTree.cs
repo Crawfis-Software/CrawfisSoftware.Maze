@@ -12,7 +12,7 @@ namespace CrawfisSoftware.Collections.Maze
             nodeFunction = nodeAccessor;
             edgeFunction = edgeAccessor;
             grid = new Grid<N, E>(width, height, nodeAccessor, edgeAccessor);
-            directions = new Direction[height, width];
+            directions = new Direction[width, height];
         }
         private void BinaryTreeMaze(int percentHorizontal = 50)
         {
@@ -35,18 +35,18 @@ namespace CrawfisSoftware.Collections.Maze
                     moveEast &= !eastBorder;
                     if (moveEast)
                     {
-                        directions[row, column] |= Direction.E;
-                        if (column + 1 <= width - 1) directions[row, column + 1] |= Direction.W;
+                        directions[column, row] |= Direction.E;
+                        if (column + 1 <= width - 1) directions[column + 1, row] |= Direction.W;
                     }
                     else if (row < height - 1)
                     {
-                        directions[row, column] |= Direction.N;
-                        directions[row + 1, column] |= Direction.S;
+                        directions[column, row] |= Direction.N;
+                        directions[column, row + 1] |= Direction.S;
                     }
                     else if ((row == height - 1) && !eastBorder)
                     {
-                        directions[row, column] |= Direction.E;
-                        if (column + 1 <= width - 1) directions[row, column + 1] |= Direction.W;
+                        directions[column, row] |= Direction.E;
+                        if (column + 1 <= width - 1) directions[column + 1, row] |= Direction.W;
                     }
                 }
             }
@@ -55,7 +55,7 @@ namespace CrawfisSoftware.Collections.Maze
         {
             BinaryTreeMaze(80);
             directions[0, 0] |= Direction.S;
-            directions[height - 1, width - 1] |= Direction.E;
+            directions[width - 1, height - 1] |= Direction.E;
             return new Maze<N, E>(grid, directions);
         }
     }
