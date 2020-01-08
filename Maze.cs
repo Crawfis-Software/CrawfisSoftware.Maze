@@ -67,7 +67,13 @@ namespace CrawfisSoftware.Collections.Maze
 
         public IEnumerable<IIndexedEdge<E>> OutEdges(int nodeIndex)
         {
-            throw new NotImplementedException();
+            foreach(var outEdge in grid.OutEdges(nodeIndex))
+            {
+                if( ContainsEdge(outEdge.From, outEdge.To))
+                {
+                    yield return outEdge;
+                }
+            }
         }
 
         public IEnumerable<int> Parents(int nodeIndex)
@@ -77,7 +83,13 @@ namespace CrawfisSoftware.Collections.Maze
 
         public IEnumerable<IIndexedEdge<E>> InEdges(int nodeIndex)
         {
-            throw new NotImplementedException();
+            foreach (var outEdge in grid.InEdges(nodeIndex))
+            {
+                if (ContainsEdge(outEdge.From, outEdge.To))
+                {
+                    yield return outEdge;
+                }
+            }
         }
 
         public bool ContainsEdge(int fromNode, int toNode)
@@ -115,7 +127,8 @@ namespace CrawfisSoftware.Collections.Maze
         #region ITransposeIndexedGraph<N,E> Members
         public IIndexedGraph<N, E> Transpose()
         {
-            throw new NotImplementedException();
+            // Todo: should be a deep copy
+            return this;
         }
         #endregion
 
