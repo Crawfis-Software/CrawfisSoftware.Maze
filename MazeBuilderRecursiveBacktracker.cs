@@ -4,15 +4,15 @@ using System.Collections.Generic;
 
 namespace CrawfisSoftware.Collections.Maze
 {
-    public class MazeBuilderRecursiveBacktracker<N> : MazeBuilderAbstract<N>
+    public class MazeBuilderRecursiveBacktracker<N, E> : MazeBuilderAbstract<N,E>
     {
-        public MazeBuilderRecursiveBacktracker(int width, int height, GetGridLabel<N> nodeAccessor, GetEdgeLabel<int> edgeAccessor)
+        public MazeBuilderRecursiveBacktracker(int width, int height, GetGridLabel<N> nodeAccessor, GetEdgeLabel<E> edgeAccessor)
         {
             this.width = width;
             this.height = height;
             nodeFunction = nodeAccessor;
             edgeFunction = edgeAccessor;
-            grid = new Grid<N, int>(width, height, nodeAccessor, edgeAccessor);
+            grid = new Grid<N, E>(width, height, nodeAccessor, edgeAccessor);
             directions = new Direction[width, height];
         }
 
@@ -49,12 +49,12 @@ namespace CrawfisSoftware.Collections.Maze
 
             }
         }
-        public override Maze<N> GetMaze()
+        public override Maze<N,E> GetMaze()
         {
             RecursiveBackTracker(10);
             directions[0, 0] |= Direction.S;
             directions[width - 1, height - 1] |= Direction.E;
-            return new Maze<N>(grid, directions);
+            return new Maze<N, E>(grid, directions);
         }
     }
 }

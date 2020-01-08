@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace CrawfisSoftware.Collections.Maze
 {
-    public abstract class MazeBuilderAbstract<N> : IMazeBuilder<N>
+    public abstract class MazeBuilderAbstract<N,E> : IMazeBuilder<N,E>
     {
         protected void CarvePassage(int currentCell, int targetCell)
         {
@@ -24,14 +24,14 @@ namespace CrawfisSoftware.Collections.Maze
             }
         }
 
-        public abstract Maze<N> GetMaze();
+        public abstract Maze<N, E> GetMaze();
 
         #region Member variables
-        protected Grid<N, int> grid;
+        protected Grid<N, E> grid;
         protected int width;
         protected int height;
         protected GetGridLabel<N> nodeFunction;
-        protected GetEdgeLabel<int> edgeFunction;
+        protected GetEdgeLabel<E> edgeFunction;
         protected Direction[,] directions;
         #endregion
     }
