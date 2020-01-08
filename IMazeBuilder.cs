@@ -1,7 +1,7 @@
 ﻿namespace CrawfisSoftware.Collections.Maze
 {
-    public interface IMazeBuilder<N, E>
+    public interface IMazeBuilder<N>
     {
-        Maze<N, E> GetMaze();
+        Maze<N> GetMaze();
     }
 }

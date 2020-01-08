@@ -5,12 +5,12 @@ using System.Text;
 
 namespace CrawfisSoftware.Collections.Maze
 {
-    public class Maze<N, E> : IIndexedGraph<N, E>, ITransposeIndexedGraph<N, E>
+    public class Maze<N> : IIndexedGraph<N, int>, ITransposeIndexedGraph<N, int>
     {
         public int Width { get { return grid.Width; } }
         public int Height {  get { return grid.Height; } }
 
-        internal Maze(Grid<N, E> grid, Direction[,] directions)
+        internal Maze(Grid<N, int> grid, Direction[,] directions)
         {
             this.grid = grid;
             this.directions = directions;
@@ -22,7 +22,7 @@ namespace CrawfisSoftware.Collections.Maze
             return directions[column, row];
         }
 
-        #region IIndexedGraph<N,E> Members
+        #region IIndexedGraph<N,int> Members
         public int NumberOfEdges
         {
             // A perfect maze is a tree which has N-1 edges.
@@ -39,7 +39,7 @@ namespace CrawfisSoftware.Collections.Maze
             get { return grid.Nodes; }
         }
 
-        public IEnumerable<IIndexedEdge<E>> Edges
+        public IEnumerable<IIndexedEdge<int>> Edges
         {
             get
             {
@@ -65,9 +65,64 @@ namespace CrawfisSoftware.Collections.Maze
             }
         }
 
-        public IEnumerable<IIndexedEdge<E>> OutEdges(int nodeIndex)
+        public IEnumerable<IIndexedEdge<int>> OutEdges(int fromNode)
         {
-            throw new NotImplementedException();
+            int toNode = fromNode + 1;
+            if (grid.ContainsEdge(fromNode, toNode))
+            {
+                int fromRow, fromColumn, toRow, toColumn;
+                grid.TryGetGridLocation(fromNode, out fromColumn, out fromRow);
+                grid.TryGetGridLocation(toNode, out toColumn, out toRow);
+                Direction dir;
+                grid.DirectionLookUp(fromColumn, fromRow, toColumn, toRow, out dir);
+                if ((directions[fromColumn, fromRow] & dir) == dir)
+                {
+                    int label = grid.GetEdgeLabel(fromNode, toNode, dir);
+                    yield return new IndexedEdge<int>(fromNode, toNode, label);
+                }
+            }
+            toNode = fromNode - 1;
+            if (grid.ContainsEdge(fromNode, toNode))
+            {
+                int fromRow, fromColumn, toRow, toColumn;
+                grid.TryGetGridLocation(fromNode, out fromColumn, out fromRow);
+                grid.TryGetGridLocation(toNode, out toColumn, out toRow);
+                Direction dir;
+                grid.DirectionLookUp(fromColumn, fromRow, toColumn, toRow, out dir);
+                if ((directions[fromColumn, fromRow] & dir) == dir)
+                {
+                    int label = grid.GetEdgeLabel(fromNode, toNode, dir);
+                    yield return new IndexedEdge<int>(fromNode, toNode, label);
+                }
+            }
+            toNode = fromNode + Width;
+            if (grid.ContainsEdge(fromNode, toNode))
+            {
+                int fromRow, fromColumn, toRow, toColumn;
+                grid.TryGetGridLocation(fromNode, out fromColumn, out fromRow);
+                grid.TryGetGridLocation(toNode, out toColumn, out toRow);
+                Direction dir;
+                grid.DirectionLookUp(fromColumn, fromRow, toColumn, toRow, out dir);
+                if ((directions[fromColumn, fromRow] & dir) == dir)
+                {
+                    int label = grid.GetEdgeLabel(fromNode, toNode, dir);
+                    yield return new IndexedEdge<int>(fromNode, toNode, label);
+                }
+            }
+            toNode = fromNode - Width;
+            if (grid.ContainsEdge(fromNode, toNode))
+            {
+                int fromRow, fromColumn, toRow, toColumn;
+                grid.TryGetGridLocation(fromNode, out fromColumn, out fromRow);
+                grid.TryGetGridLocation(toNode, out toColumn, out toRow);
+                Direction dir;
+                grid.DirectionLookUp(fromColumn, fromRow, toColumn, toRow, out dir);
+                if ((directions[fromColumn, fromRow] & dir) == dir)
+                {
+                    int label = grid.GetEdgeLabel(fromNode, toNode, dir);
+                    yield return new IndexedEdge<int>(fromNode, toNode, label);
+                }
+            }
         }
 
         public IEnumerable<int> Parents(int nodeIndex)
@@ -75,9 +130,13 @@ namespace CrawfisSoftware.Collections.Maze
             return Neighbors(nodeIndex);
         }
 
-        public IEnumerable<IIndexedEdge<E>> InEdges(int nodeIndex)
+        public IEnumerable<IIndexedEdge<int>> InEdges(int nodeIndex)
         {
-            throw new NotImplementedException();
+            return OutEdges(nodeIndex);
+            //foreach (var edge in grid.InEdges(nodeIndex))
+            //{
+            //    yield return edge;
+            //}
         }
 
         public bool ContainsEdge(int fromNode, int toNode)
@@ -95,29 +154,38 @@ namespace CrawfisSoftware.Collections.Maze
             return false;
         }
 
-        public E GetEdgeLabel(int fromNode, int toNode)
+        public int GetEdgeLabel(int fromNode, int toNode)
         {
             return grid.GetEdgeLabel(fromNode, toNode);
         }
 
-        public bool TryGetEdgeLabel(int fromNode, int toNode, out E edge)
+        public bool TryGetEdgeLabel(int fromNode, int toNode, out int edge)
         {
             if (ContainsEdge(fromNode, toNode))
             {
                 edge = GetEdgeLabel(fromNode, toNode);
                 return true;
             }
-            edge = default(E);
+            edge = default(int);
             return false;
         }
         #endregion
 
-        #region ITransposeIndexedGraph<N,E> Members
-        public IIndexedGraph<N, E> Transpose()
+        #region ITransposeIndexedGraph<N,int> Members
+        public IIndexedGraph<N, int> Transpose()
         {
-            throw new NotImplementedException();
+            // Todo: This should probably be a deep copy
+            return this;
         }
         #endregion
+
+        int UpdatedEdgeFunction(int i, int j, Direction dir)
+        {
+            int edgeValue = grid.GetEdgeLabel(i, j, dir);
+            if (!ContainsEdge(i, j))
+                edgeValue += 1000000000;
+            return edgeValue;
+        }
 
         public override string ToString()
         {
@@ -153,7 +221,7 @@ namespace CrawfisSoftware.Collections.Maze
         }
 
         #region Member variables
-        private readonly Grid<N, E> grid;
+        private readonly Grid<N, int> grid;
         Dictionary<Direction, char> graphCodes = new Dictionary<Direction, char>(16);
         private readonly Direction[,] directions;
         #endregion

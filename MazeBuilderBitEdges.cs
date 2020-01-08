@@ -3,13 +3,13 @@ using System;
 
 namespace CrawfisSoftware.Collections.Maze
 {
-    public class MazeBuilderBitEdges<N, E> : MazeBuilderAbstract<N,E>
+    public class MazeBuilderBitEdges<N> : MazeBuilderAbstract<N>
     {
-        public MazeBuilderBitEdges(int width, int height, GetGridLabel<N> nodeAccessor, GetEdgeLabel<E> edgeAccessor)
+        public MazeBuilderBitEdges(int width, int height, GetGridLabel<N> nodeAccessor, GetEdgeLabel<int> edgeAccessor)
         {
             this.width = width;
             this.height = height;
-            grid = new Grid<N, E>(width, height, nodeAccessor, edgeAccessor);
+            grid = new Grid<N, int>(width, height, nodeAccessor, edgeAccessor);
             directions = new Direction[width, height];
         }
 
@@ -53,12 +53,12 @@ namespace CrawfisSoftware.Collections.Maze
             }
             return newVBP;
         }
-        public override Maze<N, E> GetMaze()
+        public override Maze<N> GetMaze()
         {
             PassageBits(725552, 5421551);
             directions[0, 0] |= Direction.S;
             directions[width - 1, height - 1] |= Direction.E;
-            return new Maze<N, E>(grid, directions);
+            return new Maze<N>(grid, directions);
         }
     }
 }

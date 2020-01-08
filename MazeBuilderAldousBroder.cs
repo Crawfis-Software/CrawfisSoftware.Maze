@@ -5,15 +5,15 @@ using System.Linq;
 
 namespace CrawfisSoftware.Collections.Maze
 {
-    public class MazeBuilderAldousBroder<N, E> : MazeBuilderAbstract<N, E>
+    public class MazeBuilderAldousBroder<N> : MazeBuilderAbstract<N>
     {
-        public MazeBuilderAldousBroder(int width, int height, GetGridLabel<N> nodeAccessor, GetEdgeLabel<E> edgeAccessor)
+        public MazeBuilderAldousBroder(int width, int height, GetGridLabel<N> nodeAccessor, GetEdgeLabel<int> edgeAccessor)
         {
             this.width = width;
             this.height = height;
             nodeFunction = nodeAccessor;
             edgeFunction = edgeAccessor;
-            grid = new Grid<N, E>(width, height, nodeAccessor, edgeAccessor);
+            grid = new Grid<N, int>(width, height, nodeAccessor, edgeAccessor);
             directions = new Direction[width, height];
         }
         private void AldousBroder() // Random Walk, may take an infinite amount of time.
@@ -42,12 +42,12 @@ namespace CrawfisSoftware.Collections.Maze
             }
         }
 
-        public override Maze<N, E> GetMaze()
+        public override Maze<N> GetMaze()
         {
             AldousBroder();
             directions[0, 0] |= Direction.S;
             directions[width - 1, height - 1] |= Direction.E;
-            return new Maze<N, E>(grid, directions);
+            return new Maze<N>(grid, directions);
         }
     }
 }
