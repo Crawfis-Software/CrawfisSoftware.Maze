@@ -5,12 +5,8 @@ namespace CrawfisSoftware.Collections.Maze
 {
     public class MazeBuilderBitEdges<N, E> : MazeBuilderAbstract<N,E>
     {
-        public MazeBuilderBitEdges(int width, int height, GetGridLabel<N> nodeAccessor, GetEdgeLabel<E> edgeAccessor)
+        public MazeBuilderBitEdges(int width, int height, GetGridLabel<N> nodeAccessor, GetEdgeLabel<E> edgeAccessor) : base(width, height, nodeAccessor, edgeAccessor)
         {
-            this.width = width;
-            this.height = height;
-            grid = new Grid<N, E>(width, height, nodeAccessor, edgeAccessor);
-            directions = new Direction[width, height];
         }
 
         private void PassageBits(int VBP, int EBP)
@@ -53,11 +49,15 @@ namespace CrawfisSoftware.Collections.Maze
             }
             return newVBP;
         }
-        public override Maze<N, E> GetMaze()
+
+        public override void CreateMaze(bool preserveExistingCells = false)
         {
             PassageBits(725552, 5421551);
-            directions[0, 0] |= Direction.S;
-            directions[width - 1, height - 1] |= Direction.E;
+        }
+        public override Maze<N, E> GetMaze()
+        {
+            //directions[0, 0] |= Direction.S;
+            //directions[width - 1, height - 1] |= Direction.E;
             return new Maze<N, E>(grid, directions);
         }
     }

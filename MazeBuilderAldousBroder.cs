@@ -7,28 +7,34 @@ namespace CrawfisSoftware.Collections.Maze
 {
     public class MazeBuilderAldousBroder<N, E> : MazeBuilderAbstract<N, E>
     {
-        public MazeBuilderAldousBroder(int width, int height, GetGridLabel<N> nodeAccessor, GetEdgeLabel<E> edgeAccessor)
+        public MazeBuilderAldousBroder(int width, int height, GetGridLabel<N> nodeAccessor, GetEdgeLabel<E> edgeAccessor) : base(width, height, nodeAccessor, edgeAccessor)
         {
-            this.width = width;
-            this.height = height;
-            nodeFunction = nodeAccessor;
-            edgeFunction = edgeAccessor;
-            grid = new Grid<N, E>(width, height, nodeAccessor, edgeAccessor);
-            directions = new Direction[width, height];
         }
-        private void AldousBroder() // Random Walk, may take an infinite amount of time.
+        private void AldousBroder(bool preserveExistingCells = false) // Random Walk, may take an infinite amount of time.
         {
             int unvisited = grid.NumberOfNodes - 1;
             bool[] visited = new bool[grid.NumberOfNodes];
-            var randomNumber = new Random();
-            int randomCell = randomNumber.Next(grid.NumberOfNodes);
+            for (int row = 0; row < height; row++)
+            {
+                for (int column = 0; column < width; column++)
+                {
+                    int index = row * width + column;
+                    if ((directions[column, row] & Direction.Undefined) != Direction.Undefined)
+                        {
+                        visited[index] = true;
+                        unvisited--;
+                    }
+                }
+            }
+
+            int randomCell = RandomGenerator.Next(grid.NumberOfNodes);
             visited[randomCell] = true;
             while (unvisited > 0)
             {
                 List<int> neighbors = grid.Neighbors(randomCell).ToList<int>();
                 //if(neighbors.Count > 0) // Actually all grid cells have at least 2 neighbors, so no need for check.
                 {
-                    int randomNeighbor = randomNumber.Next(neighbors.Count);
+                    int randomNeighbor = RandomGenerator.Next(neighbors.Count);
                     int selectedNeighbor = neighbors[randomNeighbor];
                     //if (directionToNeighbor != (directions[row, column] & directionToNeighbor))
                     if (!visited[selectedNeighbor])
@@ -42,11 +48,15 @@ namespace CrawfisSoftware.Collections.Maze
             }
         }
 
+        public override void CreateMaze(bool preserveExistingCells = false)
+        {
+            AldousBroder(preserveExistingCells);
+        }
+
         public override Maze<N, E> GetMaze()
         {
-            AldousBroder();
-            directions[0, 0] |= Direction.S;
-            directions[width - 1, height - 1] |= Direction.E;
+            //directions[0, 0] |= Direction.S;
+            //directions[width - 1, height - 1] |= Direction.E;
             return new Maze<N, E>(grid, directions);
         }
     }
