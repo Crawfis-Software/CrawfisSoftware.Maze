@@ -113,7 +113,10 @@ namespace CrawfisSoftware.Collections.Maze
         }
 
         public abstract void CreateMaze(bool preserveExistingCells);
-        public abstract Maze<N, E> GetMaze();
+        public virtual Maze<N, E> GetMaze()
+        {
+            return new Maze<N, E>(grid, directions);
+        }
 
         #region Member variables
         protected Grid<N, E> grid;

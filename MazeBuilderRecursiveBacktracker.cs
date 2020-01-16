@@ -48,11 +48,5 @@ namespace CrawfisSoftware.Collections.Maze
             // Todo: Fix preserveExistingCells = false or throw an error
             RecursiveBackTracker(StartCell);
         }
-        public override Maze<N,E> GetMaze()
-        {
-            //directions[0, 0] |= Direction.S;
-            //directions[width - 1, height - 1] |= Direction.E;
-            return new Maze<N, E>(grid, directions);
-        }
     }
 }

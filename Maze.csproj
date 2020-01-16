@@ -42,6 +42,7 @@
     <Compile Include="MazeBuilderBitEdges.cs" />
     <Compile Include="MazeBuilderRecursiveBacktracker.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="MazeBuilderRandomWalk.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Collections\Collections.csproj">

@@ -53,11 +53,5 @@ namespace CrawfisSoftware.Collections.Maze
             AldousBroder(preserveExistingCells);
         }
 
-        public override Maze<N, E> GetMaze()
-        {
-            //directions[0, 0] |= Direction.S;
-            //directions[width - 1, height - 1] |= Direction.E;
-            return new Maze<N, E>(grid, directions);
-        }
     }
 }

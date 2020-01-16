@@ -10,7 +10,7 @@ namespace CrawfisSoftware.Collections.Maze
         public int Width { get { return grid.Width; } }
         public int Height {  get { return grid.Height; } }
 
-        internal Maze(Grid<N, E> grid, Direction[,] directions)
+        public Maze(Grid<N, E> grid, Direction[,] directions)
         {
             this.grid = grid;
             this.directions = directions;
