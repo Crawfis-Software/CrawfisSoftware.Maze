@@ -56,29 +56,16 @@ namespace CrawfisSoftware.Collections.Maze
 
         public void BlockRegion(int lowerLeftCell, int upperRightCell)
         {
-            int currentRow = lowerLeftCell / width;
-            int currentColumn = lowerLeftCell % width;
-            int endRow = upperRightCell / width;
-            int endColumn = upperRightCell % width;
-            if (currentColumn < 0 || currentColumn >= grid.Width || endColumn < 0 || endColumn >= grid.Width)
-            {
-                throw new ArgumentOutOfRangeException("Specified cell is outside of the current maze width");
-            }
-            if (currentRow < 0 || currentRow >= grid.Height || endRow < 0 || endRow >= grid.Height)
-            {
-                throw new ArgumentOutOfRangeException("Specified cell is outside of the current maze height");
-            }
-            for (int row = currentRow; row < endRow; row++)
-            {
-                for(int column = currentColumn; column < endColumn; column++)
-                {
-                    directions[column, row] = Direction.None;
-                }
-            }
+            FillRegion(lowerLeftCell, upperRightCell, Direction.None);
         }
 
 
         public void OpenRegion(int lowerLeftCell, int upperRightCell)
+        {
+            FillRegion(lowerLeftCell, upperRightCell, Direction.E | Direction.N | Direction.W | Direction.S);
+        }
+
+        public void FillRegion(int lowerLeftCell, int upperRightCell, Direction dirs)
         {
             int currentRow = lowerLeftCell / width;
             int currentColumn = lowerLeftCell % width;
@@ -96,11 +83,12 @@ namespace CrawfisSoftware.Collections.Maze
             {
                 for (int column = currentColumn; column < endColumn; column++)
                 {
-                    directions[column, row] = Direction.E | Direction.N | Direction.W | Direction.S;
+                    directions[column, row] = dirs;
                 }
             }
         }
-        private void Clear()
+
+        public void Clear()
         {
             for (int row = 0; row < height; row++)
             {
@@ -110,6 +98,14 @@ namespace CrawfisSoftware.Collections.Maze
                 }
             }
 
+        }
+
+        /// <summary>
+        /// If a Neighbor edge does not match and has Undefined as a flag, set the edge to match.
+        /// </summary>
+        public void MatchEdges()
+        {
+            throw new NotImplementedException("Too lazy to have implemented MatchEdges yet.");
         }
 
         public abstract void CreateMaze(bool preserveExistingCells);
