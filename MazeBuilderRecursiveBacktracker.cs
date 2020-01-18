@@ -14,11 +14,13 @@ namespace CrawfisSoftware.Collections.Maze
         {
             Stack<int> currentPath = new Stack<int>();
             currentPath.Push(startingNode);
+            List<int> neighbors = new List<int>(4);
+
             while (currentPath.Count > 0)
             {
                 int currentNode = currentPath.Peek();
+                neighbors.Clear();
                 // Select neighbors who have not been visited (Direction is None).
-                List<int> neighbors = new List<int>();
                 foreach (int neighbor in grid.Neighbors(currentNode))
                 {
                     int row = neighbor / width;
@@ -28,11 +30,18 @@ namespace CrawfisSoftware.Collections.Maze
                         neighbors.Add(neighbor);
                     }
                 }
-                if (neighbors.Count > 0)
+                bool pathCarved = false;
+                int nextNode = -1;
+                while (!pathCarved && neighbors.Count > 0)
                 {
                     int randomNeighbor = RandomGenerator.Next(neighbors.Count);
-                    int nextNode = neighbors[randomNeighbor];
-                    CarvePassage(currentNode, nextNode);
+                    nextNode = neighbors[randomNeighbor];
+                    pathCarved = CarvePassage(currentNode, nextNode, preserveExistingCells);
+                    // Holy crap!!! The next line changes the value of nextNode. I had it above pathCarved.
+                    neighbors.RemoveAt(randomNeighbor);
+                }
+                if (pathCarved)
+                {
                     currentPath.Push(nextNode);
                 }
                 else

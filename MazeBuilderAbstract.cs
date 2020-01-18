@@ -24,34 +24,51 @@ namespace CrawfisSoftware.Collections.Maze
             RandomGenerator = new Random();
         }
 
-        public void CarvePassage(int currentCell, int targetCell)
+        public bool CarvePassage(int currentCell, int targetCell, bool preserveExistingCells = false)
         {
             int currentRow = currentCell / width;
             int currentColumn = currentCell % width;
             int selectedRow = targetCell / width;
             int selectedColumn = targetCell % width;
+            bool cellsCanBeModified = true;
+            if (preserveExistingCells)
+            {
+                cellsCanBeModified = (directions[currentColumn, currentRow] & Direction.Undefined) == Direction.Undefined;
+                cellsCanBeModified &= (directions[selectedColumn, selectedRow] & Direction.Undefined) == Direction.Undefined;
+            }
             Direction directionToNeighbor, directionToCurrent;
-            if (grid.DirectionLookUp(currentCell, targetCell, out directionToNeighbor))
+            if (cellsCanBeModified && grid.DirectionLookUp(currentCell, targetCell, out directionToNeighbor))
             {
                 directions[currentColumn, currentRow] |= directionToNeighbor;
                 if (grid.DirectionLookUp(targetCell, currentCell, out directionToCurrent))
+                {
                     directions[selectedColumn, selectedRow] |= directionToCurrent;
+                    return true;
+                }
             }
+            return false;
         }
 
-        public void AddWall(int currentCell, int targetCell)
+        public bool AddWall(int currentCell, int targetCell, bool preserveExistingCells = false)
         {
             int currentRow = currentCell / width;
             int currentColumn = currentCell % width;
             int selectedRow = targetCell / width;
             int selectedColumn = targetCell % width;
+            bool cellsCanBeModified = !preserveExistingCells;
+            cellsCanBeModified &= directions[currentColumn, currentRow] == (directions[currentColumn, currentRow] & Direction.Undefined);
+            cellsCanBeModified &= directions[selectedColumn, selectedRow] == (directions[selectedColumn, selectedRow] & Direction.Undefined);
             Direction directionToNeighbor, directionToCurrent;
             if (grid.DirectionLookUp(currentCell, targetCell, out directionToNeighbor))
             {
                 directions[currentColumn, currentRow] &= ~directionToNeighbor;
                 if (grid.DirectionLookUp(targetCell, currentCell, out directionToCurrent))
+                {
                     directions[selectedColumn, selectedRow] &= ~directionToCurrent;
+                    return true;
+                }
             }
+            return false;
         }
 
         public void BlockRegion(int lowerLeftCell, int upperRightCell)
