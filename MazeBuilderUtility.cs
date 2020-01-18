@@ -11,11 +11,39 @@ namespace CrawfisSoftware.Collections.Maze
     {
         public static Maze<N, E> CreateMazeFromCSVFile(string filename, GetGridLabel<N> nodeAccessor, GetEdgeLabel<E> edgeAccessor)
         {
+            int width, height;
+            List<Direction> directions;
+            ReadCSVFile(filename, out width, out height, out directions);
+            return CreateMaze(width, height, directions, nodeAccessor, edgeAccessor);
+        }
+        public static Maze<int,int> CreateMaze(int width, int height, List<Direction> directions)
+        {
+            return MazeBuilderUtility<int,int>.CreateMaze(width, height, directions, DummyNodeValues, DummyEdgeValues);
+        }
+        public static Maze<N, E> CreateMaze(int width, int height, List<Direction> directions, GetGridLabel<N> nodeAccessor, GetEdgeLabel<E> edgeAccessor)
+        {
+            var mazeBuilder = new MazeBuilderExplicit<N, E>(width, height, nodeAccessor, edgeAccessor);
+            int i = 0;
+            int j = 0;
+            foreach (var dir in directions)
+            {
+                mazeBuilder.SetCell(i, j, dir);
+                i++;
+                if (i >= width)
+                {
+                    i = 0;
+                    j++;
+                }
+            }
+            return mazeBuilder.GetMaze();
+        }
+
+        public static void ReadCSVFile(string filename, out int width, out int height, out List<Direction> directions)
+        {
             // Read in CSV file,
             // Send array to a MazeBuild
             // Get Maze and return it.
-            int width, height;
-            List<Direction> directions = new List<Direction>();
+            directions = new List<Direction>();
             using (var file = new StreamReader(filename))
             {
                 string row = file.ReadLine();
@@ -32,6 +60,7 @@ namespace CrawfisSoftware.Collections.Maze
                     }
                     else
                     {
+                        // Note: Undefined could also be the value of 16.
                         directions.Add(Direction.Undefined);
                     }
                 }
@@ -42,41 +71,36 @@ namespace CrawfisSoftware.Collections.Maze
                     cells = row.Split(',');
                     foreach (var cell in cells)
                     {
-                        int cellValue = Int32.Parse(cell);
-                        if (cellValue >= 0)
+                        Direction dir;
+                        bool invalidInput = false;
+                        if (Enum.TryParse(cell, true, out dir))
                         {
-                            // Parse will only throw an exception if using strings (e.g. "N,NW"), not numbers (e.g, 16).
-                            Direction dir = (Direction)Enum.Parse(typeof(Direction), cell);
-                            if (!Enum.IsDefined(typeof(Direction), dir))
+                            // Parse will only return false if there is an invalid string (e.g. "N,NW"), not an invalid number (e.g, 234).
+                            if (Enum.IsDefined(typeof(Direction), dir) | dir.ToString().Contains(","))
                             {
-                                string error = string.Format("The value {0} being read in the CSV file {1} is not a valid set of Directions", dir, filename);
-                                throw new InvalidCastException(error);
+                                directions.Add(dir);
                             }
-                            directions.Add(dir);
+                            else
+                            {
+                                invalidInput = true;
+                            }
                         }
                         else
                         {
+                            invalidInput = true;
+                        }
+                        if (invalidInput)
+                        {
+                            //string error = string.Format("The value {0} being read in the CSV file {1} is not a valid set of Directions", dir, filename);
+                            //throw new InvalidCastException(error);
                             directions.Add(Direction.Undefined);
                         }
                     }
                     row = file.ReadLine();
                 }
             }
-            var mazeBuilder = new MazeBuilderExplicit<N, E>(width, height, nodeAccessor, edgeAccessor);
-            int i = 0;
-            int j = 0;
-            foreach (var dir in directions)
-            {
-                mazeBuilder.SetCell(i, j, dir);
-                i++;
-                if (i >= width)
-                {
-                    i = 0;
-                    j++;
-                }
-            }
-            return mazeBuilder.GetMaze();
         }
+
         public static int DummyNodeValues(int i, int j)
         {
             return 1;
