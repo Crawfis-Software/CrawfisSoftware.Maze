@@ -24,12 +24,8 @@ namespace CrawfisSoftware.Collections.Maze
             RandomGenerator = new Random();
         }
 
-        public bool CarvePassage(int currentCell, int targetCell, bool preserveExistingCells = false)
+        public bool CarvePassage(int currentColumn, int currentRow, int selectedColumn, int selectedRow, bool preserveExistingCells = false)
         {
-            int currentRow = currentCell / width;
-            int currentColumn = currentCell % width;
-            int selectedRow = targetCell / width;
-            int selectedColumn = targetCell % width;
             bool cellsCanBeModified = true;
             if (preserveExistingCells)
             {
@@ -37,16 +33,24 @@ namespace CrawfisSoftware.Collections.Maze
                 cellsCanBeModified &= (directions[selectedColumn, selectedRow] & Direction.Undefined) == Direction.Undefined;
             }
             Direction directionToNeighbor, directionToCurrent;
-            if (cellsCanBeModified && grid.DirectionLookUp(currentCell, targetCell, out directionToNeighbor))
+            if (cellsCanBeModified && grid.DirectionLookUp(currentColumn,currentRow,selectedColumn, selectedRow, out directionToNeighbor))
             {
                 directions[currentColumn, currentRow] |= directionToNeighbor;
-                if (grid.DirectionLookUp(targetCell, currentCell, out directionToCurrent))
+                if (grid.DirectionLookUp(currentColumn, currentRow, selectedColumn, selectedRow, out directionToCurrent))
                 {
                     directions[selectedColumn, selectedRow] |= directionToCurrent;
                     return true;
                 }
             }
             return false;
+        }
+            public bool CarvePassage(int currentCell, int targetCell, bool preserveExistingCells = false)
+            {
+            int currentRow = currentCell / width;
+            int currentColumn = currentCell % width;
+            int selectedRow = targetCell / width;
+            int selectedColumn = targetCell % width;
+            return CarvePassage(currentColumn, currentRow, selectedColumn, selectedRow, preserveExistingCells);
         }
 
         public bool AddWall(int currentCell, int targetCell, bool preserveExistingCells = false)
@@ -55,14 +59,19 @@ namespace CrawfisSoftware.Collections.Maze
             int currentColumn = currentCell % width;
             int selectedRow = targetCell / width;
             int selectedColumn = targetCell % width;
+            return AddWall(currentRow, currentColumn, selectedRow, selectedColumn, preserveExistingCells);
+        }
+
+        private bool AddWall(int currentRow, int currentColumn, int selectedRow, int selectedColumn, bool preserveExistingCells = false)
+        {
             bool cellsCanBeModified = !preserveExistingCells;
             cellsCanBeModified &= directions[currentColumn, currentRow] == (directions[currentColumn, currentRow] & Direction.Undefined);
             cellsCanBeModified &= directions[selectedColumn, selectedRow] == (directions[selectedColumn, selectedRow] & Direction.Undefined);
             Direction directionToNeighbor, directionToCurrent;
-            if (grid.DirectionLookUp(currentCell, targetCell, out directionToNeighbor))
+            if (grid.DirectionLookUp(currentColumn, currentRow, selectedColumn, selectedRow, out directionToNeighbor))
             {
                 directions[currentColumn, currentRow] &= ~directionToNeighbor;
-                if (grid.DirectionLookUp(targetCell, currentCell, out directionToCurrent))
+                if (grid.DirectionLookUp(currentColumn, currentRow, selectedColumn, selectedRow, out directionToCurrent))
                 {
                     directions[selectedColumn, selectedRow] &= ~directionToCurrent;
                     return true;
@@ -117,12 +126,55 @@ namespace CrawfisSoftware.Collections.Maze
 
         }
 
+        public void MakeConsistent()
+        {
+            MakeConsistent(width+1, width * height - 1 - width - 1);
+        }
         /// <summary>
         /// If a Neighbor edge does not match and has Undefined as a flag, set the edge to match.
         /// </summary>
-        public void MatchEdges()
+        public void MakeConsistent(int lowerLeftCell, int upperRightCell)
         {
-            throw new NotImplementedException("Too lazy to have implemented MatchEdges yet.");
+            int currentRow = lowerLeftCell / width;
+            int currentColumn = lowerLeftCell % width;
+            int endRow = upperRightCell / width;
+            int endColumn = upperRightCell % width;
+            if (currentColumn < 0 || currentColumn >= grid.Width || endColumn < 0 || endColumn >= grid.Width)
+            {
+                throw new ArgumentOutOfRangeException("Specified cell is outside of the current maze width");
+            }
+            if (currentRow < 0 || currentRow >= grid.Height || endRow < 0 || endRow >= grid.Height)
+            {
+                throw new ArgumentOutOfRangeException("Specified cell is outside of the current maze height");
+            }
+            for (int row = currentRow; row < endRow; row++)
+            {
+                for (int column = currentColumn; column < endColumn; column++)
+                {
+                    Direction dir = directions[column, row];
+                    Direction dirWest = directions[column - 1, row];
+                    Direction dirNorth = directions[column, row + 1];
+                    Direction dirEast = directions[column + 1, row];
+                    Direction dirSouth = directions[column, row - 1];
+                    if ((dir & Direction.W) == Direction.W)
+                            directions[column - 1, row] |= Direction.E;
+                    else
+                        directions[column - 1, row] &= ~Direction.E;
+                    if ((dir & Direction.N) == Direction.N)
+                        directions[column, row+1] |= Direction.N;
+                    else
+                        directions[column, row+1] &= ~Direction.N;
+                    if ((dir & Direction.E) == Direction.E)
+                        directions[column + 1, row] |= Direction.W;
+                    else
+                        directions[column + 1, row] &= ~Direction.W;
+                    if ((dir & Direction.S) == Direction.S)
+                        directions[column, row-1] |= Direction.N;
+                    else
+                        directions[column, row-1] &= ~Direction.N;
+                }
+            }
+
         }
 
         public abstract void CreateMaze(bool preserveExistingCells);

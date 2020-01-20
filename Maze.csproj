@@ -34,6 +34,7 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="DungeonMakeBuilder.cs" />
     <Compile Include="IMazeBuilder.cs" />
     <Compile Include="Maze.cs" />
     <Compile Include="MazeBuilderAbstract.cs" />
