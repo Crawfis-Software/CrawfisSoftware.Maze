@@ -36,7 +36,7 @@ namespace CrawfisSoftware.Collections.Maze
             if (cellsCanBeModified && grid.DirectionLookUp(currentColumn,currentRow,selectedColumn, selectedRow, out directionToNeighbor))
             {
                 directions[currentColumn, currentRow] |= directionToNeighbor;
-                if (grid.DirectionLookUp(currentColumn, currentRow, selectedColumn, selectedRow, out directionToCurrent))
+                if (grid.DirectionLookUp(selectedColumn, selectedRow, currentColumn, currentRow, out directionToCurrent))
                 {
                     directions[selectedColumn, selectedRow] |= directionToCurrent;
                     return true;

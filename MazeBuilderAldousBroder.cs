@@ -32,7 +32,7 @@ namespace CrawfisSoftware.Collections.Maze
             while (unvisited > 0)
             {
                 List<int> neighbors = grid.Neighbors(randomCell).ToList<int>();
-                //if(neighbors.Count > 0) // Actually all grid cells have at least 2 neighbors, so no need for check.
+                //if(neighbors.Count > 0) // Actually all grid cells have at least 1 neighbor, so no need for check.
                 {
                     int randomNeighbor = RandomGenerator.Next(neighbors.Count);
                     int selectedNeighbor = neighbors[randomNeighbor];
