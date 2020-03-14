@@ -1,13 +1,9 @@
 ﻿using CrawfisSoftware.Collections.Graph;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CrawfisSoftware.Collections.Maze
 {
-    public abstract class MazeBuilderAbstract<N,E> : IMazeBuilder<N,E>
+    public abstract class MazeBuilderAbstract<N, E> : IMazeBuilder<N, E>
     {
         public int StartCell { get; set; }
         public int EndCell { get; set; }
@@ -33,7 +29,7 @@ namespace CrawfisSoftware.Collections.Maze
                 cellsCanBeModified &= (directions[selectedColumn, selectedRow] & Direction.Undefined) == Direction.Undefined;
             }
             Direction directionToNeighbor, directionToCurrent;
-            if (cellsCanBeModified && grid.DirectionLookUp(currentColumn,currentRow,selectedColumn, selectedRow, out directionToNeighbor))
+            if (cellsCanBeModified && grid.DirectionLookUp(currentColumn, currentRow, selectedColumn, selectedRow, out directionToNeighbor))
             {
                 directions[currentColumn, currentRow] |= directionToNeighbor;
                 if (grid.DirectionLookUp(selectedColumn, selectedRow, currentColumn, currentRow, out directionToCurrent))
@@ -44,8 +40,8 @@ namespace CrawfisSoftware.Collections.Maze
             }
             return false;
         }
-            public bool CarvePassage(int currentCell, int targetCell, bool preserveExistingCells = false)
-            {
+        public bool CarvePassage(int currentCell, int targetCell, bool preserveExistingCells = false)
+        {
             int currentRow = currentCell / width;
             int currentColumn = currentCell % width;
             int selectedRow = targetCell / width;
@@ -128,7 +124,7 @@ namespace CrawfisSoftware.Collections.Maze
 
         public void MakeConsistent()
         {
-            MakeConsistent(width+1, width * height - 1 - width - 1);
+            MakeConsistent(width + 1, width * height - 1 - width - 1);
         }
         /// <summary>
         /// If a Neighbor edge does not match and has Undefined as a flag, set the edge to match.
@@ -157,21 +153,21 @@ namespace CrawfisSoftware.Collections.Maze
                     Direction dirEast = directions[column + 1, row];
                     Direction dirSouth = directions[column, row - 1];
                     if ((dir & Direction.W) == Direction.W)
-                            directions[column - 1, row] |= Direction.E;
+                        directions[column - 1, row] |= Direction.E;
                     else
                         directions[column - 1, row] &= ~Direction.E;
                     if ((dir & Direction.N) == Direction.N)
-                        directions[column, row+1] |= Direction.N;
+                        directions[column, row + 1] |= Direction.N;
                     else
-                        directions[column, row+1] &= ~Direction.N;
+                        directions[column, row + 1] &= ~Direction.N;
                     if ((dir & Direction.E) == Direction.E)
                         directions[column + 1, row] |= Direction.W;
                     else
                         directions[column + 1, row] &= ~Direction.W;
                     if ((dir & Direction.S) == Direction.S)
-                        directions[column, row-1] |= Direction.N;
+                        directions[column, row - 1] |= Direction.N;
                     else
-                        directions[column, row-1] &= ~Direction.N;
+                        directions[column, row - 1] &= ~Direction.N;
                 }
             }
 

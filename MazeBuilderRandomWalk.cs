@@ -8,19 +8,19 @@ namespace CrawfisSoftware.Collections.Maze
     /// </summary>
     /// <typeparam name="N"></typeparam>
     /// <typeparam name="E"></typeparam>
-    public class MazeBuilderRandomWalk<N,E> : MazeBuilderAbstract<N,E>
+    public class MazeBuilderRandomWalk<N, E> : MazeBuilderAbstract<N, E>
     {
         // Having Walker in a seperate class allows for multiple walkers. Need to make this thread safe though.
         private class Walker
         {
-            private MazeBuilderRandomWalk<N,E> mazeBuilder;
+            private MazeBuilderRandomWalk<N, E> mazeBuilder;
             public int currentCell;
             private System.Random random;
             private bool preserveExistingCells;
             private bool favorForwardCarving;
             private int[] nextCellIncrement;
             private int lastMove;
-            public void StartWalker(MazeBuilderRandomWalk<N,E> mazeBuilder, int cell, bool preserveExistingCells, bool favorForwardCarving, System.Random random)
+            public void StartWalker(MazeBuilderRandomWalk<N, E> mazeBuilder, int cell, bool preserveExistingCells, bool favorForwardCarving, System.Random random)
             {
                 this.mazeBuilder = mazeBuilder;
                 currentCell = cell;
@@ -115,7 +115,7 @@ namespace CrawfisSoftware.Collections.Maze
             {
                 Clear();
             }
-            numberOfNewPassages = (int) (PercentToCarve * grid.NumberOfEdges);
+            numberOfNewPassages = (int)(PercentToCarve * grid.NumberOfEdges);
             this.preserveExistingCells = preserveExistingCells;
             InitializeWalkers();
         }
@@ -142,15 +142,15 @@ namespace CrawfisSoftware.Collections.Maze
         {
             while (true)
             {
-                foreach(var walker in walkers)
+                foreach (var walker in walkers)
                 {
                     walker.Update();
                     if (numberOfCarvedPassages < numberOfNewPassages && numberOfSteps < MaxWalkingDistance)
                         continue;
                     return;
                 }
-                if((walkers.Count < NumberOfWalkers) && (this.RandomGenerator.NextDouble() < ChanceNewWalker))
-                    {
+                if ((walkers.Count < NumberOfWalkers) && (this.RandomGenerator.NextDouble() < ChanceNewWalker))
+                {
                     Walker newWalker = new Walker();
                     int startCell = walkers[RandomGenerator.Next(walkers.Count)].currentCell;
                     newWalker.StartWalker(this, startCell, preserveExistingCells, favorForwardCarving, this.RandomGenerator);

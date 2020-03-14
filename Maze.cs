@@ -1,5 +1,4 @@
 ﻿using CrawfisSoftware.Collections.Graph;
-using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -8,7 +7,7 @@ namespace CrawfisSoftware.Collections.Maze
     public class Maze<N, E> : IIndexedGraph<N, E>, ITransposeIndexedGraph<N, E>
     {
         public int Width { get { return grid.Width; } }
-        public int Height {  get { return grid.Height; } }
+        public int Height { get { return grid.Height; } }
 
         public Maze(Grid<N, E> grid, Direction[,] directions)
         {
@@ -67,9 +66,9 @@ namespace CrawfisSoftware.Collections.Maze
 
         public IEnumerable<IIndexedEdge<E>> OutEdges(int nodeIndex)
         {
-            foreach(var outEdge in grid.OutEdges(nodeIndex))
+            foreach (var outEdge in grid.OutEdges(nodeIndex))
             {
-                if( ContainsEdge(outEdge.From, outEdge.To))
+                if (ContainsEdge(outEdge.From, outEdge.To))
                 {
                     yield return outEdge;
                 }
