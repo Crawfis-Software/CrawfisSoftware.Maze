@@ -1,9 +1,8 @@
 ﻿using CrawfisSoftware.Collections.Graph;
-using System;
 
 namespace CrawfisSoftware.Collections.Maze
 {
-    public class MazeBuilderBinaryTree<N, E> : MazeBuilderAbstract<N,E>
+    public class MazeBuilderBinaryTree<N, E> : MazeBuilderAbstract<N, E>
     {
         public MazeBuilderBinaryTree(int width, int height, GetGridLabel<N> nodeAccessor, GetEdgeLabel<E> edgeAccessor) : base(width, height, nodeAccessor, edgeAccessor)
         {

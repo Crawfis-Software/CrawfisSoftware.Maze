@@ -1,9 +1,6 @@
 ﻿using CrawfisSoftware.Collections.Graph;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CrawfisSoftware.Collections.Maze
 {
@@ -30,7 +27,7 @@ namespace CrawfisSoftware.Collections.Maze
         private int minRoomDistance = 2;
         private int maxNumberOfTrys = 100000;
 
-        public DungeonMakeBuilder(int width, int height, GetGridLabel<N> nodeAccessor, GetEdgeLabel<E> edgeAccessor) 
+        public DungeonMakeBuilder(int width, int height, GetGridLabel<N> nodeAccessor, GetEdgeLabel<E> edgeAccessor)
             : base(width, height, nodeAccessor, edgeAccessor)
         {
             this.width = width;
@@ -180,11 +177,11 @@ namespace CrawfisSoftware.Collections.Maze
             int u2 = u1 + room2.width;
             int v1 = room2.minY;
             int v2 = v1 + room2.height;
-            if(x2 < u1)
+            if (x2 < u1)
             {
                 xDistance = u1 - x2;
             }
-            else if(u2 < x1)
+            else if (u2 < x1)
             {
                 xDistance = x1 - u2;
             }

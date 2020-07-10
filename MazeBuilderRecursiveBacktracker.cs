@@ -1,10 +1,9 @@
 ﻿using CrawfisSoftware.Collections.Graph;
-using System;
 using System.Collections.Generic;
 
 namespace CrawfisSoftware.Collections.Maze
 {
-    public class MazeBuilderRecursiveBacktracker<N, E> : MazeBuilderAbstract<N,E>
+    public class MazeBuilderRecursiveBacktracker<N, E> : MazeBuilderAbstract<N, E>
     {
         public MazeBuilderRecursiveBacktracker(int width, int height, GetGridLabel<N> nodeAccessor, GetEdgeLabel<E> edgeAccessor) : base(width, height, nodeAccessor, edgeAccessor)
         {

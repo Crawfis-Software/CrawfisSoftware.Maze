@@ -1,13 +1,11 @@
 ﻿using CrawfisSoftware.Collections.Graph;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.IO;
-using System.Threading.Tasks;
 
 namespace CrawfisSoftware.Collections.Maze
 {
-    public static class MazeBuilderUtility<N,E>
+    public static class MazeBuilderUtility<N, E>
     {
         public static Maze<N, E> CreateMazeFromCSVFile(string filename, GetGridLabel<N> nodeAccessor, GetEdgeLabel<E> edgeAccessor)
         {
@@ -23,11 +21,11 @@ namespace CrawfisSoftware.Collections.Maze
             Direction[,] directionGrid = new Direction[width, height];
             int row = height - 1;
             int column = 0;
-            foreach(Direction dir in directions)
+            foreach (Direction dir in directions)
             {
                 directionGrid[column, row] = dir;
                 column++;
-                if(column>=width)
+                if (column >= width)
                 {
                     column = 0;
                     row--;
@@ -36,9 +34,9 @@ namespace CrawfisSoftware.Collections.Maze
             return directionGrid;
         }
 
-        public static Maze<int,int> CreateMaze(int width, int height, List<Direction> directions)
+        public static Maze<int, int> CreateMaze(int width, int height, List<Direction> directions)
         {
-            return MazeBuilderUtility<int,int>.CreateMaze(width, height, directions, DummyNodeValues, DummyEdgeValues);
+            return MazeBuilderUtility<int, int>.CreateMaze(width, height, directions, DummyNodeValues, DummyEdgeValues);
         }
         public static Maze<N, E> CreateMaze(int width, int height, List<Direction> directions, GetGridLabel<N> nodeAccessor, GetEdgeLabel<E> edgeAccessor)
         {
@@ -66,7 +64,7 @@ namespace CrawfisSoftware.Collections.Maze
             {
                 for (int j = 0; j < height; j++)
                 {
-                    mazeBuilder.SetCell(i, j, directions[i,j]);
+                    mazeBuilder.SetCell(i, j, directions[i, j]);
                 }
             }
             return mazeBuilder.GetMaze();

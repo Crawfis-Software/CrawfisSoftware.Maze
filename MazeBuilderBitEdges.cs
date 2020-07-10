@@ -3,7 +3,7 @@ using System;
 
 namespace CrawfisSoftware.Collections.Maze
 {
-    public class MazeBuilderBitEdges<N, E> : MazeBuilderAbstract<N,E>
+    public class MazeBuilderBitEdges<N, E> : MazeBuilderAbstract<N, E>
     {
         public MazeBuilderBitEdges(int width, int height, GetGridLabel<N> nodeAccessor, GetEdgeLabel<E> edgeAccessor) : base(width, height, nodeAccessor, edgeAccessor)
         {

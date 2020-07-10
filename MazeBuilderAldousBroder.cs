@@ -1,5 +1,4 @@
 ﻿using CrawfisSoftware.Collections.Graph;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -20,7 +19,7 @@ namespace CrawfisSoftware.Collections.Maze
                 {
                     int index = row * width + column;
                     if ((directions[column, row] & Direction.Undefined) != Direction.Undefined)
-                        {
+                    {
                         visited[index] = true;
                         unvisited--;
                     }
