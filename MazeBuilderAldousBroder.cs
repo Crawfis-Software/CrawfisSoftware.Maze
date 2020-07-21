@@ -13,11 +13,11 @@ namespace CrawfisSoftware.Collections.Maze
         {
             int unvisited = grid.NumberOfNodes - 1;
             bool[] visited = new bool[grid.NumberOfNodes];
-            for (int row = 0; row < height; row++)
+            for (int row = 0; row < Height; row++)
             {
-                for (int column = 0; column < width; column++)
+                for (int column = 0; column < Width; column++)
                 {
-                    int index = row * width + column;
+                    int index = row * Width + column;
                     if ((directions[column, row] & Direction.Undefined) != Direction.Undefined)
                     {
                         visited[index] = true;

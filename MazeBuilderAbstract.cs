@@ -8,10 +8,13 @@ namespace CrawfisSoftware.Collections.Maze
         public int StartCell { get; set; }
         public int EndCell { get; set; }
         public System.Random RandomGenerator { get; set; }
+        public int Width { get; protected set; }
+        public int Height { get; protected set; }
+
         public MazeBuilderAbstract(int width, int height, GetGridLabel<N> nodeAccessor, GetEdgeLabel<E> edgeAccessor)
         {
-            this.width = width;
-            this.height = height;
+            this.Width = width;
+            this.Height = height;
             nodeFunction = nodeAccessor;
             edgeFunction = edgeAccessor;
             grid = new Grid<N, E>(width, height, nodeAccessor, edgeAccessor);
@@ -42,19 +45,19 @@ namespace CrawfisSoftware.Collections.Maze
         }
         public bool CarvePassage(int currentCell, int targetCell, bool preserveExistingCells = false)
         {
-            int currentRow = currentCell / width;
-            int currentColumn = currentCell % width;
-            int selectedRow = targetCell / width;
-            int selectedColumn = targetCell % width;
+            int currentRow = currentCell / Width;
+            int currentColumn = currentCell % Width;
+            int selectedRow = targetCell / Width;
+            int selectedColumn = targetCell % Width;
             return CarvePassage(currentColumn, currentRow, selectedColumn, selectedRow, preserveExistingCells);
         }
 
         public bool AddWall(int currentCell, int targetCell, bool preserveExistingCells = false)
         {
-            int currentRow = currentCell / width;
-            int currentColumn = currentCell % width;
-            int selectedRow = targetCell / width;
-            int selectedColumn = targetCell % width;
+            int currentRow = currentCell / Width;
+            int currentColumn = currentCell % Width;
+            int selectedRow = targetCell / Width;
+            int selectedColumn = targetCell % Width;
             return AddWall(currentRow, currentColumn, selectedRow, selectedColumn, preserveExistingCells);
         }
 
@@ -89,10 +92,10 @@ namespace CrawfisSoftware.Collections.Maze
 
         public void FillRegion(int lowerLeftCell, int upperRightCell, Direction dirs)
         {
-            int currentRow = lowerLeftCell / width;
-            int currentColumn = lowerLeftCell % width;
-            int endRow = upperRightCell / width;
-            int endColumn = upperRightCell % width;
+            int currentRow = lowerLeftCell / Width;
+            int currentColumn = lowerLeftCell % Width;
+            int endRow = upperRightCell / Width;
+            int endColumn = upperRightCell % Width;
             if (currentColumn < 0 || currentColumn >= grid.Width || endColumn < 0 || endColumn >= grid.Width)
             {
                 throw new ArgumentOutOfRangeException("Specified cell is outside of the current maze width");
@@ -112,9 +115,9 @@ namespace CrawfisSoftware.Collections.Maze
 
         public void Clear()
         {
-            for (int row = 0; row < height; row++)
+            for (int row = 0; row < Height; row++)
             {
-                for (int column = 0; column < width; column++)
+                for (int column = 0; column < Width; column++)
                 {
                     directions[column, row] = Direction.Undefined;
                 }
@@ -124,17 +127,17 @@ namespace CrawfisSoftware.Collections.Maze
 
         public void MakeConsistent()
         {
-            MakeConsistent(width + 1, width * height - 1 - width - 1);
+            MakeConsistent(Width + 1, Width * Height - 1 - Width - 1);
         }
         /// <summary>
         /// If a Neighbor edge does not match and has Undefined as a flag, set the edge to match.
         /// </summary>
         public void MakeConsistent(int lowerLeftCell, int upperRightCell)
         {
-            int currentRow = lowerLeftCell / width;
-            int currentColumn = lowerLeftCell % width;
-            int endRow = upperRightCell / width;
-            int endColumn = upperRightCell % width;
+            int currentRow = lowerLeftCell / Width;
+            int currentColumn = lowerLeftCell % Width;
+            int endRow = upperRightCell / Width;
+            int endColumn = upperRightCell % Width;
             if (currentColumn < 0 || currentColumn >= grid.Width || endColumn < 0 || endColumn >= grid.Width)
             {
                 throw new ArgumentOutOfRangeException("Specified cell is outside of the current maze width");
@@ -181,8 +184,6 @@ namespace CrawfisSoftware.Collections.Maze
 
         #region Member variables
         protected Grid<N, E> grid;
-        protected int width;
-        protected int height;
         protected GetGridLabel<N> nodeFunction;
         protected GetEdgeLabel<E> edgeFunction;
         protected Direction[,] directions;

@@ -23,22 +23,22 @@ namespace CrawfisSoftware.Collections.Maze
                 {
                     bool moveEast = RandomGenerator.Next(maxRandomValue) < threshold;
                     bool eastBorder = false;
-                    if (column >= width - 1) eastBorder = true;
+                    if (column >= Width - 1) eastBorder = true;
                     moveEast &= !eastBorder;
                     if (moveEast)
                     {
                         directions[column, row] |= Direction.E;
-                        if (column + 1 <= width - 1) directions[column + 1, row] |= Direction.W;
+                        if (column + 1 <= Width - 1) directions[column + 1, row] |= Direction.W;
                     }
-                    else if (row < height - 1)
+                    else if (row < Height - 1)
                     {
                         directions[column, row] |= Direction.N;
                         directions[column, row + 1] |= Direction.S;
                     }
-                    else if ((row == height - 1) && !eastBorder)
+                    else if ((row == Height - 1) && !eastBorder)
                     {
                         directions[column, row] |= Direction.E;
-                        if (column + 1 <= width - 1) directions[column + 1, row] |= Direction.W;
+                        if (column + 1 <= Width - 1) directions[column + 1, row] |= Direction.W;
                     }
                 }
             }
