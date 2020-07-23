@@ -13,8 +13,8 @@ namespace CrawfisSoftware.Collections.Maze
         {
             this.grid = grid;
             this.directions = directions;
-            directions[0, 0] |= Direction.S;
-            directions[grid.Width - 1, grid.Height - 1] |= Direction.E;
+            //directions[0, 0] |= Direction.S;
+            //directions[grid.Width - 1, grid.Height - 1] |= Direction.E;
         }
         public Direction GetDirection(int column, int row)
         {
