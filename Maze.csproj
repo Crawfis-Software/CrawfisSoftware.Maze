@@ -42,6 +42,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="DungeonMakeBuilder.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="IMazeBuilder.cs" />
     <Compile Include="Maze.cs" />
     <Compile Include="MazeBuilderAbstract.cs" />

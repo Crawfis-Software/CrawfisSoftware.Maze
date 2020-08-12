@@ -23,6 +23,11 @@ namespace CrawfisSoftware.Collections.Maze
             RandomGenerator = new Random();
         }
 
+        public void CarveDirectionally(int currentColumn, int currentRow, Direction directionsToCarve)
+        {
+            directions[currentColumn, currentRow] |= directionsToCarve;
+        }
+
         public bool CarvePassage(int currentColumn, int currentRow, int selectedColumn, int selectedRow, bool preserveExistingCells = false)
         {
             bool cellsCanBeModified = true;
@@ -31,11 +36,11 @@ namespace CrawfisSoftware.Collections.Maze
                 cellsCanBeModified = (directions[currentColumn, currentRow] & Direction.Undefined) == Direction.Undefined;
                 cellsCanBeModified &= (directions[selectedColumn, selectedRow] & Direction.Undefined) == Direction.Undefined;
             }
-            Direction directionToNeighbor, directionToCurrent;
-            if (cellsCanBeModified && grid.DirectionLookUp(currentColumn, currentRow, selectedColumn, selectedRow, out directionToNeighbor))
+            //Direction directionToNeighbor, directionToCurrent;
+            if (cellsCanBeModified && grid.DirectionLookUp(currentColumn, currentRow, selectedColumn, selectedRow, out Direction directionToNeighbor))
             {
                 directions[currentColumn, currentRow] |= directionToNeighbor;
-                if (grid.DirectionLookUp(selectedColumn, selectedRow, currentColumn, currentRow, out directionToCurrent))
+                if (grid.DirectionLookUp(selectedColumn, selectedRow, currentColumn, currentRow, out Direction directionToCurrent))
                 {
                     directions[selectedColumn, selectedRow] |= directionToCurrent;
                     return true;
@@ -63,14 +68,16 @@ namespace CrawfisSoftware.Collections.Maze
 
         private bool AddWall(int currentRow, int currentColumn, int selectedRow, int selectedColumn, bool preserveExistingCells = false)
         {
-            bool cellsCanBeModified = !preserveExistingCells;
-            cellsCanBeModified &= directions[currentColumn, currentRow] == (directions[currentColumn, currentRow] & Direction.Undefined);
-            cellsCanBeModified &= directions[selectedColumn, selectedRow] == (directions[selectedColumn, selectedRow] & Direction.Undefined);
-            Direction directionToNeighbor, directionToCurrent;
-            if (grid.DirectionLookUp(currentColumn, currentRow, selectedColumn, selectedRow, out directionToNeighbor))
+            bool cellsCanBeModified = true;
+            if (preserveExistingCells)
+            {
+                cellsCanBeModified = (directions[currentColumn, currentRow] & Direction.Undefined) == Direction.Undefined;
+                cellsCanBeModified &= (directions[selectedColumn, selectedRow] & Direction.Undefined) == Direction.Undefined;
+            }
+            if (cellsCanBeModified && grid.DirectionLookUp(currentColumn, currentRow, selectedColumn, selectedRow, out Direction directionToNeighbor))
             {
                 directions[currentColumn, currentRow] &= ~directionToNeighbor;
-                if (grid.DirectionLookUp(currentColumn, currentRow, selectedColumn, selectedRow, out directionToCurrent))
+                if (grid.DirectionLookUp(currentColumn, currentRow, selectedColumn, selectedRow, out Direction directionToCurrent))
                 {
                     directions[selectedColumn, selectedRow] &= ~directionToCurrent;
                     return true;
@@ -151,10 +158,6 @@ namespace CrawfisSoftware.Collections.Maze
                 for (int column = currentColumn; column < endColumn; column++)
                 {
                     Direction dir = directions[column, row];
-                    Direction dirWest = directions[column - 1, row];
-                    Direction dirNorth = directions[column, row + 1];
-                    Direction dirEast = directions[column + 1, row];
-                    Direction dirSouth = directions[column, row - 1];
                     if ((dir & Direction.W) == Direction.W)
                         directions[column - 1, row] |= Direction.E;
                     else
