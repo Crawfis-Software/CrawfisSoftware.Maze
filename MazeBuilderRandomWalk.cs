@@ -27,7 +27,7 @@ namespace CrawfisSoftware.Collections.Maze
                 this.preserveExistingCells = preserveExistingCells;
                 this.favorForwardCarving = favorForwardCarving;
                 this.random = random;
-                nextCellIncrement = new int[] { -1, 1, mazeBuilder.width, -mazeBuilder.width };
+                nextCellIncrement = new int[] { -1, 1, mazeBuilder.Width, -mazeBuilder.Width };
                 lastMove = nextCellIncrement[random.Next(4)];
             }
             // Could move carving logic to the RandomWalk class.
@@ -127,9 +127,9 @@ namespace CrawfisSoftware.Collections.Maze
             {
                 Walker initialWalker = new Walker();
                 // Initial start is placed randomly avoiding the borders. Assumes height > 2.
-                int startCell = RandomGenerator.Next(width - 2) + 1;
-                int heightCheck = (height > 2) ? RandomGenerator.Next(height - 2) + 1 : height - 1;
-                startCell += width * heightCheck;
+                int startCell = RandomGenerator.Next(Width - 2) + 1;
+                int heightCheck = (Height > 2) ? RandomGenerator.Next(Height - 2) + 1 : Height - 1;
+                startCell += Width * heightCheck;
 
                 initialWalker.StartWalker(this, startCell, preserveExistingCells, favorForwardCarving, RandomGenerator);
                 walkers.Add(initialWalker);

@@ -11,13 +11,13 @@ namespace CrawfisSoftware.Collections.Maze
 
         private void PassageBits(int VBP, int EBP)
         {
-            if ((width > 6) || (height > 6))
+            if ((Width > 6) || (Height > 6))
                 throw new ArgumentException("Width and Height are too large!");
-            int numberOfBits = width * (height - 1);
+            int numberOfBits = Width * (Height - 1);
             // Loop through the vertical passages adding directions. Then loop through the horizontal passages.
             VBP = ConvertVBP(numberOfBits, VBP);
             int[] loops = { VBP, EBP };
-            int nextCellOffset = width; // vertical
+            int nextCellOffset = Width; // vertical
             foreach (int bitVector in loops)
             {
                 for (int i = numberOfBits - 1; i >= 0; i--)
@@ -30,7 +30,7 @@ namespace CrawfisSoftware.Collections.Maze
                     }
                 }
                 nextCellOffset = 1; // horizontal
-                numberOfBits = (width - 1) * height;
+                numberOfBits = (Width - 1) * Height;
             }
         }
 
@@ -40,11 +40,11 @@ namespace CrawfisSoftware.Collections.Maze
             int newVBP = 0;
             for (int i = numberOfBits - 1; i >= 0; i--)
             {
-                int row = i % (height - 1);
-                int column = i / (height - 1);
+                int row = i % (Height - 1);
+                int column = i / (Height - 1);
                 int bitLocation = bitVector >> i;
                 int passageExists = bitLocation % 2;
-                bitLocation = row * (width) + column;
+                bitLocation = row * (Width) + column;
                 newVBP |= passageExists << bitLocation;
             }
             return newVBP;

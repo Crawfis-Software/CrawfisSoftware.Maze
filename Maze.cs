@@ -13,8 +13,13 @@ namespace CrawfisSoftware.Collections.Maze
         {
             this.grid = grid;
             this.directions = directions;
-            directions[0, 0] |= Direction.S;
-            directions[grid.Width - 1, grid.Height - 1] |= Direction.E;
+            //directions[0, 0] |= Direction.S;
+            //directions[grid.Width - 1, grid.Height - 1] |= Direction.E;
+        }
+
+        public void AddOpening(int column, int row, Direction openingDirection)
+        {
+            directions[column, row] |= openingDirection;
         }
         public Direction GetDirection(int column, int row)
         {
@@ -95,11 +100,13 @@ namespace CrawfisSoftware.Collections.Maze
         {
             if (grid.ContainsEdge(fromNode, toNode))
             {
-                int fromRow, fromColumn, toRow, toColumn;
-                grid.TryGetGridLocation(fromNode, out fromColumn, out fromRow);
-                grid.TryGetGridLocation(toNode, out toColumn, out toRow);
-                Direction dir;
-                grid.DirectionLookUp(fromColumn, fromRow, toColumn, toRow, out dir);
+                _ = grid.TryGetGridLocation(fromNode,
+                                            out int fromColumn,
+                                            out int fromRow);
+                _ = grid.TryGetGridLocation(toNode,
+                                            out int toColumn,
+                                            out int toRow);
+                grid.DirectionLookUp(fromColumn, fromRow, toColumn, toRow, out Direction dir);
                 if ((directions[fromColumn, fromRow] & dir) == dir)
                     return true;
             }
@@ -166,7 +173,6 @@ namespace CrawfisSoftware.Collections.Maze
 
         #region Member variables
         private readonly Grid<N, E> grid;
-        Dictionary<Direction, char> graphCodes = new Dictionary<Direction, char>(16);
         private readonly Direction[,] directions;
         #endregion
     }

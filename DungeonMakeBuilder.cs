@@ -30,8 +30,8 @@ namespace CrawfisSoftware.Collections.Maze
         public DungeonMakeBuilder(int width, int height, GetGridLabel<N> nodeAccessor, GetEdgeLabel<E> edgeAccessor)
             : base(width, height, nodeAccessor, edgeAccessor)
         {
-            this.width = width;
-            this.height = height;
+            this.Width = width;
+            this.Height = height;
         }
 
         public override void CreateMaze(bool preserveExistingCells)
@@ -54,20 +54,21 @@ namespace CrawfisSoftware.Collections.Maze
             CreateRandomRooms();
             foreach (Room room in roomList)
             {
-                int lowerLeftIndex = room.minX + width * room.minY;
-                int upperRightIndex = lowerLeftIndex + (room.height - 1) * width + (room.width - 1);
-                Console.WriteLine("Creating Room {0}, {1}  to {2}, {3}", lowerLeftIndex % width, lowerLeftIndex / width, upperRightIndex % width, upperRightIndex / width);
+                int lowerLeftIndex = room.minX + Width * room.minY;
+                int upperRightIndex = lowerLeftIndex + (room.height - 1) * Width + (room.width - 1);
+                Console.WriteLine("Creating Room {0}, {1}  to {2}, {3}", lowerLeftIndex % Width, lowerLeftIndex / Width, upperRightIndex % Width, upperRightIndex / Width);
 
                 MakeRoom(lowerLeftIndex, upperRightIndex);
             }
+            MoveRoomsToCircle();
         }
 
         private void MakeRoom(int lowerLeftIndex, int upperRightIndex)
         {
-            int left = lowerLeftIndex % width;
-            int right = upperRightIndex % width;
-            int bottom = lowerLeftIndex / width;
-            int top = upperRightIndex / width;
+            int left = lowerLeftIndex % Width;
+            int right = upperRightIndex % Width;
+            int bottom = lowerLeftIndex / Width;
+            int top = upperRightIndex / Width;
             // Set corners
             directions[left, bottom] |= Direction.N | Direction.E;
             directions[left, top] |= Direction.S | Direction.E;
@@ -96,8 +97,8 @@ namespace CrawfisSoftware.Collections.Maze
         private void CreateRandomRooms()
         {
             int deltaWidth = MaxRoomSize - MinRoomSize + 1;
-            int minimumXCoord = width - MaxRoomSize;
-            int minumumYCoord = height - MaxRoomSize;
+            int minimumXCoord = Width - MaxRoomSize;
+            int minumumYCoord = Height - MaxRoomSize;
             // Random create rooms
             int roomTrys = 0;
             while (roomList.Count < this.NumberOfRooms && roomTrys < maxNumberOfTrys)
@@ -109,7 +110,7 @@ namespace CrawfisSoftware.Collections.Maze
                 Room room = new Room(minX, minY, roomWidth, roomHeight);
                 roomTrys++;
                 // Ensure they are minRoomDistance apart.
-                int minDistance = width + height;
+                int minDistance = Width + Height;
                 foreach (Room placedRoom in roomList)
                 {
                     int distance = RoomDistance(placedRoom, room);
@@ -125,6 +126,44 @@ namespace CrawfisSoftware.Collections.Maze
                 }
             }
         }
+
+        private void MoveRoomsForceImpule()
+        {
+
+        }
+        private void MoveRoomsToCircle()
+        {
+            // Ignore Room position and only use the width and height
+            int count = roomList.Count;
+            float deltaRadians = 2.0f * (float)Math.PI / (float)count;
+            int minRadius = 3 * MaxRoomSize;
+
+            List<Room> newList = new List<Room>(roomList.Count);
+            float angle = (float) RandomGenerator.NextDouble();
+            foreach(Room room in roomList)
+            {
+                float deltaX = (float)Math.Cos(angle);
+                float deltaY = (float)Math.Sin(angle);
+                int xEnd = Width / 2 - room.width - 1;
+                int xStart = Math.Min(minRadius, xEnd);
+                int newX = (int)(deltaX * RandomGenerator.Next(xStart, xEnd));
+                int yEnd = Height / 2 - room.height - 1;
+                int yStart = Math.Min(minRadius, xEnd);
+                int newY = (int)(deltaY * RandomGenerator.Next(xStart, xEnd));
+                angle += deltaRadians;
+                Room newRoom = new Room(newX, newY, room.width, room.height);
+                newList.Add(newRoom);
+            }
+            roomList = newList;
+        }
+        //public static Room NodeValues(int i, int j)
+        //{
+        //    return null;
+        //}
+        //public static int EdgeValues(int i, int j, Direction dir)
+        //{
+        //    return 1;
+        //}
 
         private static int RoomDistance(Room room1, Room room2)
         {

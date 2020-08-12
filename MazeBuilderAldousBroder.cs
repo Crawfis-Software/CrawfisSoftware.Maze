@@ -13,11 +13,11 @@ namespace CrawfisSoftware.Collections.Maze
         {
             int unvisited = grid.NumberOfNodes - 1;
             bool[] visited = new bool[grid.NumberOfNodes];
-            for (int row = 0; row < height; row++)
+            for (int row = 0; row < Height; row++)
             {
-                for (int column = 0; column < width; column++)
+                for (int column = 0; column < Width; column++)
                 {
-                    int index = row * width + column;
+                    int index = row * Width + column;
                     if ((directions[column, row] & Direction.Undefined) != Direction.Undefined)
                     {
                         visited[index] = true;
@@ -31,7 +31,7 @@ namespace CrawfisSoftware.Collections.Maze
             while (unvisited > 0)
             {
                 List<int> neighbors = grid.Neighbors(randomCell).ToList<int>();
-                //if(neighbors.Count > 0) // Actually all grid cells have at least 2 neighbors, so no need for check.
+                //if(neighbors.Count > 0) // Actually all grid cells have at least 1 neighbor, so no need for check.
                 {
                     int randomNeighbor = RandomGenerator.Next(neighbors.Count);
                     int selectedNeighbor = neighbors[randomNeighbor];

@@ -22,8 +22,8 @@ namespace CrawfisSoftware.Collections.Maze
                 // Select neighbors who have not been visited (Direction is None).
                 foreach (int neighbor in grid.Neighbors(currentNode))
                 {
-                    int row = neighbor / width;
-                    int column = neighbor % width;
+                    int row = neighbor / Width;
+                    int column = neighbor % Width;
                     if (directions[column, row] == Direction.Undefined)
                     {
                         neighbors.Add(neighbor);
