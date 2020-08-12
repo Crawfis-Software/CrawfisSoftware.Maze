@@ -1,0 +1,97 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="NameAndType">
+  <Class Name="CrawfisSoftware.Collections.Maze.DungeonMakeBuilder&lt;N, E&gt;">
+    <Position X="0.5" Y="6.5" Width="2" />
+    <NestedTypes>
+      <Struct Name="CrawfisSoftware.Collections.Maze.DungeonMakeBuilder&lt;N, E&gt;.Room" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>DungeonMakeBuilder.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AAAAAEAAACAAAAAATAABAAAEADCAAAAAABEAAAAAgAA=</HashCode>
+      <FileName>DungeonMakeBuilder.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CrawfisSoftware.Collections.Maze.Maze&lt;N, E&gt;" BaseTypeListCollapsed="true">
+    <Position X="0.5" Y="0.5" Width="3.5" />
+    <TypeIdentifier>
+      <HashCode>AAAigAAgBAIIAAAEACIAAEACAAAEAAAAIAAggEgIAAA=</HashCode>
+      <FileName>Maze.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="CrawfisSoftware.Collections.Maze.MazeBuilderAbstract&lt;N, E&gt;">
+    <Position X="7.25" Y="0.5" Width="3.75" />
+    <TypeIdentifier>
+      <HashCode>oAAEAAAgJBIAAAJAAAIEAEIAAACEAAAAgAAAAABAAAA=</HashCode>
+      <FileName>MazeBuilderAbstract.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="CrawfisSoftware.Collections.Maze.MazeBuilderAldousBroder&lt;N, E&gt;">
+    <Position X="2.75" Y="6.5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAEAAAAAAAAAA=</HashCode>
+      <FileName>MazeBuilderAldousBroder.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CrawfisSoftware.Collections.Maze.MazeBuilderBinaryTree&lt;N, E&gt;">
+    <Position X="8" Y="6.5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAgAAAAAA=</HashCode>
+      <FileName>MazeBuilderBinaryTree.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CrawfisSoftware.Collections.Maze.MazeBuilderBitEdges&lt;N, E&gt;">
+    <Position X="13.5" Y="6.5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAgAAAAAAAAAAAAAAACAgAAAAAAAAAAAAAA=</HashCode>
+      <FileName>MazeBuilderBitEdges.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CrawfisSoftware.Collections.Maze.MazeBuilderExplicit&lt;N, E&gt;">
+    <Position X="16" Y="6.5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAEAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>MazeBuilderExplicit.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CrawfisSoftware.Collections.Maze.MazeBuilderRandomWalk&lt;N, E&gt;">
+    <Position X="5.25" Y="6.5" Width="2.5" />
+    <NestedTypes>
+      <Class Name="CrawfisSoftware.Collections.Maze.MazeBuilderRandomWalk&lt;N, E&gt;.Walker" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>MazeBuilderRandomWalk.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>IQACAAgAAABIAAAAAAAAAAAAAACAgAAECYAAAAAAggA=</HashCode>
+      <FileName>MazeBuilderRandomWalk.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CrawfisSoftware.Collections.Maze.MazeBuilderRecursiveBacktracker&lt;N, E&gt;">
+    <Position X="10.5" Y="6.5" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAABAAAAAA=</HashCode>
+      <FileName>MazeBuilderRecursiveBacktracker.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CrawfisSoftware.Collections.Maze.MazeBuilderUtility&lt;N, E&gt;">
+    <Position X="13" Y="0.75" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAgACAAAAAAAgACAAAgAAAACAAAAAAAAAQAAAAAA=</HashCode>
+      <FileName>MazeBuilderUtility.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Interface Name="CrawfisSoftware.Collections.Maze.IMazeBuilder&lt;N, E&gt;">
+    <Position X="4.5" Y="0.5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>oAAEAAAgIBAAAAIAAAAAAAIAAACAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>IMazeBuilder.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
