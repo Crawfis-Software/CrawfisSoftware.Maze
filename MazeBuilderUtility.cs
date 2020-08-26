@@ -5,8 +5,20 @@ using System.IO;
 
 namespace CrawfisSoftware.Collections.Maze
 {
+    /// <summary>
+    /// Static class for some useful tools to build mazes
+    /// </summary>
+    /// <typeparam name="N">The type used for node labels</typeparam>
+    /// <typeparam name="E">The type used for edge weights</typeparam>
     public static class MazeBuilderUtility<N, E>
     {
+        /// <summary>
+        /// Create a maze from a CSV file
+        /// </summary>
+        /// <param name="filename">Path and filename of the csv file to open.</param>
+        /// <param name="nodeAccessor">A function to retrieve any node labels</param>
+        /// <param name="edgeAccessor">A function to retrieve any edge weights</param>
+        /// <returns></returns>
         public static Maze<N, E> CreateMazeFromCSVFile(string filename, GetGridLabel<N> nodeAccessor, GetEdgeLabel<E> edgeAccessor)
         {
             int width, height;
@@ -16,6 +28,14 @@ namespace CrawfisSoftware.Collections.Maze
             return CreateMaze(directionGrid, nodeAccessor, edgeAccessor);
         }
 
+        /// <summary>
+        /// Utility on Direction that will take a stream of directions with the y origin as the top
+        /// and produce a 2D grid of Directions with the y origin as the bottom row.
+        /// </summary>
+        /// <param name="width">The desired width of the maze</param>
+        /// <param name="height">The desired height of the maze</param>
+        /// <param name="directions">A stream of directions starting from the lower-left corner.</param>
+        /// <returns>A 2D grid of Directions</returns>
         public static Direction[,] MoveOriginToLowerLeft(int width, int height, List<Direction> directions)
         {
             Direction[,] directionGrid = new Direction[width, height];
@@ -34,10 +54,27 @@ namespace CrawfisSoftware.Collections.Maze
             return directionGrid;
         }
 
+        /// <summary>
+        /// Create a maze given a stream of directions
+        /// </summary>
+        /// <param name="width">The desired width of the maze</param>
+        /// <param name="height">The desired height of the maze</param>
+        /// <param name="directions">A stream of directions starting from the lower-left corner.</param>
+        /// <returns>A new maze</returns>
         public static Maze<int, int> CreateMaze(int width, int height, List<Direction> directions)
         {
             return MazeBuilderUtility<int, int>.CreateMaze(width, height, directions, DummyNodeValues, DummyEdgeValues);
         }
+
+        /// <summary>
+        /// Create a maze given a stream of directions
+        /// </summary>
+        /// <param name="width">The desired width of the maze</param>
+        /// <param name="height">The desired height of the maze</param>
+        /// <param name="directions">A stream of directions starting from the lower-left corner.</param>
+        /// <param name="nodeAccessor">A function to retrieve any node labels</param>
+        /// <param name="edgeAccessor">A function to retrieve any edge weights</param>
+        /// <returns>A new maze</returns>
         public static Maze<N, E> CreateMaze(int width, int height, List<Direction> directions, GetGridLabel<N> nodeAccessor, GetEdgeLabel<E> edgeAccessor)
         {
             var mazeBuilder = new MazeBuilderExplicit<N, E>(width, height, nodeAccessor, edgeAccessor);
@@ -55,6 +92,14 @@ namespace CrawfisSoftware.Collections.Maze
             }
             return mazeBuilder.GetMaze();
         }
+
+        /// <summary>
+        /// Create a mze from a grid of Directions
+        /// </summary>
+        /// <param name="directions">A 2D array of Directions for the maze</param>
+        /// <param name="nodeAccessor">A function to retrieve any node labels</param>
+        /// <param name="edgeAccessor">A function to retrieve any edge weights</param>
+        /// <returns></returns>
         public static Maze<N, E> CreateMaze(Direction[,] directions, GetGridLabel<N> nodeAccessor, GetEdgeLabel<E> edgeAccessor)
         {
             int width = directions.GetLength(0);
@@ -70,7 +115,7 @@ namespace CrawfisSoftware.Collections.Maze
             return mazeBuilder.GetMaze();
         }
 
-        public static void ReadCSVFile(string filename, out int width, out int height, out List<Direction> directions)
+        private static void ReadCSVFile(string filename, out int width, out int height, out List<Direction> directions)
         {
             // Read in CSV file,
             // Send array to a MazeBuild
@@ -127,10 +172,24 @@ namespace CrawfisSoftware.Collections.Maze
             }
         }
 
+        /// <summary>
+        /// Function that always returns 1
+        /// </summary>
+        /// <param name="i">Column index of a cell.</param>
+        /// <param name="j">Row index of a cell.</param>
+        /// <returns></returns>
         public static int DummyNodeValues(int i, int j)
         {
             return 1;
         }
+
+        /// <summary>
+        /// Function that always returns 1
+        /// </summary>
+        /// <param name="i">Column index of a cell.</param>
+        /// <param name="j">Row index of a cell.</param>
+        /// <param name="dir">Direction of the desired edge</param>
+        /// <returns></returns>
         public static int DummyEdgeValues(int i, int j, Direction dir)
         {
             return 1;

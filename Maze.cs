@@ -4,45 +4,78 @@ using System.Text;
 
 namespace CrawfisSoftware.Collections.Maze
 {
+    /// <summary>
+    /// A grid with some edges blocked and others open
+    /// </summary>
+    /// <typeparam name="N">The type used for node labels</typeparam>
+    /// <typeparam name="E">The type used for edge weights</typeparam>
     public class Maze<N, E> : IIndexedGraph<N, E>, ITransposeIndexedGraph<N, E>
     {
+        /// <value>
+        /// Get the width in the number of grid cells
+        /// </value>
         public int Width { get { return grid.Width; } }
+
+        /// <value>
+        /// Get the height in the number of grid cells
+        /// </value>
         public int Height { get { return grid.Height; } }
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="grid">A grid to use as the basic structure of the maze</param>
+        /// <param name="directions">A 2D array of Direction flags that specify the maze.</param>
         public Maze(Grid<N, E> grid, Direction[,] directions)
         {
+            // Todo: Check that the grid size and the direction lengths are the same
             this.grid = grid;
             this.directions = directions;
-            //directions[0, 0] |= Direction.S;
-            //directions[grid.Width - 1, grid.Height - 1] |= Direction.E;
         }
 
+        /// <summary>
+        /// Carve an opening in the maze from the indicated cell to the neighbor specified by the direction.
+        /// </summary>
+        /// <param name="column">The i index of the cell</param>
+        /// <param name="row">The j index of the cell</param>
+        /// <param name="openingDirection">A direction (multiple flags are allowed)</param>
         public void AddOpening(int column, int row, Direction openingDirection)
         {
             directions[column, row] |= openingDirection;
         }
+
+        /// <summary>
+        /// Get the set of opening directions in the current cell
+        /// </summary>
+        /// <param name="column">The i index of the cell</param>
+        /// <param name="row">The j index of the cell</param>
+        /// <returns>A set of Direction flags</returns>
         public Direction GetDirection(int column, int row)
         {
             return directions[column, row];
         }
 
         #region IIndexedGraph<N,E> Members
+        /// <inheritdoc/>
         public int NumberOfEdges
         {
             // A perfect maze is a tree which has N-1 edges.
             get { return grid.NumberOfNodes - 1; }
         }
 
+        /// <inheritdoc/>
         public int NumberOfNodes
         {
             get { return grid.NumberOfNodes; }
         }
 
+        /// <inheritdoc/>
         public IEnumerable<int> Nodes
         {
             get { return grid.Nodes; }
         }
 
+        /// <inheritdoc/>
         public IEnumerable<IIndexedEdge<E>> Edges
         {
             get
@@ -55,11 +88,13 @@ namespace CrawfisSoftware.Collections.Maze
             }
         }
 
+        /// <inheritdoc/>
         public N GetNodeLabel(int nodeIndex)
         {
             return grid.GetNodeLabel(nodeIndex);
         }
 
+        /// <inheritdoc/>
         public IEnumerable<int> Neighbors(int nodeIndex)
         {
             foreach (int index in grid.Neighbors(nodeIndex))
@@ -69,6 +104,7 @@ namespace CrawfisSoftware.Collections.Maze
             }
         }
 
+        /// <inheritdoc/>
         public IEnumerable<IIndexedEdge<E>> OutEdges(int nodeIndex)
         {
             foreach (var outEdge in grid.OutEdges(nodeIndex))
@@ -80,11 +116,13 @@ namespace CrawfisSoftware.Collections.Maze
             }
         }
 
+        /// <inheritdoc/>
         public IEnumerable<int> Parents(int nodeIndex)
         {
             return Neighbors(nodeIndex);
         }
 
+        /// <inheritdoc/>
         public IEnumerable<IIndexedEdge<E>> InEdges(int nodeIndex)
         {
             foreach (var outEdge in grid.InEdges(nodeIndex))
@@ -96,6 +134,7 @@ namespace CrawfisSoftware.Collections.Maze
             }
         }
 
+        /// <inheritdoc/>
         public bool ContainsEdge(int fromNode, int toNode)
         {
             if (grid.ContainsEdge(fromNode, toNode))
@@ -113,11 +152,13 @@ namespace CrawfisSoftware.Collections.Maze
             return false;
         }
 
+        /// <inheritdoc/>
         public E GetEdgeLabel(int fromNode, int toNode)
         {
             return grid.GetEdgeLabel(fromNode, toNode);
         }
 
+        /// <inheritdoc/>
         public bool TryGetEdgeLabel(int fromNode, int toNode, out E edge)
         {
             if (ContainsEdge(fromNode, toNode))
@@ -131,6 +172,7 @@ namespace CrawfisSoftware.Collections.Maze
         #endregion
 
         #region ITransposeIndexedGraph<N,E> Members
+        /// <inheritdoc/>
         public IIndexedGraph<N, E> Transpose()
         {
             // Todo: should be a deep copy
@@ -138,6 +180,10 @@ namespace CrawfisSoftware.Collections.Maze
         }
         #endregion
 
+        /// <summary>
+        /// Converts the maze to an asci string representation
+        /// </summary>
+        /// <returns>A string</returns>
         public override string ToString()
         {
             int width = grid.Width;

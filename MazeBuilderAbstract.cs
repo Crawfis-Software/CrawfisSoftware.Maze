@@ -3,14 +3,35 @@ using System;
 
 namespace CrawfisSoftware.Collections.Maze
 {
+    /// <summary>
+    /// Abstract base class to build mazes with some concrete implemetations
+    /// </summary>
+    /// <typeparam name="N">The type used for node labels</typeparam>
+    /// <typeparam name="E">The type used for edge weights</typeparam>
     public abstract class MazeBuilderAbstract<N, E> : IMazeBuilder<N, E>
     {
+        /// <inheritdoc/>
         public int StartCell { get; set; }
+
+        /// <inheritdoc/>
         public int EndCell { get; set; }
+
+        /// <inheritdoc/>
         public System.Random RandomGenerator { get; set; }
+
+        /// <inheritdoc/>
         public int Width { get; protected set; }
+
+        /// <inheritdoc/>
         public int Height { get; protected set; }
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="width">The width of the desired maze</param>
+        /// <param name="height">The height of the desired maze</param>
+        /// <param name="nodeAccessor">A function to retrieve any node labels</param>
+        /// <param name="edgeAccessor">A function to retrieve any edge weights</param>
         public MazeBuilderAbstract(int width, int height, GetGridLabel<N> nodeAccessor, GetEdgeLabel<E> edgeAccessor)
         {
             this.Width = width;
@@ -23,11 +44,20 @@ namespace CrawfisSoftware.Collections.Maze
             RandomGenerator = new Random();
         }
 
+        /// <summary>
+        /// Carve a passage in the specified direction.
+        /// </summary>
+        /// <param name="currentColumn">Column index of the cell to carve</param>
+        /// <param name="currentRow">Row index of the row to carve</param>
+        /// <param name="directionsToCarve">Set of directions to carve (uni-directionally)</param>
+        /// <remarks>May lead to possible inconsistent neighbor directions.</remarks>
+        /// <seealso>MakeBidirectionallyConsistent</seealso>
         public void CarveDirectionally(int currentColumn, int currentRow, Direction directionsToCarve)
         {
             directions[currentColumn, currentRow] |= directionsToCarve;
         }
 
+        /// <inheritdoc/>
         public bool CarvePassage(int currentColumn, int currentRow, int selectedColumn, int selectedRow, bool preserveExistingCells = false)
         {
             bool cellsCanBeModified = true;
@@ -48,6 +78,8 @@ namespace CrawfisSoftware.Collections.Maze
             }
             return false;
         }
+
+        /// <inheritdoc/>
         public bool CarvePassage(int currentCell, int targetCell, bool preserveExistingCells = false)
         {
             int currentRow = currentCell / Width;
@@ -57,6 +89,7 @@ namespace CrawfisSoftware.Collections.Maze
             return CarvePassage(currentColumn, currentRow, selectedColumn, selectedRow, preserveExistingCells);
         }
 
+        /// <inheritdoc/>
         public bool AddWall(int currentCell, int targetCell, bool preserveExistingCells = false)
         {
             int currentRow = currentCell / Width;
@@ -86,17 +119,38 @@ namespace CrawfisSoftware.Collections.Maze
             return false;
         }
 
+        /// <summary>
+        /// Remove all directions in the specified region.
+        /// </summary>
+        /// <param name="lowerLeftCell">The lower-left corner of the region to fix.</param>
+        /// <param name="upperRightCell">The upper-right corner of the region to fix.</param>
+        /// <remarks>May lead to possible inconsistent neighbor directions.</remarks>
+        /// <seealso>MakeBidirectionallyConsistent</seealso>
         public void BlockRegion(int lowerLeftCell, int upperRightCell)
         {
             FillRegion(lowerLeftCell, upperRightCell, Direction.None);
         }
 
-
+        /// <summary>
+        /// Add passages to all neighbors within the specified region
+        /// </summary>
+        /// <param name="lowerLeftCell">The lower-left corner of the region to fix.</param>
+        /// <param name="upperRightCell">The upper-right corner of the region to fix.</param>
+        /// <remarks>May lead to possible inconsistent neighbor directions.</remarks>
+        /// <seealso>MakeBidirectionallyConsistent</seealso>
         public void OpenRegion(int lowerLeftCell, int upperRightCell)
         {
             FillRegion(lowerLeftCell, upperRightCell, Direction.E | Direction.N | Direction.W | Direction.S);
         }
 
+        /// <summary>
+        /// Set all cells with the directions specified.
+        /// </summary>
+        /// <param name="lowerLeftCell">The lower-left corner of the region to fix.</param>
+        /// <param name="upperRightCell">The upper-right corner of the region to fix.</param>
+        /// <param name="dirs">List of directions to set each cell to.</param>
+        /// <remarks>May lead to possible inconsistent neighbor directions.</remarks>
+        /// <seealso>MakeBidirectionallyConsistent</seealso>
         public void FillRegion(int lowerLeftCell, int upperRightCell, Direction dirs)
         {
             int currentRow = lowerLeftCell / Width;
@@ -120,6 +174,9 @@ namespace CrawfisSoftware.Collections.Maze
             }
         }
 
+        /// <summary>
+        /// Set all directions in the maze to Direction.Undefined
+        /// </summary>
         public void Clear()
         {
             for (int row = 0; row < Height; row++)
@@ -132,14 +189,24 @@ namespace CrawfisSoftware.Collections.Maze
 
         }
 
-        public void MakeConsistent()
-        {
-            MakeConsistent(Width + 1, Width * Height - 1 - Width - 1);
-        }
         /// <summary>
-        /// If a Neighbor edge does not match and has Undefined as a flag, set the edge to match.
+        /// Ensures that all edges are bi-directional. In other words, a passage was not carved from A to
+        /// B and not B to A.
         /// </summary>
-        public void MakeConsistent(int lowerLeftCell, int upperRightCell)
+        /// <remarks>This will open up all inconsistencies.</remarks>
+        public void MakeBidirectionallyConsistent()
+        {
+            MakeBiDirectionallyConsistent(Width + 1, Width * Height - 1 - Width - 1);
+        }
+
+        /// <summary>
+        /// Ensures that all edges are bi-directional. In other words, a passage was not carved from A to
+        /// B and not B to A.
+        /// </summary>
+        /// <param name="lowerLeftCell">The lower-left corner of the region to fix.</param>
+        /// <param name="upperRightCell">The upper-right corner of the region to fix.</param>
+        /// <remarks>This will open up all inconsistencies.</remarks>
+        public void MakeBiDirectionallyConsistent(int lowerLeftCell, int upperRightCell)
         {
             int currentRow = lowerLeftCell / Width;
             int currentColumn = lowerLeftCell % Width;
@@ -179,16 +246,31 @@ namespace CrawfisSoftware.Collections.Maze
 
         }
 
+        /// <inheritdoc/>
         public abstract void CreateMaze(bool preserveExistingCells);
+
+        /// <inheritdoc/>
         public virtual Maze<N, E> GetMaze()
         {
             return new Maze<N, E>(grid, directions);
         }
 
         #region Member variables
+        /// <summary>
+        /// The underlying grid data structure
+        /// </summary>
         protected Grid<N, E> grid;
+        /// <summary>
+        /// A function used to look up node labels
+        /// </summary>
         protected GetGridLabel<N> nodeFunction;
+        /// <summary>
+        /// A function used to look up edge weights
+        /// </summary>
         protected GetEdgeLabel<E> edgeFunction;
+        /// <summary>
+        /// A 2D array storing the structure of the maze as a 2D array of directions
+        /// </summary>
         protected Direction[,] directions;
         #endregion
     }

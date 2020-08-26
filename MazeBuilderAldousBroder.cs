@@ -4,8 +4,20 @@ using System.Linq;
 
 namespace CrawfisSoftware.Collections.Maze
 {
+    /// <summary>
+    /// Create a maze using the Aldous Broder algorithm
+    /// </summary>
+    /// <typeparam name="N">The type used for node labels</typeparam>
+    /// <typeparam name="E">The type used for edge weights</typeparam>
     public class MazeBuilderAldousBroder<N, E> : MazeBuilderAbstract<N, E>
     {
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="width">The width of the desired maze</param>
+        /// <param name="height">The height of the desired maze</param>
+        /// <param name="nodeAccessor">A function to retrieve any node labels</param>
+        /// <param name="edgeAccessor">A function to retrieve any edge weights</param>
         public MazeBuilderAldousBroder(int width, int height, GetGridLabel<N> nodeAccessor, GetEdgeLabel<E> edgeAccessor) : base(width, height, nodeAccessor, edgeAccessor)
         {
         }
@@ -47,6 +59,7 @@ namespace CrawfisSoftware.Collections.Maze
             }
         }
 
+        /// <inheritdoc/>
         public override void CreateMaze(bool preserveExistingCells = false)
         {
             AldousBroder(preserveExistingCells);
