@@ -43,18 +43,47 @@ namespace CrawfisSoftware.Collections.Maze
             Clear();
             RandomGenerator = new Random();
         }
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="mazeBuilder">An existing maze builder to copy the current state from.</param>
+        public MazeBuilderAbstract(MazeBuilderAbstract<N,E> mazeBuilder)
+        {
+            this.Width = mazeBuilder.Width;
+            this.Height = mazeBuilder.Height;
+            nodeFunction = mazeBuilder.nodeFunction;
+            edgeFunction = mazeBuilder.edgeFunction;
+            grid = mazeBuilder.grid;
+            directions = mazeBuilder.directions;
+            RandomGenerator = mazeBuilder.RandomGenerator;
+        }
 
         /// <summary>
         /// Carve a passage in the specified direction.
         /// </summary>
         /// <param name="currentColumn">Column index of the cell to carve</param>
         /// <param name="currentRow">Row index of the row to carve</param>
-        /// <param name="directionsToCarve">Set of directions to carve (uni-directionally)</param>
-        /// <remarks>May lead to possible inconsistent neighbor directions.</remarks>
-        /// <seealso>MakeBidirectionallyConsistent</seealso>
-        public void CarveDirectionally(int currentColumn, int currentRow, Direction directionsToCarve)
+        /// <param name="directionToCarve">A single direction to carve</param>
+        /// <param name="preserveExistingCells">Boolean indicating whether to only replace maze cells that are undefined.
+        /// Default is false.</param>
+        /// <return>Returns true if the operation was successful.</return>
+        public bool CarveDirectionally(int currentColumn, int currentRow, Direction directionToCarve, bool preserveExistingCells = false)
         {
-            directions[currentColumn, currentRow] |= directionsToCarve;
+            int cellIndex = currentRow * Width + currentColumn;
+            switch (directionToCarve)
+            {
+                case Direction.None:
+                    break;
+                case Direction.W:
+                    return CarvePassage(cellIndex, cellIndex - 1, preserveExistingCells);
+                case Direction.N:
+                    return CarvePassage(cellIndex, cellIndex + Width, preserveExistingCells);
+                case Direction.E:
+                    return CarvePassage(cellIndex, cellIndex + 1, preserveExistingCells);
+                case Direction.S:
+                    return CarvePassage(cellIndex, cellIndex - Width, preserveExistingCells);
+            }
+            return false;
         }
 
         /// <inheritdoc/>
@@ -70,11 +99,13 @@ namespace CrawfisSoftware.Collections.Maze
             if (cellsCanBeModified && grid.DirectionLookUp(currentColumn, currentRow, selectedColumn, selectedRow, out Direction directionToNeighbor))
             {
                 directions[currentColumn, currentRow] |= directionToNeighbor;
+                //directions[currentColumn, currentRow] &= ~Direction.Undefined;
                 if (grid.DirectionLookUp(selectedColumn, selectedRow, currentColumn, currentRow, out Direction directionToCurrent))
                 {
                     directions[selectedColumn, selectedRow] |= directionToCurrent;
-                    return true;
+                    //directions[selectedColumn, selectedRow] &= ~Direction.Undefined;
                 }
+                return true;
             }
             return false;
         }
@@ -183,10 +214,38 @@ namespace CrawfisSoftware.Collections.Maze
             {
                 for (int column = 0; column < Width; column++)
                 {
-                    directions[column, row] = Direction.Undefined;
+                    directions[column, row] |= Direction.Undefined;
                 }
             }
+        }
 
+        /// <summary>
+        /// Remove Direction.Undefined for all cells.
+        /// </summary>
+        public void RemoveUndefines()
+        {
+            for (int row = 0; row < Height; row++)
+            {
+                for (int column = 0; column < Width; column++)
+                {
+                    directions[column, row] &= ~Direction.Undefined;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Remove Direction.Undefined for all cells that have been defined
+        /// </summary>
+        public void FreezeCells()
+        {
+            for (int row = 0; row < Height; row++)
+            {
+                for (int column = 0; column < Width; column++)
+                {
+                    if(directions[column,row] != Direction.Undefined)
+                        directions[column, row] &= ~Direction.Undefined;
+                }
+            }
         }
 
         /// <summary>
@@ -247,7 +306,7 @@ namespace CrawfisSoftware.Collections.Maze
         }
 
         /// <inheritdoc/>
-        public abstract void CreateMaze(bool preserveExistingCells);
+        public abstract void CreateMaze(bool preserveExistingCells = false);
 
         /// <inheritdoc/>
         public virtual Maze<N, E> GetMaze()

@@ -21,6 +21,14 @@ namespace CrawfisSoftware.Collections.Maze
         {
         }
 
+        /// <summary>
+        /// Constructor, Takes an existing maze builder (derived from MazeBuilderAbstract) and copies the state over.
+        /// </summary>
+        /// <param name="mazeBuilder">A maze builder</param>
+        public MazeBuilderBitEdges(MazeBuilderAbstract<N, E> mazeBuilder) : base(mazeBuilder)
+        {
+        }
+
         private void PassageBits(int VBP, int EBP)
         {
             if ((Width > 6) || (Height > 6))

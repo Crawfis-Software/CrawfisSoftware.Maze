@@ -21,8 +21,19 @@ namespace CrawfisSoftware.Collections.Maze
         public MazeBuilderAldousBroder(int width, int height, GetGridLabel<N> nodeAccessor, GetEdgeLabel<E> edgeAccessor) : base(width, height, nodeAccessor, edgeAccessor)
         {
         }
+
+        /// <summary>
+        /// Constructor, Takes an existing maze builder (derived from MazeBuilderAbstract) and copies the state over.
+        /// </summary>
+        /// <param name="mazeBuilder">A maze builder</param>
+        public MazeBuilderAldousBroder(MazeBuilderAbstract<N, E> mazeBuilder) : base(mazeBuilder)
+        {
+        }
+
         private void AldousBroder(bool preserveExistingCells = false) // Random Walk, may take an infinite amount of time.
         {
+            if (!preserveExistingCells)
+                Clear();
             int unvisited = grid.NumberOfNodes - 1;
             bool[] visited = new bool[grid.NumberOfNodes];
             for (int row = 0; row < Height; row++)
@@ -51,7 +62,7 @@ namespace CrawfisSoftware.Collections.Maze
                     if (!visited[selectedNeighbor])
                     {
                         visited[selectedNeighbor] = true;
-                        CarvePassage(randomCell, selectedNeighbor);
+                        CarvePassage(randomCell, selectedNeighbor, preserveExistingCells);
                         unvisited--;
                     }
                     randomCell = selectedNeighbor;
@@ -63,6 +74,9 @@ namespace CrawfisSoftware.Collections.Maze
         public override void CreateMaze(bool preserveExistingCells = false)
         {
             AldousBroder(preserveExistingCells);
+            // Clear all Undefined flags, since maze generation should touch all cells.
+            // Todo: Not true, as "grid" may be masked to certain edges.
+            RemoveUndefines();
         }
 
     }

@@ -22,6 +22,14 @@ namespace CrawfisSoftware.Collections.Maze
         }
 
         /// <summary>
+        /// Constructor, Takes an existing maze builder (derived from MazeBuilderAbstract) and copies the state over.
+        /// </summary>
+        /// <param name="mazeBuilder">A maze builder</param>
+        public MazeBuilderExplicit(MazeBuilderAbstract<N, E> mazeBuilder) : base(mazeBuilder)
+        {
+        }
+
+        /// <summary>
         /// Set the directions for this cell
         /// </summary>
         /// <param name="i">The column index</param>

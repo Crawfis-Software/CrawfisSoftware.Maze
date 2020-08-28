@@ -21,8 +21,20 @@ namespace CrawfisSoftware.Collections.Maze
         {
         }
 
+        /// <summary>
+        /// Constructor, Takes an existing maze builder (derived from MazeBuilderAbstract) and copies the state over.
+        /// </summary>
+        /// <param name="mazeBuilder">A maze builder</param>
+        public MazeBuilderRecursiveBacktracker(MazeBuilderAbstract<N,E> mazeBuilder) : base(mazeBuilder)
+        {
+        }
+
         private void RecursiveBackTracker(int startingNode, bool preserveExistingCells = true)
         {
+            if (!preserveExistingCells)
+                Clear();
+            bool[,] visited = new bool[directions.GetLength(0), directions.GetLength(1)];
+
             Stack<int> currentPath = new Stack<int>();
             currentPath.Push(startingNode);
             List<int> neighbors = new List<int>(4);
@@ -36,9 +48,10 @@ namespace CrawfisSoftware.Collections.Maze
                 {
                     int row = neighbor / Width;
                     int column = neighbor % Width;
-                    if (directions[column, row] == Direction.Undefined)
-                    {
-                        neighbors.Add(neighbor);
+                    //if ((directions[column, row] & (~Direction.Undefined)) == Direction.None)
+                        if (!visited[column,row])
+                        {
+                            neighbors.Add(neighbor);
                     }
                 }
                 bool pathCarved = false;
@@ -48,7 +61,7 @@ namespace CrawfisSoftware.Collections.Maze
                     int randomNeighbor = RandomGenerator.Next(neighbors.Count);
                     nextNode = neighbors[randomNeighbor];
                     pathCarved = CarvePassage(currentNode, nextNode, preserveExistingCells);
-                    // Holy crap!!! The next line changes the value of nextNode. I had it above pathCarved.
+                    visited[nextNode % Width, nextNode / Width] = true;
                     neighbors.RemoveAt(randomNeighbor);
                 }
                 if (pathCarved)
@@ -67,7 +80,10 @@ namespace CrawfisSoftware.Collections.Maze
         public override void CreateMaze(bool preserveExistingCells = true)
         {
             // Todo: Fix preserveExistingCells = false or throw an error
-            RecursiveBackTracker(StartCell);
+            RecursiveBackTracker(StartCell, preserveExistingCells);
+            // Clear all Undefined flags, since maze generation should touch all cells.
+            // Todo: Not true, as "grid" may be masked to certain edges.
+            RemoveUndefines();
         }
     }
 }

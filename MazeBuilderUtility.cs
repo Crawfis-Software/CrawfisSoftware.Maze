@@ -94,7 +94,7 @@ namespace CrawfisSoftware.Collections.Maze
         }
 
         /// <summary>
-        /// Create a mze from a grid of Directions
+        /// Create a maze from a grid of Directions
         /// </summary>
         /// <param name="directions">A 2D array of Directions for the maze</param>
         /// <param name="nodeAccessor">A function to retrieve any node labels</param>
