@@ -76,7 +76,7 @@ namespace CrawfisSoftware.Collections.Maze
             AldousBroder(preserveExistingCells);
             // Clear all Undefined flags, since maze generation should touch all cells.
             // Todo: Not true, as "grid" may be masked to certain edges.
-            RemoveUndefines();
+            //RemoveUndefines();
         }
 
     }

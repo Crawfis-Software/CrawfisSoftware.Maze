@@ -31,8 +31,8 @@ namespace CrawfisSoftware.Collections.Maze
 
         private void RecursiveBackTracker(int startingNode, bool preserveExistingCells = true)
         {
-            if (!preserveExistingCells)
-                Clear();
+            //if (!preserveExistingCells)
+            //    Clear();
             bool[,] visited = new bool[directions.GetLength(0), directions.GetLength(1)];
 
             Stack<int> currentPath = new Stack<int>();
@@ -83,7 +83,7 @@ namespace CrawfisSoftware.Collections.Maze
             RecursiveBackTracker(StartCell, preserveExistingCells);
             // Clear all Undefined flags, since maze generation should touch all cells.
             // Todo: Not true, as "grid" may be masked to certain edges.
-            RemoveUndefines();
+            //RemoveUndefines();
         }
     }
 }

@@ -127,24 +127,29 @@ namespace CrawfisSoftware.Collections.Maze
             int currentColumn = currentCell % Width;
             int selectedRow = targetCell / Width;
             int selectedColumn = targetCell % Width;
-            return AddWall(currentRow, currentColumn, selectedRow, selectedColumn, preserveExistingCells);
+            return AddWall(currentColumn, currentRow, selectedColumn, selectedRow, preserveExistingCells);
         }
 
-        private bool AddWall(int currentRow, int currentColumn, int selectedRow, int selectedColumn, bool preserveExistingCells = false)
+        private bool AddWall(int currentColumn, int currentRow, int selectedColumn, int selectedRow, bool preserveExistingCells = false)
         {
             bool cellsCanBeModified = true;
-            if (preserveExistingCells)
+            if (grid.DirectionLookUp(currentColumn, currentRow, selectedColumn, selectedRow, out Direction directionToNeighbor))
             {
-                cellsCanBeModified = (directions[currentColumn, currentRow] & Direction.Undefined) == Direction.Undefined;
-                cellsCanBeModified &= (directions[selectedColumn, selectedRow] & Direction.Undefined) == Direction.Undefined;
-            }
-            if (cellsCanBeModified && grid.DirectionLookUp(currentColumn, currentRow, selectedColumn, selectedRow, out Direction directionToNeighbor))
-            {
-                directions[currentColumn, currentRow] &= ~directionToNeighbor;
-                if (grid.DirectionLookUp(currentColumn, currentRow, selectedColumn, selectedRow, out Direction directionToCurrent))
+                bool biDirectional = grid.DirectionLookUp(selectedColumn, selectedRow, currentColumn, currentRow, out Direction directionToCurrent);
+                if (preserveExistingCells)
                 {
-                    directions[selectedColumn, selectedRow] &= ~directionToCurrent;
-                    return true;
+                    cellsCanBeModified = (directions[currentColumn, currentRow] & Direction.Undefined) == Direction.Undefined;
+                    if(biDirectional)
+                        cellsCanBeModified &= (directions[selectedColumn, selectedRow] & Direction.Undefined) == Direction.Undefined;
+                }
+                if (cellsCanBeModified)
+                {
+                    directions[currentColumn, currentRow] &= ~directionToNeighbor;
+                    if (biDirectional)
+                    {
+                        directions[selectedColumn, selectedRow] &= ~directionToCurrent;
+                        return true;
+                    }
                 }
             }
             return false;
@@ -215,6 +220,32 @@ namespace CrawfisSoftware.Collections.Maze
                 for (int column = 0; column < Width; column++)
                 {
                     directions[column, row] |= Direction.Undefined;
+                }
+            }
+        }
+
+        public void RemoveAllDeadEnds(bool preserveExistingCells = false)
+        {
+            for (int row = 0; row < Height; row++)
+            {
+                for (int column = 0; column < Width; column++)
+                {
+                    Direction dir = directions[column, row] & ~Direction.Undefined;
+                    switch (dir)
+                    {
+                        case Direction.W:
+                            AddWall(column, row, column - 1, row, preserveExistingCells);
+                            break;
+                        case Direction.N:
+                            AddWall(column, row, column, row + 1, preserveExistingCells);
+                            break;
+                        case Direction.E:
+                            AddWall(column, row, column+1, row, preserveExistingCells);
+                            break;
+                        case Direction.S:
+                            AddWall(column, row, column, row - 1, preserveExistingCells);
+                            break;
+                    }
                 }
             }
         }
