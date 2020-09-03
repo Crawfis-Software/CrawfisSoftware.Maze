@@ -63,7 +63,8 @@ namespace CrawfisSoftware.Collections.Maze
         /// <returns>A new maze</returns>
         public static Maze<int, int> CreateMaze(int width, int height, List<Direction> directions)
         {
-            return MazeBuilderUtility<int, int>.CreateMaze(width, height, directions, DummyNodeValues, DummyEdgeValues);
+            return MazeBuilderUtility<int, int>.CreateMaze(width, height, directions, 
+                MazeBuilderUtility<int,int>.DummyNodeValues, MazeBuilderUtility<int, int>.DummyEdgeValues);
         }
 
         /// <summary>
@@ -177,10 +178,10 @@ namespace CrawfisSoftware.Collections.Maze
         /// </summary>
         /// <param name="i">Column index of a cell.</param>
         /// <param name="j">Row index of a cell.</param>
-        /// <returns></returns>
-        public static int DummyNodeValues(int i, int j)
+        /// <returns>The default value for the <typeparamref name="N"/>.</returns>
+        public static N DummyNodeValues(int i, int j)
         {
-            return 1;
+            return default(N);
         }
 
         /// <summary>
@@ -189,10 +190,10 @@ namespace CrawfisSoftware.Collections.Maze
         /// <param name="i">Column index of a cell.</param>
         /// <param name="j">Row index of a cell.</param>
         /// <param name="dir">Direction of the desired edge</param>
-        /// <returns></returns>
-        public static int DummyEdgeValues(int i, int j, Direction dir)
+        /// <returns>The default value for the <typeparamref name="E"/>.</returns>
+        public static E DummyEdgeValues(int i, int j, Direction dir)
         {
-            return 1;
+            return default(E);
         }
     }
 }

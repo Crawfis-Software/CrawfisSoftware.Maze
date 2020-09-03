@@ -31,8 +31,6 @@ namespace CrawfisSoftware.Collections.Maze
 
         private void RecursiveBackTracker(int startingNode, bool preserveExistingCells = true)
         {
-            //if (!preserveExistingCells)
-            //    Clear();
             bool[,] visited = new bool[directions.GetLength(0), directions.GetLength(1)];
 
             Stack<int> currentPath = new Stack<int>();
@@ -43,12 +41,11 @@ namespace CrawfisSoftware.Collections.Maze
             {
                 int currentNode = currentPath.Peek();
                 neighbors.Clear();
-                // Select neighbors who have not been visited (Direction is None).
+                // Select neighbors who have not been visited.
                 foreach (int neighbor in grid.Neighbors(currentNode))
                 {
                     int row = neighbor / Width;
                     int column = neighbor % Width;
-                    //if ((directions[column, row] & (~Direction.Undefined)) == Direction.None)
                         if (!visited[column,row])
                         {
                             neighbors.Add(neighbor);
@@ -72,7 +69,6 @@ namespace CrawfisSoftware.Collections.Maze
                 {
                     currentPath.Pop();
                 }
-
             }
         }
 

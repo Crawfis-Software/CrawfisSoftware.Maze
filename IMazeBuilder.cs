@@ -1,4 +1,6 @@
-﻿namespace CrawfisSoftware.Collections.Maze
+﻿using CrawfisSoftware.Collections.Graph;
+
+namespace CrawfisSoftware.Collections.Maze
 {
     /// <summary>
     /// Interface for creating mazes.
@@ -68,5 +70,88 @@
         /// </summary>
         /// <returns>A maze</returns>
         Maze<N, E> GetMaze();
+
+        /// <summary>
+        /// Block the directions going to and from the cells
+        /// </summary>
+        /// <param name="currentColumn">A column index</param>
+        /// <param name="currentRow">A row index</param>
+        /// <param name="selectedColumn">Neighboring column index</param>
+        /// <param name="selectedRow">Neighboring row index</param>
+        /// <param name="preserveExistingCells">Boolean indicating whether to only replace maze cells that are undefined.
+        /// Default is false.</param>
+        /// <returns></returns>
+        bool AddWall(int currentColumn, int currentRow, int selectedColumn, int selectedRow, bool preserveExistingCells = false);
+
+        /// <summary>
+        /// Carve a passage in the specified direction.
+        /// </summary>
+        /// <param name="currentColumn">Column index of the cell to carve</param>
+        /// <param name="currentRow">Row index of the row to carve</param>
+        /// <param name="directionToCarve">A single direction to carve</param>
+        /// <param name="preserveExistingCells">Boolean indicating whether to only replace maze cells that are undefined.
+        /// Default is false.</param>
+        /// <return>Returns true if the operation was successful.</return>
+        bool CarveDirectionally(int currentColumn, int currentRow, Direction directionToCarve, bool preserveExistingCells = false);
+
+        /// <summary>
+        /// Set all cells with the directions specified.
+        /// </summary>
+        /// <param name="lowerLeftCell">The lower-left corner of the region to fix.</param>
+        /// <param name="upperRightCell">The upper-right corner of the region to fix.</param>
+        /// <param name="dirs">List of directions to set each cell to.</param>
+        /// <remarks>May lead to possible inconsistent neighbor directions.</remarks>
+        /// <seealso>MakeBidirectionallyConsistent</seealso>
+        void FillRegion(int lowerLeftCell, int upperRightCell, Direction dirs);
+
+        /// <summary>
+        /// Set all directions in the maze to Direction.Undefined
+        /// </summary>
+        void Clear();
+
+        /// <summary>
+        /// Remove dead-ends (implementation specific - one pass or many passes).
+        /// Replaces dead-ends by blocking the only passage creating an empty cell
+        /// </summary>
+        /// <param name="preserveExistingCells"></param>
+        void RemoveDeadEnds(bool preserveExistingCells = false);
+
+        /// <summary>
+        /// Remove Direction.Undefined for all cells that have been defined
+        /// </summary>
+        void FreezeCells();
+
+        /// <summary>
+        /// Remove Direction.Undefined for all cells.
+        /// </summary>
+        void RemoveUndefines();
+
+        /// <summary>
+        /// Ensures that all edges are bi-directional. In other words, a passage was not carved from A to
+        /// B and not B to A.
+        /// </summary>
+        /// <remarks>This will open up all inconsistencies.</remarks>
+        void MakeBidirectionallyConsistent();
+
+        /// <summary>
+        /// Ensures that all edges are bi-directional. In other words, a passage was not carved from A to
+        /// B and not B to A.
+        /// </summary>
+        /// <param name="lowerLeftCell">The lower-left corner of the region to fix.</param>
+        /// <param name="upperRightCell">The upper-right corner of the region to fix.</param>
+        /// <remarks>This will open up all inconsistencies.</remarks>
+        void MakeBiDirectionallyConsistent(int lowerLeftCell, int upperRightCell);
+
+        /// <summary>
+        /// Carve a passage in the specified direction.
+        /// </summary>
+        /// <param name="currentColumn">A column index</param>
+        /// <param name="currentRow">A row index</param>
+        /// <param name="selectedColumn">Neighboring column index</param>
+        /// <param name="selectedRow">Neighboring row index</param>
+        /// <param name="preserveExistingCells">Boolean indicating whether to only replace maze cells that are undefined.
+        /// Default is false.</param>
+        /// <return>Returns true if the operation was successful.</return>
+        bool CarvePassage(int currentColumn, int currentRow, int selectedColumn, int selectedRow, bool preserveExistingCells = false);
     }
 }

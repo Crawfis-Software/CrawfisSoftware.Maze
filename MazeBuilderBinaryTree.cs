@@ -31,7 +31,8 @@ namespace CrawfisSoftware.Collections.Maze
         /// <param name="nodeAccessor">A function to retrieve any node labels</param>
         /// <param name="edgeAccessor">A function to retrieve any edge weights</param>
         /// <param name="percentHorizontal">Control to favor horizontal or vertical runs</param>
-        public MazeBuilderBinaryTree(int width, int height, GetGridLabel<N> nodeAccessor, GetEdgeLabel<E> edgeAccessor, int percentHorizontal = 50) : base(width, height, nodeAccessor, edgeAccessor)
+        public MazeBuilderBinaryTree(int width, int height, GetGridLabel<N> nodeAccessor = null, GetEdgeLabel<E> edgeAccessor = null,
+            int percentHorizontal = 50) : base(width, height, nodeAccessor, edgeAccessor)
         {
             PercentHorizontal = percentHorizontal;
         }

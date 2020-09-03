@@ -18,7 +18,8 @@ namespace CrawfisSoftware.Collections.Maze
         /// <param name="height">The height of the desired maze</param>
         /// <param name="nodeAccessor">A function to retrieve any node labels</param>
         /// <param name="edgeAccessor">A function to retrieve any edge weights</param>
-        public MazeBuilderAldousBroder(int width, int height, GetGridLabel<N> nodeAccessor, GetEdgeLabel<E> edgeAccessor) : base(width, height, nodeAccessor, edgeAccessor)
+        public MazeBuilderAldousBroder(int width, int height, GetGridLabel<N> nodeAccessor = null, GetEdgeLabel<E> edgeAccessor = null)
+            : base(width, height, nodeAccessor, edgeAccessor)
         {
         }
 

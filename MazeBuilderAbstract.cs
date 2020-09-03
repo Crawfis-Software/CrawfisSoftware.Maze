@@ -32,22 +32,22 @@ namespace CrawfisSoftware.Collections.Maze
         /// <param name="height">The height of the desired maze</param>
         /// <param name="nodeAccessor">A function to retrieve any node labels</param>
         /// <param name="edgeAccessor">A function to retrieve any edge weights</param>
-        public MazeBuilderAbstract(int width, int height, GetGridLabel<N> nodeAccessor, GetEdgeLabel<E> edgeAccessor)
+        public MazeBuilderAbstract(int width, int height, GetGridLabel<N> nodeAccessor = null, GetEdgeLabel<E> edgeAccessor = null)
         {
             this.Width = width;
             this.Height = height;
-            nodeFunction = nodeAccessor;
-            edgeFunction = edgeAccessor;
-            grid = new Grid<N, E>(width, height, nodeAccessor, edgeAccessor);
+            nodeFunction = nodeAccessor != null ? nodeAccessor : MazeBuilderUtility<N,E>.DummyNodeValues;
+            edgeFunction = edgeAccessor != null ? edgeAccessor : MazeBuilderUtility<N, E>.DummyEdgeValues;
+            grid = new Grid<N, E>(width, height, nodeFunction, edgeFunction);
             directions = new Direction[width, height];
             Clear();
             RandomGenerator = new Random();
         }
         /// <summary>
-        /// Constructor
+        /// Copy Constructor (shallow copy)
         /// </summary>
         /// <param name="mazeBuilder">An existing maze builder to copy the current state from.</param>
-        public MazeBuilderAbstract(MazeBuilderAbstract<N,E> mazeBuilder)
+        public MazeBuilderAbstract(MazeBuilderAbstract<N, E> mazeBuilder)
         {
             this.Width = mazeBuilder.Width;
             this.Height = mazeBuilder.Height;
@@ -58,15 +58,7 @@ namespace CrawfisSoftware.Collections.Maze
             RandomGenerator = mazeBuilder.RandomGenerator;
         }
 
-        /// <summary>
-        /// Carve a passage in the specified direction.
-        /// </summary>
-        /// <param name="currentColumn">Column index of the cell to carve</param>
-        /// <param name="currentRow">Row index of the row to carve</param>
-        /// <param name="directionToCarve">A single direction to carve</param>
-        /// <param name="preserveExistingCells">Boolean indicating whether to only replace maze cells that are undefined.
-        /// Default is false.</param>
-        /// <return>Returns true if the operation was successful.</return>
+        /// <inheritdoc/>
         public bool CarveDirectionally(int currentColumn, int currentRow, Direction directionToCarve, bool preserveExistingCells = false)
         {
             int cellIndex = currentRow * Width + currentColumn;
@@ -130,7 +122,8 @@ namespace CrawfisSoftware.Collections.Maze
             return AddWall(currentColumn, currentRow, selectedColumn, selectedRow, preserveExistingCells);
         }
 
-        private bool AddWall(int currentColumn, int currentRow, int selectedColumn, int selectedRow, bool preserveExistingCells = false)
+        /// <inheritdoc/>
+        public bool AddWall(int currentColumn, int currentRow, int selectedColumn, int selectedRow, bool preserveExistingCells = false)
         {
             bool cellsCanBeModified = true;
             if (grid.DirectionLookUp(currentColumn, currentRow, selectedColumn, selectedRow, out Direction directionToNeighbor))
@@ -139,7 +132,7 @@ namespace CrawfisSoftware.Collections.Maze
                 if (preserveExistingCells)
                 {
                     cellsCanBeModified = (directions[currentColumn, currentRow] & Direction.Undefined) == Direction.Undefined;
-                    if(biDirectional)
+                    if (biDirectional)
                         cellsCanBeModified &= (directions[selectedColumn, selectedRow] & Direction.Undefined) == Direction.Undefined;
                 }
                 if (cellsCanBeModified)
@@ -179,14 +172,7 @@ namespace CrawfisSoftware.Collections.Maze
             FillRegion(lowerLeftCell, upperRightCell, Direction.E | Direction.N | Direction.W | Direction.S);
         }
 
-        /// <summary>
-        /// Set all cells with the directions specified.
-        /// </summary>
-        /// <param name="lowerLeftCell">The lower-left corner of the region to fix.</param>
-        /// <param name="upperRightCell">The upper-right corner of the region to fix.</param>
-        /// <param name="dirs">List of directions to set each cell to.</param>
-        /// <remarks>May lead to possible inconsistent neighbor directions.</remarks>
-        /// <seealso>MakeBidirectionallyConsistent</seealso>
+        /// <inheritdoc/>
         public void FillRegion(int lowerLeftCell, int upperRightCell, Direction dirs)
         {
             int currentRow = lowerLeftCell / Width;
@@ -210,9 +196,7 @@ namespace CrawfisSoftware.Collections.Maze
             }
         }
 
-        /// <summary>
-        /// Set all directions in the maze to Direction.Undefined
-        /// </summary>
+        /// <inheritdoc/>
         public void Clear()
         {
             for (int row = 0; row < Height; row++)
@@ -224,7 +208,8 @@ namespace CrawfisSoftware.Collections.Maze
             }
         }
 
-        public void RemoveAllDeadEnds(bool preserveExistingCells = false)
+        /// <inheritdoc/>
+        public void RemoveDeadEnds(bool preserveExistingCells = false)
         {
             for (int row = 0; row < Height; row++)
             {
@@ -240,7 +225,7 @@ namespace CrawfisSoftware.Collections.Maze
                             AddWall(column, row, column, row + 1, preserveExistingCells);
                             break;
                         case Direction.E:
-                            AddWall(column, row, column+1, row, preserveExistingCells);
+                            AddWall(column, row, column + 1, row, preserveExistingCells);
                             break;
                         case Direction.S:
                             AddWall(column, row, column, row - 1, preserveExistingCells);
@@ -250,9 +235,7 @@ namespace CrawfisSoftware.Collections.Maze
             }
         }
 
-        /// <summary>
-        /// Remove Direction.Undefined for all cells.
-        /// </summary>
+        /// <inheritdoc/>
         public void RemoveUndefines()
         {
             for (int row = 0; row < Height; row++)
@@ -264,38 +247,26 @@ namespace CrawfisSoftware.Collections.Maze
             }
         }
 
-        /// <summary>
-        /// Remove Direction.Undefined for all cells that have been defined
-        /// </summary>
+        /// <inheritdoc/>
         public void FreezeCells()
         {
             for (int row = 0; row < Height; row++)
             {
                 for (int column = 0; column < Width; column++)
                 {
-                    if(directions[column,row] != Direction.Undefined)
+                    if (directions[column, row] != Direction.Undefined)
                         directions[column, row] &= ~Direction.Undefined;
                 }
             }
         }
 
-        /// <summary>
-        /// Ensures that all edges are bi-directional. In other words, a passage was not carved from A to
-        /// B and not B to A.
-        /// </summary>
-        /// <remarks>This will open up all inconsistencies.</remarks>
+        /// <inheritdoc/>
         public void MakeBidirectionallyConsistent()
         {
             MakeBiDirectionallyConsistent(Width + 1, Width * Height - 1 - Width - 1);
         }
 
-        /// <summary>
-        /// Ensures that all edges are bi-directional. In other words, a passage was not carved from A to
-        /// B and not B to A.
-        /// </summary>
-        /// <param name="lowerLeftCell">The lower-left corner of the region to fix.</param>
-        /// <param name="upperRightCell">The upper-right corner of the region to fix.</param>
-        /// <remarks>This will open up all inconsistencies.</remarks>
+        /// <inheritdoc/>
         public void MakeBiDirectionallyConsistent(int lowerLeftCell, int upperRightCell)
         {
             int currentRow = lowerLeftCell / Width;
