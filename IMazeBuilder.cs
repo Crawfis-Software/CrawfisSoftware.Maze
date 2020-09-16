@@ -153,5 +153,25 @@ namespace CrawfisSoftware.Collections.Maze
         /// Default is false.</param>
         /// <return>Returns true if the operation was successful.</return>
         bool CarvePassage(int currentColumn, int currentRow, int selectedColumn, int selectedRow, bool preserveExistingCells = false);
+
+        /// <summary>
+        /// Carve a continuous horizontal passage.
+        /// </summary>
+        /// <param name="row">The row to carve</param>
+        /// <param name="column1">The start (or end) of the passage.</param>
+        /// <param name="column2">The end (or start) of the passage.</param>
+        /// <param name="preserveExistingCells">Boolean indicating whether to only replace maze cells that are undefined.
+        /// Default is false.</param>
+        void CarveHorizontalSpan(int row, int column1, int column2, bool preserveExistingCells);
+
+        /// <summary>
+        /// Carve a continuous vertical passage.
+        /// </summary>
+        /// <param name="column">The column to carve</param>
+        /// <param name="row1">The start (or end) of the passage.</param>
+        /// <param name="row2">The end (or start) of the passage.</param>
+        /// <param name="preserveExistingCells">Boolean indicating whether to only replace maze cells that are undefined.
+        /// Default is false.</param>
+        void CarveVerticalSpan(int column, int row1, int row2, bool preserveExistingCells);
     }
 }

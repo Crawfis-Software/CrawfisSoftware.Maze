@@ -316,6 +316,39 @@ namespace CrawfisSoftware.Collections.Maze
             return new Maze<N, E>(grid, directions);
         }
 
+        /// <inheritdoc/>
+        public void CarveHorizontalSpan(int row, int column1, int column2, bool preserveExistingCells)
+        {
+            int start = column2;
+            int end = column1;
+            column1 = column2;
+            if (start > end)
+            {
+                start = end;
+                end = column2;
+            }
+            for (int i = start; i < end; i++)
+            {
+                CarveDirectionally(i, row, Direction.E, preserveExistingCells);
+            }
+        }
+
+        /// <inheritdoc/>
+        public void CarveVerticalSpan(int column, int row1, int row2, bool preserveExistingCells)
+        {
+            int start = row1;
+            int end = row2;
+            if (start > end)
+            {
+                start = end;
+                end = row1;
+            }
+            for (int i = start; i < end; i++)
+            {
+                CarveDirectionally(column, i, Direction.N, preserveExistingCells);
+            }
+        }
+
         #region Member variables
         /// <summary>
         /// The underlying grid data structure
