@@ -31,18 +31,23 @@ namespace CrawfisSoftware.Collections.Maze
             // Todo: Check that the grid size and the direction lengths are the same
             this.grid = grid;
             this.directions = directions;
+            this.NumberOfNodes = System.Linq.Enumerable.Count<int>(this.Nodes);
+            this.NumberOfEdges = System.Linq.Enumerable.Count<IIndexedEdge<E>>(this.Edges);
+            // Todo: major bug in Graph framework - assumes set of all node indices are {0...NumberOfNodes}
+            // Need a remapping from Node index to grid index
         }
 
-        /// <summary>
-        /// Carve an opening in the maze from the indicated cell to the neighbor specified by the direction.
-        /// </summary>
-        /// <param name="column">The i index of the cell</param>
-        /// <param name="row">The j index of the cell</param>
-        /// <param name="openingDirection">A direction (multiple flags are allowed)</param>
-        public void AddOpening(int column, int row, Direction openingDirection)
-        {
-            directions[column, row] |= openingDirection;
-        }
+        // Removed this to keep Maze immutable.
+        ///// <summary>
+        ///// Carve an opening in the maze from the indicated cell to the neighbor specified by the direction.
+        ///// </summary>
+        ///// <param name="column">The i index of the cell</param>
+        ///// <param name="row">The j index of the cell</param>
+        ///// <param name="openingDirection">A direction (multiple flags are allowed)</param>
+        //public void AddOpening(int column, int row, Direction openingDirection)
+        //{
+        //    directions[column, row] |= openingDirection;
+        //}
 
         /// <summary>
         /// Get the set of opening directions in the current cell
@@ -59,20 +64,29 @@ namespace CrawfisSoftware.Collections.Maze
         /// <inheritdoc/>
         public int NumberOfEdges
         {
-            // A perfect maze is a tree which has N-1 edges.
-            get { return grid.NumberOfNodes - 1; }
+            get; private set;
         }
 
         /// <inheritdoc/>
         public int NumberOfNodes
         {
-            get { return grid.NumberOfNodes; }
+            get; private set;
         }
 
         /// <inheritdoc/>
+        /// <remarks>If the node for a maze has no directions specified it is not output.</remarks>
         public IEnumerable<int> Nodes
         {
-            get { return grid.Nodes; }
+            get
+            {
+                foreach (int node in grid.Nodes)
+                {
+                    int row = node / Width;
+                    int column = node % Width;
+                    if (directions[column, row] != Direction.None && directions[column, row] != Direction.Undefined)
+                        yield return node;
+                }
+            }
         }
 
         /// <inheritdoc/>
@@ -176,6 +190,7 @@ namespace CrawfisSoftware.Collections.Maze
         public IIndexedGraph<N, E> Transpose()
         {
             // Todo: should be a deep copy
+            // Todo: This needs to be implemented to support direction mazes
             return this;
         }
         #endregion
