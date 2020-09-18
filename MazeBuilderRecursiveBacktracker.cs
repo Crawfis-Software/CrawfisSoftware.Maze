@@ -37,6 +37,7 @@ namespace CrawfisSoftware.Collections.Maze
             Stack<int> currentPath = new Stack<int>();
             currentPath.Push(startingNode);
             List<int> neighbors = new List<int>(4);
+            visited[startingNode % Width, startingNode / Width] = true;
 
             while (currentPath.Count > 0)
             {
