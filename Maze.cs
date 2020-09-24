@@ -26,7 +26,8 @@ namespace CrawfisSoftware.Collections.Maze
         /// </summary>
         /// <param name="grid">A grid to use as the basic structure of the maze</param>
         /// <param name="directions">A 2D array of Direction flags that specify the maze.</param>
-        public Maze(Grid<N, E> grid, Direction[,] directions)
+        /// <remarks>Made access internal to prevent changes to the directions array.</remarks>
+        internal Maze(Grid<N, E> grid, Direction[,] directions)
         {
             // Todo: Check that the grid size and the direction lengths are the same
             this.grid = grid;
@@ -210,6 +211,7 @@ namespace CrawfisSoftware.Collections.Maze
             StringBuilder rowBody = new StringBuilder(width * 4);
             StringBuilder bottomOfRow = new StringBuilder(width * 4);
             string cellSpace = "   ";
+            const string cellFilled = "...";
             // For each row we will have two strings.
             for (int row = grid.Height - 1; row >= 0; row--)
             {
@@ -219,8 +221,12 @@ namespace CrawfisSoftware.Collections.Maze
                 bottomOfRow.Append("+");
                 for (int column = 0; column < width; column++)
                 {
+                    Direction dirs = directions[column, row];
                     string eastString = (directions[column, row] & Direction.E) == Direction.E ? " " : "|";
-                    rowBody.Append(cellSpace);
+                    if (dirs == Direction.Undefined || dirs == Direction.None)
+                        rowBody.Append(cellFilled);
+                    else
+                        rowBody.Append(cellSpace);
                     rowBody.Append(eastString);
                     string southString = (directions[column, row] & Direction.S) == Direction.S ? cellSpace : "---";
                     bottomOfRow.Append(southString);

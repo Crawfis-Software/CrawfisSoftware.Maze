@@ -36,7 +36,7 @@ namespace CrawfisSoftware.Collections.Maze
         /// <param name="height">The desired height of the maze</param>
         /// <param name="directions">A stream of directions starting from the lower-left corner.</param>
         /// <returns>A 2D grid of Directions</returns>
-        public static Direction[,] MoveOriginToLowerLeft(int width, int height, List<Direction> directions)
+        public static Direction[,] MoveOriginToLowerLeft(int width, int height, IList<Direction> directions)
         {
             Direction[,] directionGrid = new Direction[width, height];
             int row = height - 1;
@@ -61,7 +61,7 @@ namespace CrawfisSoftware.Collections.Maze
         /// <param name="height">The desired height of the maze</param>
         /// <param name="directions">A stream of directions starting from the lower-left corner.</param>
         /// <returns>A new maze</returns>
-        public static Maze<int, int> CreateMaze(int width, int height, List<Direction> directions)
+        public static Maze<int, int> CreateMaze(int width, int height, IList<Direction> directions)
         {
             return MazeBuilderUtility<int, int>.CreateMaze(width, height, directions, 
                 MazeBuilderUtility<int,int>.DummyNodeValues, MazeBuilderUtility<int, int>.DummyEdgeValues);
@@ -76,7 +76,7 @@ namespace CrawfisSoftware.Collections.Maze
         /// <param name="nodeAccessor">A function to retrieve any node labels</param>
         /// <param name="edgeAccessor">A function to retrieve any edge weights</param>
         /// <returns>A new maze</returns>
-        public static Maze<N, E> CreateMaze(int width, int height, List<Direction> directions, GetGridLabel<N> nodeAccessor, GetEdgeLabel<E> edgeAccessor)
+        public static Maze<N, E> CreateMaze(int width, int height, IList<Direction> directions, GetGridLabel<N> nodeAccessor, GetEdgeLabel<E> edgeAccessor)
         {
             var mazeBuilder = new MazeBuilderExplicit<N, E>(width, height, nodeAccessor, edgeAccessor);
             int i = 0;
@@ -185,7 +185,7 @@ namespace CrawfisSoftware.Collections.Maze
         }
 
         /// <summary>
-        /// Function that always returns 1
+        /// Function that always returns the default value
         /// </summary>
         /// <param name="i">Column index of a cell.</param>
         /// <param name="j">Row index of a cell.</param>
