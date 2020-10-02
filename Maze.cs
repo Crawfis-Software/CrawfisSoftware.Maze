@@ -22,20 +22,34 @@ namespace CrawfisSoftware.Collections.Maze
         public int Height { get { return grid.Height; } }
 
         /// <summary>
+        /// The starting cell index for the maze. Cell indices go from bottom-left across a row to top-right.
+        /// </summary>
+        public int StartCell { get; }
+
+        /// <summary>
+        /// The end cell index for the maze. Cell indices go from bottom-left across a row to top-right.
+        /// </summary>
+        public int EndCell { get; }
+
+        /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="grid">A grid to use as the basic structure of the maze</param>
         /// <param name="directions">A 2D array of Direction flags that specify the maze.</param>
+        /// <param name="startCellIndex">The starting cell index for the maze. Cell indices go from 
+        /// bottom-left across a row to top-right.</param>
+        /// <param name="endCellIndex">The ending cell index for the maze. Cell indices go from 
+        /// bottom-left across a row to top-right.</param>
         /// <remarks>Made access internal to prevent changes to the directions array.</remarks>
-        internal Maze(Grid<N, E> grid, Direction[,] directions)
+        internal Maze(Grid<N, E> grid, Direction[,] directions, int startCellIndex, int endCellIndex)
         {
             // Todo: Check that the grid size and the direction lengths are the same
             this.grid = grid;
             this.directions = directions;
+            this.StartCell = startCellIndex;
+            this.EndCell = endCellIndex;
             this.NumberOfNodes = System.Linq.Enumerable.Count<int>(this.Nodes);
             this.NumberOfEdges = System.Linq.Enumerable.Count<IIndexedEdge<E>>(this.Edges);
-            // Todo: major bug in Graph framework - assumes set of all node indices are {0...NumberOfNodes}
-            // Need a remapping from Node index to grid index
         }
 
         // Removed this to keep Maze immutable.

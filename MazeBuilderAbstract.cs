@@ -51,6 +51,8 @@ namespace CrawfisSoftware.Collections.Maze
         {
             this.Width = mazeBuilder.Width;
             this.Height = mazeBuilder.Height;
+            this.StartCell = mazeBuilder.StartCell;
+            this.EndCell = mazeBuilder.EndCell;
             nodeFunction = mazeBuilder.nodeFunction;
             edgeFunction = mazeBuilder.edgeFunction;
             grid = mazeBuilder.grid;
@@ -313,7 +315,8 @@ namespace CrawfisSoftware.Collections.Maze
         /// <inheritdoc/>
         public virtual Maze<N, E> GetMaze()
         {
-            return new Maze<N, E>(grid, directions);
+            var maze = new Maze<N, E>(grid, directions, StartCell, EndCell);
+            return maze;
         }
 
         /// <inheritdoc/>
