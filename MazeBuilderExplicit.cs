@@ -29,17 +29,6 @@ namespace CrawfisSoftware.Collections.Maze
         {
         }
 
-        /// <summary>
-        /// Set the directions for this cell
-        /// </summary>
-        /// <param name="i">The column index</param>
-        /// <param name="j">The row index</param>
-        /// <param name="dirs"></param>
-        public void SetCell(int i, int j, Direction dirs)
-        {
-            directions[i, j] = dirs;
-        }
-
         /// <inheritdoc/>
         public override void CreateMaze(bool preserveExistingCells)
         {

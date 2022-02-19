@@ -217,15 +217,20 @@ namespace CrawfisSoftware.Collections.Maze
         public override string ToString()
         {
             int width = grid.Width;
+            string cellSpace = "   ";
+            const string cellFilled = "...";
             StringBuilder mazeString = new StringBuilder(width);
             mazeString.Append("+");
             for (int i = 0; i < width; i++)
-                mazeString.Append("---+");
+            {
+                Direction dirs = directions[i, grid.Height-1];
+                string northString = (dirs & Direction.N) == Direction.N ? cellSpace : "---";
+                mazeString.Append(northString);
+                mazeString.Append("+");
+            }
             mazeString.AppendLine();
             StringBuilder rowBody = new StringBuilder(width * 4);
             StringBuilder bottomOfRow = new StringBuilder(width * 4);
-            string cellSpace = "   ";
-            const string cellFilled = "...";
             // For each row we will have two strings.
             for (int row = grid.Height - 1; row >= 0; row--)
             {

@@ -352,6 +352,18 @@ namespace CrawfisSoftware.Collections.Maze
             }
         }
 
+        /// <inheritdoc/>
+        public void SetCell(int i, int j, Direction dirs)
+        {
+            directions[i, j] = dirs;
+        }
+
+        /// <inheritdoc/>
+        public void AddDirectionExplicitly(int i, int j, Direction dirs)
+        {
+            directions[i, j] |= dirs;
+        }
+
         #region Member variables
         /// <summary>
         /// The underlying grid data structure

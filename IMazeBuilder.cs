@@ -173,5 +173,21 @@ namespace CrawfisSoftware.Collections.Maze
         /// <param name="preserveExistingCells">Boolean indicating whether to only replace maze cells that are undefined.
         /// Default is false.</param>
         void CarveVerticalSpan(int column, int row1, int row2, bool preserveExistingCells);
+
+        /// <summary>
+        /// Set the directions for this cell w/o any safeguards
+        /// </summary>
+        /// <param name="i">The column index</param>
+        /// <param name="j">The row index</param>
+        /// <param name="dirs">The cell value including all directions</param>
+        void SetCell(int i, int j, Direction dirs);
+
+        /// <summary>
+        /// Add the direction(s) to this cell w/o any safeguards
+        /// </summary>
+        /// <param name="i">The column index</param>
+        /// <param name="j">The row index</param>
+        /// <param name="dirs">The directions to add</param>
+        void AddDirectionExplicitly(int i, int j, Direction dirs);
     }
 }
