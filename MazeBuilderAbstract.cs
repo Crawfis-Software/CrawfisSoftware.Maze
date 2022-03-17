@@ -1,5 +1,8 @@
-﻿using CrawfisSoftware.Collections.Graph;
+﻿using CrawfisSoftware.Collections;
+using CrawfisSoftware.Collections.Graph;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace CrawfisSoftware.Collections.Maze
 {
@@ -245,31 +248,26 @@ namespace CrawfisSoftware.Collections.Maze
                 for (int column = 0; column < Width; column++)
                 {
                     Direction dir = directions[column, row] & ~Direction.Undefined;
-                    // Todo: the direction to merge should be random. Need to loop in case preserveExistingCells prevents a partidular direction.
-                    var dirs = grid.Neighbors(column + row * Width);
+                    IList<int> dirs = grid.Neighbors(column + row * Width).ToList();
                     int incomingCellIndex = -1;
                     switch (dir)
                     {
                         case Direction.W:
                             incomingCellIndex = column - 1 + row * Width;
-                            //CarvePassage(column, row, column + 1, row, preserveExistingCells);
                             break;
                         case Direction.N:
                             incomingCellIndex = column + (row+1) * Width;
-                            //CarvePassage(column, row, column, row - 1, preserveExistingCells);
                             break;
                         case Direction.E:
                             incomingCellIndex = column + 1 + row * Width;
-                            //CarvePassage(column, row, column - 1, row, preserveExistingCells);
                             break;
                         case Direction.S:
                             incomingCellIndex = column + (row-1) * Width;
-                            //CarvePassage(column, row, column, row + 1, preserveExistingCells);
                             break;
                     }
                     if (incomingCellIndex != -1)
                     {
-                        foreach (var cell in dirs)
+                        foreach (var cell in dirs.Shuffle<int>(RandomGenerator))
                         {
                             if (cell == incomingCellIndex) continue;
                             if (CarvePassage(column + row * Width, cell, preserveExistingCells)) break;
@@ -292,7 +290,7 @@ namespace CrawfisSoftware.Collections.Maze
         }
 
         /// <inheritdoc/>
-        public void FreezeCells()
+        public void FreezeDefinedCells()
         {
             for (int row = 0; row < Height; row++)
             {

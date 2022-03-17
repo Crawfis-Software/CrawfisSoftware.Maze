@@ -119,7 +119,7 @@ namespace CrawfisSoftware.Collections.Maze
         /// <summary>
         /// Remove Direction.Undefined for all cells that have been defined
         /// </summary>
-        void FreezeCells();
+        void FreezeDefinedCells();
 
         /// <summary>
         /// Remove Direction.Undefined for all cells.
