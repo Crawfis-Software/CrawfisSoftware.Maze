@@ -140,7 +140,7 @@ namespace CrawfisSoftware.Collections.Maze
         /// <param name="lowerLeftCell">The lower-left corner of the region to fix.</param>
         /// <param name="upperRightCell">The upper-right corner of the region to fix.</param>
         /// <remarks>This will open up all inconsistencies.</remarks>
-        void MakeBiDirectionallyConsistent(int lowerLeftCell, int upperRightCell);
+        void MakeBidirectionallyConsistent(int lowerLeftCell, int upperRightCell);
 
         /// <summary>
         /// Carve a passage in the specified direction.
@@ -189,5 +189,6 @@ namespace CrawfisSoftware.Collections.Maze
         /// <param name="j">The row index</param>
         /// <param name="dirs">The directions to add</param>
         void AddDirectionExplicitly(int i, int j, Direction dirs);
+        void MakeBidirectionallyConsistent(int currentColumn, int currentRow, int endColumn, int endRow);
     }
 }

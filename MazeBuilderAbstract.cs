@@ -241,14 +241,14 @@ namespace CrawfisSoftware.Collections.Maze
         }
 
         /// <inheritdoc/>
-        public void MergeDeadEnds(bool preserveExistingCells = false)
+        /// <param name="carveNeighbors">True to keep the underlying maze consistent. False to just modify the dead-end cell.</param>
+        public void MergeDeadEnds(bool preserveExistingCells = false, bool carveNeighbors = true)
         {
             for (int row = 0; row < Height; row++)
             {
                 for (int column = 0; column < Width; column++)
                 {
                     Direction dir = directions[column, row] & ~Direction.Undefined;
-                    IList<int> dirs = grid.Neighbors(column + row * Width).ToList();
                     int incomingCellIndex = -1;
                     switch (dir)
                     {
@@ -267,10 +267,21 @@ namespace CrawfisSoftware.Collections.Maze
                     }
                     if (incomingCellIndex != -1)
                     {
-                        foreach (var cell in dirs.Shuffle<int>(RandomGenerator))
+                        IList<int> neighborDirs = grid.Neighbors(column + row * Width).ToList();
+                        foreach (var neighborIndex in neighborDirs.Shuffle<int>(RandomGenerator))
                         {
-                            if (cell == incomingCellIndex) continue;
-                            if (CarvePassage(column + row * Width, cell, preserveExistingCells)) break;
+                            if (neighborIndex == incomingCellIndex) continue;
+                            if (carveNeighbors)
+                            {
+                                if (CarvePassage(column + row * Width, neighborIndex, preserveExistingCells)) break;
+                            }
+                            else
+                            {
+                                // This will lead to an inconsistent edge, which is useful is certain situations.
+                                var directionToCarve = DirectionExtensions.GetEdgeDirection(column + row * Width, neighborIndex, Width);
+                                directions[column, row] |= directionToCarve;
+                                break;
+                            }
                         }
                     }
                 }
@@ -305,16 +316,21 @@ namespace CrawfisSoftware.Collections.Maze
         /// <inheritdoc/>
         public void MakeBidirectionallyConsistent()
         {
-            MakeBiDirectionallyConsistent(Width + 1, Width * Height - 1 - Width - 1);
+            MakeBidirectionallyConsistent(0, 0, Width-1, Height-1);
         }
 
         /// <inheritdoc/>
-        public void MakeBiDirectionallyConsistent(int lowerLeftCell, int upperRightCell)
+        public void MakeBidirectionallyConsistent(int lowerLeftCell, int upperRightCell)
         {
             int currentRow = lowerLeftCell / Width;
             int currentColumn = lowerLeftCell % Width;
             int endRow = upperRightCell / Width;
             int endColumn = upperRightCell % Width;
+            MakeBidirectionallyConsistent(currentColumn, currentRow, endColumn, endRow);
+        }
+
+        public void MakeBidirectionallyConsistent(int currentColumn, int currentRow, int endColumn, int endRow)
+        {
             if (currentColumn < 0 || currentColumn >= grid.Width || endColumn < 0 || endColumn >= grid.Width)
             {
                 throw new ArgumentOutOfRangeException("Specified cell is outside of the current maze width");
@@ -323,27 +339,27 @@ namespace CrawfisSoftware.Collections.Maze
             {
                 throw new ArgumentOutOfRangeException("Specified cell is outside of the current maze height");
             }
-            for (int row = currentRow; row < endRow; row++)
+            for (int row = currentRow; row <= endRow; row++)
             {
-                for (int column = currentColumn; column < endColumn; column++)
+                for (int column = currentColumn; column <= endColumn; column++)
                 {
                     Direction dir = directions[column, row];
-                    if ((dir & Direction.W) == Direction.W)
+                    if (column > 0 && (dir & Direction.W) == Direction.W)
                         directions[column - 1, row] |= Direction.E;
-                    else
-                        directions[column - 1, row] &= ~Direction.E;
-                    if ((dir & Direction.N) == Direction.N)
-                        directions[column, row + 1] |= Direction.N;
-                    else
-                        directions[column, row + 1] &= ~Direction.N;
-                    if ((dir & Direction.E) == Direction.E)
+                    //else if (column > 0)
+                    //    directions[column - 1, row] &= ~Direction.E;
+                    if ((row < Height) && (dir & Direction.N) == Direction.N)
+                        directions[column, row + 1] |= Direction.S;
+                    //else if (row < Height)
+                    //    directions[column, row + 1] &= ~Direction.S;
+                    if ((column < Width) && (dir & Direction.E) == Direction.E)
                         directions[column + 1, row] |= Direction.W;
-                    else
-                        directions[column + 1, row] &= ~Direction.W;
-                    if ((dir & Direction.S) == Direction.S)
+                    //else if(column < Width)
+                    //    directions[column + 1, row] &= ~Direction.W;
+                    if ((row > 0) && (dir & Direction.S) == Direction.S)
                         directions[column, row - 1] |= Direction.N;
-                    else
-                        directions[column, row - 1] &= ~Direction.N;
+                    //else if(row > 0)
+                    //    directions[column, row - 1] &= ~Direction.N;
                 }
             }
 
