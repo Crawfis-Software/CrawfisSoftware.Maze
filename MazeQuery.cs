@@ -160,7 +160,7 @@ namespace CrawfisSoftware.Collections.Maze
         /// </summary>
         /// <param name="maze">The maze to query.</param>
         /// <param name="directions">An set of directions as a Direction Flag (enum).</param>
-        /// <returns>An IEnumberable os Tuples containing the row and column).</returns>
+        /// <returns>An IEnumberable of Tuples containing the row and column).</returns>
         public static IEnumerable<(int Row, int Column)> ContainsAny(this Maze<int, int> maze, Direction directions)
         {
             for (int row = 0; row < maze.Height; row++)
@@ -176,6 +176,11 @@ namespace CrawfisSoftware.Collections.Maze
             }
         }
 
+        /// <summary>
+        /// Query the maze to find all edges between cells where the directions do not match: Goes East but East neighbor does not go West.
+        /// </summary>
+        /// <param name="maze">The maze to query.</param>
+        /// <returns>An IEnumerable of Tuples containing the cell index of the cell that has an extra direction and the inconsistent neighbor cell index.</returns>
         // Todo: This needs testing. Useful after say removing deadends inconsistently to determine edges that need a barrier or something.
         // Todo: Handle the Undefined flag.
         public static IEnumerable<(int cell1, int cell2)> FindInconsistentEdges(this Maze<int, int> maze)

@@ -51,6 +51,7 @@
     <Compile Include="MazeBuilderBitEdges.cs" />
     <Compile Include="MazeBuilderExplicit.cs" />
     <Compile Include="MazeBuilderRecursiveBacktracker.cs" />
+    <Compile Include="MazeBuilderRecursiveDivision.cs" />
     <Compile Include="MazeBuilderUtility.cs" />
     <Compile Include="MazeQuery.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -33,8 +33,6 @@ namespace CrawfisSoftware.Collections.Maze
 
         private void AldousBroder(bool preserveExistingCells = false) // Random Walk, may take an infinite amount of time.
         {
-            if (!preserveExistingCells)
-                Clear();
             int unvisited = grid.NumberOfNodes - 1;
             bool[] visited = new bool[grid.NumberOfNodes];
             for (int row = 0; row < Height; row++)

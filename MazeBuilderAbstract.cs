@@ -174,12 +174,15 @@ namespace CrawfisSoftware.Collections.Maze
         /// <seealso>MakeBidirectionallyConsistent</seealso>
         public void OpenRegion(int lowerLeftCell, int upperRightCell)
         {
-            FillRegion(lowerLeftCell, upperRightCell, Direction.E | Direction.N | Direction.W | Direction.S);
+            // Todo: Add preserveCells logic. 
+            FillRegion(lowerLeftCell, upperRightCell, Direction.E | Direction.N | Direction.W | Direction.S | Direction.Undefined);
         }
 
         /// <inheritdoc/>
         public void FillRegion(int lowerLeftCell, int upperRightCell, Direction dirs)
         {
+            // Todo: Add preserveCells logic. Lots of ways to do this: Add dirs, set dirs, set dirs if Undefined, preserve undefined, ...
+            // Bug: upperRightCell is non-inclusive, so would need to be out of bounds to reach the right-edge or 
             int currentRow = lowerLeftCell / Width;
             int currentColumn = lowerLeftCell % Width;
             int endRow = upperRightCell / Width;
@@ -192,13 +195,32 @@ namespace CrawfisSoftware.Collections.Maze
             {
                 throw new ArgumentOutOfRangeException("Specified cell is outside of the current maze height");
             }
-            for (int row = currentRow; row < endRow; row++)
+            for (int row = currentRow; row <= endRow; row++)
             {
-                for (int column = currentColumn; column < endColumn; column++)
+                for (int column = currentColumn; column <= endColumn; column++)
                 {
                     directions[column, row] = dirs;
                 }
             }
+        }
+
+        /// <summary>
+        /// Add walls (inconsistenly currently) to the boundary of the define rectangle.
+        /// </summary>
+        /// <param name="lowerLeftCell">The lower-left cell index.</param>
+        /// <param name="upperRightCell">The upper -right cell index.</param>
+        public void WallBoundary(int lowerLeftCell, int upperRightCell)
+        {
+            int lowerRightCell = upperRightCell % Width + Width * (int)(lowerLeftCell / Width);
+            int upperLeftCell = lowerLeftCell % Width + Width * (int)(upperRightCell / Width);
+            FillRegion(lowerLeftCell, lowerRightCell, ~Direction.S);
+            FillRegion(lowerRightCell, upperRightCell, ~Direction.E);
+            FillRegion(lowerLeftCell, upperLeftCell, ~Direction.W);
+            FillRegion(upperLeftCell, upperRightCell, ~Direction.N);
+            directions[lowerLeftCell % Width, lowerLeftCell / Width] = (~Direction.S & ~Direction.W);
+            directions[lowerRightCell % Width, lowerRightCell / Width] = (~Direction.S & ~Direction.E);
+            directions[upperLeftCell % Width, upperLeftCell / Width] = (~Direction.N & ~Direction.W);
+            directions[upperRightCell % Width, upperRightCell / Width] = (~Direction.N & ~Direction.E);
         }
 
         /// <inheritdoc/>
@@ -208,7 +230,7 @@ namespace CrawfisSoftware.Collections.Maze
             {
                 for (int column = 0; column < Width; column++)
                 {
-                    directions[column, row] |= Direction.Undefined;
+                    directions[column, row] = Direction.Undefined;
                 }
             }
         }
@@ -240,7 +262,10 @@ namespace CrawfisSoftware.Collections.Maze
             }
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Provides a weave for the maze, randomly connecting dead-end cell to a neighbor. 
+        /// </summary>
+        /// <param name="preserveExistingCells">Boolean indicating whether to only replace maze cells that are undefined.</param>
         /// <param name="carveNeighbors">True to keep the underlying maze consistent. False to just modify the dead-end cell.</param>
         public void MergeDeadEnds(bool preserveExistingCells = false, bool carveNeighbors = true)
         {
@@ -329,6 +354,8 @@ namespace CrawfisSoftware.Collections.Maze
             MakeBidirectionallyConsistent(currentColumn, currentRow, endColumn, endRow);
         }
 
+        /// <inheritdoc/>
+        /// <exception cref="ArgumentOutOfRangeException"></exception>
         public void MakeBidirectionallyConsistent(int currentColumn, int currentRow, int endColumn, int endRow)
         {
             if (currentColumn < 0 || currentColumn >= grid.Width || endColumn < 0 || endColumn >= grid.Width)

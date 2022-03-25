@@ -134,15 +134,6 @@ namespace CrawfisSoftware.Collections.Maze
         void MakeBidirectionallyConsistent();
 
         /// <summary>
-        /// Ensures that all edges are bi-directional. In other words, a passage was not carved from A to
-        /// B and not B to A.
-        /// </summary>
-        /// <param name="lowerLeftCell">The lower-left corner of the region to fix.</param>
-        /// <param name="upperRightCell">The upper-right corner of the region to fix.</param>
-        /// <remarks>This will open up all inconsistencies.</remarks>
-        void MakeBidirectionallyConsistent(int lowerLeftCell, int upperRightCell);
-
-        /// <summary>
         /// Carve a passage in the specified direction.
         /// </summary>
         /// <param name="currentColumn">A column index</param>
@@ -189,6 +180,23 @@ namespace CrawfisSoftware.Collections.Maze
         /// <param name="j">The row index</param>
         /// <param name="dirs">The directions to add</param>
         void AddDirectionExplicitly(int i, int j, Direction dirs);
+
+        /// <summary>
+        /// Ensures that all edges are bi-directional. In other words, a passage was not carved from A to
+        /// B and not B to A.
+        /// </summary>
+        /// <param name="lowerLeftCell">The lower-left corner of the region to fix.</param>
+        /// <param name="upperRightCell">The upper-right corner of the region to fix.</param>
+        /// <remarks>This will open up all inconsistencies.</remarks>
+        void MakeBidirectionallyConsistent(int lowerLeftCell, int upperRightCell);
+
+        /// <summary>
+        /// Loops over the specified region and removes the Direction.Undefined if any.
+        /// </summary>
+        /// <param name="currentColumn">Lower-left column</param>
+        /// <param name="currentRow">Lower-left row</param>
+        /// <param name="endColumn">upper-left column inclusive</param>
+        /// <param name="endRow">upper-right row inclusive</param>
         void MakeBidirectionallyConsistent(int currentColumn, int currentRow, int endColumn, int endRow);
     }
 }

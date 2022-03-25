@@ -235,12 +235,14 @@ namespace CrawfisSoftware.Collections.Maze
             for (int row = grid.Height - 1; row >= 0; row--)
             {
                 rowBody.Remove(0, rowBody.Length);
-                rowBody.Append("|");
+                Direction dirs = directions[0,row];
+                string westString = (dirs & Direction.W) == Direction.W ? cellSpace : "|";
+                rowBody.Append(westString);
                 bottomOfRow.Remove(0, bottomOfRow.Length);
                 bottomOfRow.Append("+");
                 for (int column = 0; column < width; column++)
                 {
-                    Direction dirs = directions[column, row];
+                    dirs = directions[column, row];
                     string eastString = (directions[column, row] & Direction.E) == Direction.E ? " " : "|";
                     if (dirs == Direction.Undefined || dirs == Direction.None)
                         rowBody.Append(cellFilled);
