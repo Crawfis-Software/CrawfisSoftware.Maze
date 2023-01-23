@@ -10,7 +10,7 @@
     <DocumentationFile>bin\Debug\Maze.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Collections\Collections.csproj" />
+    <ProjectReference Include="..\..\Collections\CrawfisSoftware.Collections.csproj" />
     <ProjectReference Include="..\Graph\CrawfisSoftware.Graph.csproj" />
     <ProjectReference Include="..\Grid\CrawfisSoftware.Grid.csproj" />
     <ProjectReference Include="..\IGraph\CrawfisSoftware.IGraph.csproj" />
