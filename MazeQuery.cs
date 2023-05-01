@@ -13,7 +13,7 @@ namespace CrawfisSoftware.Collections.Maze
         /// Lists the grid (row,column) tuple of each dead-end.
         /// </summary>
         /// <param name="maze">The maze to query.</param>
-        /// <returns>An IEnumberable os Tuples containing the row and column).</returns>
+        /// <returns>An IEnumberable of Tuples containing the row and column).</returns>
         public static IEnumerable<(int Row, int Column)> DeadEnds(this Maze<int, int> maze)
         {
             for (int row = 0; row < maze.Height; row++)
@@ -33,7 +33,7 @@ namespace CrawfisSoftware.Collections.Maze
         /// Lists the grid (row,column) tuple of each TJunction.
         /// </summary>
         /// <param name="maze">The maze to query.</param>
-        /// <returns>An IEnumberable os Tuples containing the row and column).</returns>
+        /// <returns>An IEnumberable of Tuples containing the row and column).</returns>
         public static IEnumerable<(int Row, int Column)> TJunctions(this Maze<int, int> maze)
         {
             //var query = from cell in maze
@@ -57,7 +57,7 @@ namespace CrawfisSoftware.Collections.Maze
         /// Lists the grid (row,column) tuple of each horizontal or straight cell.
         /// </summary>
         /// <param name="maze">The maze to query.</param>
-        /// <returns>An IEnumberable os Tuples containing the row and column).</returns>
+        /// <returns>An IEnumberable of Tuples containing the row and column).</returns>
         public static IEnumerable<(int Row, int Column)> Straights(this Maze<int, int> maze)
         {
             for (int row = 0; row < maze.Height; row++)
@@ -77,7 +77,7 @@ namespace CrawfisSoftware.Collections.Maze
         /// Lists the grid (row,column) tuple of each cell containing only a turn.
         /// </summary>
         /// <param name="maze">The maze to query.</param>
-        /// <returns>An IEnumberable os Tuples containing the row and column).</returns>
+        /// <returns>An IEnumberable of Tuples containing the row and column).</returns>
         public static IEnumerable<(int Row, int Column)> Turns(this Maze<int, int> maze)
         {
             for (int row = 0; row < maze.Height; row++)
@@ -97,7 +97,7 @@ namespace CrawfisSoftware.Collections.Maze
         /// Lists the grid (row,column) tuple of each cross-section.
         /// </summary>
         /// <param name="maze">The maze to query.</param>
-        /// <returns>An IEnumberable os Tuples containing the row and column).</returns>
+        /// <returns>An IEnumberable of Tuples containing the row and column).</returns>
         public static IEnumerable<(int Row, int Column)> CrossSections(this Maze<int, int> maze)
         {
             for (int row = 0; row < maze.Height; row++)
@@ -118,7 +118,7 @@ namespace CrawfisSoftware.Collections.Maze
         /// </summary>
         /// <param name="maze">The maze to query.</param>
         /// <param name="directions">An set of directions as a Direction Flag (enum).</param>
-        /// <returns>An IEnumberable os Tuples containing the row and column).</returns>
+        /// <returns>An IEnumberable of Tuples containing the row and column).</returns>
         public static IEnumerable<(int Row, int Column)> MatchingExactly(this Maze<int, int> maze, Direction directions)
         {
             for (int row = 0; row < maze.Height; row++)
@@ -139,7 +139,7 @@ namespace CrawfisSoftware.Collections.Maze
         /// </summary>
         /// <param name="maze">The maze to query.</param>
         /// <param name="directions">An set of directions as a Direction Flag (enum).</param>
-        /// <returns>An IEnumberable os Tuples containing the row and column).</returns>
+        /// <returns>An IEnumberable of Tuples containing the row and column).</returns>
         public static IEnumerable<(int Row, int Column)> ContainsAll(this Maze<int, int> maze, Direction directions)
         {
             for (int row = 0; row < maze.Height; row++)
