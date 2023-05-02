@@ -2,6 +2,7 @@
 using CrawfisSoftware.Collections.Graph;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace CrawfisSoftware.Collections.Maze
@@ -94,6 +95,7 @@ namespace CrawfisSoftware.Collections.Maze
             RandomlyAssignSecondaryExits(random);
             RandomlyAssignTertiaryExits(random);
             ComputeMazeDistanceFromSolutionPath();
+            ComputeGridDistanceFromSolutionPath();
             ComputeBranchLevels();
         }
 
@@ -184,7 +186,7 @@ namespace CrawfisSoftware.Collections.Maze
         {
             if (!_isSolutionPathComputed) ComputeSolutionPath();
             int[] distances = new int[_width * _height];
-            var grid = new Graph.Grid<int,int>(_width, _height, null, null);
+            var grid = new Graph.Grid<int, int>(_width, _height, new GetGridLabel<int>((i, j) => {return 1; }), new GetEdgeLabel<int>((i, j, v) => { return 1; }));
             var gridEnumerator = new IndexedGraphEdgeEnumerator<int, int>(grid, new QueueAdaptor<IIndexedEdge<int>>());
             foreach (var edge in gridEnumerator.TraverseNodes(_overallMetrics.SolutionPath))
             {
