@@ -25,7 +25,6 @@ namespace CrawfisSoftware.Collections.Maze
         public Nullable<int> NumberOfCrossJunctionCells;
         public Nullable<int> NumberOfSolidCells;
         public Nullable<int> NumberOfUndefinedCells;
-        // Todo
         public Nullable<int> MaxBranchLevel;
         public Nullable<int> MaxDeadEndLength;
         public Nullable<int> MaxDistanceFromStart;
@@ -41,10 +40,10 @@ namespace CrawfisSoftware.Collections.Maze
         public Nullable<EdgeFlow> TopEdgeFlow;
         public Nullable<EdgeFlow> RightEdgeFlow;
         public Nullable<EdgeFlow> BottomEdgeFlow;
-        // Todo
         public Nullable<int> BranchLevel;
         public Nullable<int> PathDistanceToSolution;
         public Nullable<int> GridDistanceToSolution;
+        public Nullable<(int solutionPathCell, Direction edge)> BranchId;
         public Nullable<int> Parent;
     }
 
@@ -61,6 +60,8 @@ namespace CrawfisSoftware.Collections.Maze
         private EdgeFlow[] _rightEdgeFlows;
         private EdgeFlow[] _bottomEdgeFlows;
         private int[] _branchLevels;
+        private int[] _solutionRoot;
+        private  Direction[] _solutionEdge;
         private int _width;
         private int _height;
         private MazeMetrics _overallMetrics;
@@ -120,8 +121,13 @@ namespace CrawfisSoftware.Collections.Maze
             }
             if (_areMazeDistancesComputed)
                 cellMetrics.PathDistanceToSolution = _mazeDistancesFromSolutionPath[cellIndex];
+            if (_areGridDistancesComputed)
+                cellMetrics.GridDistanceToSolution = _gridDistancesFromSolutionPath[cellIndex];
             if (_areBranchLevelsComputed)
+            {
                 cellMetrics.BranchLevel = _branchLevels[cellIndex];
+                cellMetrics.BranchId = (_solutionRoot[cellIndex], _solutionEdge[cellIndex]);
+            }
             return cellMetrics;
         }
 
@@ -191,7 +197,52 @@ namespace CrawfisSoftware.Collections.Maze
 
         public void ComputeBranchLevels()
         {
-            throw new NotImplementedException();
+            int maxBranchLevel = 0;
+            if (!_isSolutionPathComputed) ComputeSolutionPath();
+            int[] branchLevels = new int[_width * _height];
+            int[] solutionRoot = new int[_width * _height];
+            Direction[] solutionEdge = new Direction[_width * _height];
+            // Set the path distance to zero and all others to a large number.
+            for (int i = 0; i < branchLevels.Length; i++) branchLevels[i] = -1;
+            foreach (var cellIndex in _overallMetrics.SolutionPath)
+            {
+                branchLevels[cellIndex] = 0;
+            }
+
+            int currentBranchRoot = -1;
+            Direction currentBranchEdge = Direction.None;
+            var mazeEnumerator = new IndexedGraphEdgeEnumerator<int, int>(_maze, new QueueAdaptor<IIndexedEdge<int>>());
+            foreach (var edge in mazeEnumerator.TraverseNodes(_overallMetrics.SolutionPath))
+            {
+                // Increment branch level if the parent's edge to me was a secondary or third exit.
+                int from = edge.From;
+                Direction fromEdge = DirectionExtensions.GetEdgeDirection(from, edge.To, _width);
+                EdgeFlow[] edgeFlowList = null;
+                if ((fromEdge & Direction.W) == Direction.W) edgeFlowList = _leftEdgeFlows;
+                if ((fromEdge & Direction.N) == Direction.N) edgeFlowList = _topEdgeFlows;
+                if ((fromEdge & Direction.E) == Direction.E) edgeFlowList = _rightEdgeFlows;
+                if ((fromEdge & Direction.S) == Direction.S) edgeFlowList = _bottomEdgeFlows;
+                EdgeFlow flowLevel = edgeFlowList[from];
+                int branchLevel = branchLevels[edge.From];
+                if (branchLevel == 0)
+                {
+                    currentBranchRoot = from;
+                    currentBranchEdge = fromEdge;
+                }
+                if (flowLevel == EdgeFlow.SecondaryExit || flowLevel == EdgeFlow.ThirdExit)
+                {
+                    branchLevel += 1;
+                    maxBranchLevel = Math.Max(maxBranchLevel, branchLevel);
+                }
+                branchLevels[edge.To] = branchLevel;
+                solutionRoot[edge.To] = currentBranchRoot;
+                solutionEdge[edge.To] = currentBranchEdge;
+            }
+            _branchLevels = branchLevels;
+            _solutionRoot = solutionRoot;
+            _solutionEdge = solutionEdge;
+            _overallMetrics.MaxBranchLevel = maxBranchLevel;
+            _areBranchLevelsComputed = true;
         }
 
         /// <summary>
