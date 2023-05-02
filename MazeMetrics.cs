@@ -84,13 +84,13 @@ namespace CrawfisSoftware.Collections.Maze
         /// Compute all available per cell Metrics.
         /// </summary>
         /// <param name="random"></param>
-        public void ComputeAllMetrics(Random random)
+        public void ComputeAllMetrics(Random random, Direction exitDirection)
         {
             ComputeCellCounts();
             ComputeDistancesFromStart();
             ComputeDistancesToEnd();
             DirectionsFromStart();
-            AddSecondaryExitsOnPath();
+            AddSecondaryExitsOnPath(exitDirection);
             RandomlyAssignSecondaryExits(random);
             RandomlyAssignTertiaryExits(random);
             ComputeMazeDistanceFromSolutionPath();
@@ -229,6 +229,13 @@ namespace CrawfisSoftware.Collections.Maze
                     currentBranchRoot = from;
                     currentBranchEdge = fromEdge;
                 }
+                else
+                {
+                    currentBranchRoot = solutionRoot[from];
+                    currentBranchEdge = solutionEdge[from];
+                }
+                if(flowLevel != EdgeFlow.PrimaryExit)
+                    Console.WriteLine($"Edgeflow is {flowLevel}");
                 if (flowLevel == EdgeFlow.SecondaryExit || flowLevel == EdgeFlow.ThirdExit)
                 {
                     branchLevel += 1;
@@ -251,6 +258,7 @@ namespace CrawfisSoftware.Collections.Maze
         public void ComputeDistancesFromStart()
         {
             int[] distances = new int[_width * _height];
+            _parents = new int[_width * _height];
             int furthestDistance = 0;
             var graphEnumerator = new IndexedGraphEdgeEnumerator<int, int>(_maze, new QueueAdaptor<IIndexedEdge<int>>());
             var breadthFirstSearch = graphEnumerator.TraverseGraph(_maze.StartCell);
@@ -321,8 +329,9 @@ namespace CrawfisSoftware.Collections.Maze
         {
             var path = PathQuery<int, int>.FindPath(_maze, _maze.StartCell, _maze.EndCell);
             var solutionPath = new List<int>();
+            solutionPath.Add(_maze.StartCell);
             foreach (var edge in path)
-                solutionPath.Add(edge.Value);
+                solutionPath.Add(edge.To);
             _overallMetrics.SolutionPath = solutionPath;
             _overallMetrics.SolutionPathLength = solutionPath.Count;
             _isSolutionPathComputed = true;
@@ -332,9 +341,9 @@ namespace CrawfisSoftware.Collections.Maze
         /// Convert multiple PrimaryExits on T-junctions and Cross-Junctions to Secondary Exits along the solution path to the maze.
         /// </summary>
         /// <remarks>Calls DirectionsFromStart is not called already.</remarks>
-        public void AddSecondaryExitsOnPath()
+        public void AddSecondaryExitsOnPath(Direction exitDirection)
         {
-            AddSecondaryExitsOnPath(_maze.StartCell, _maze.EndCell);
+            AddSecondaryExitsOnPath(_maze.StartCell, _maze.EndCell, exitDirection);
         }
 
         /// <summary>
@@ -343,21 +352,32 @@ namespace CrawfisSoftware.Collections.Maze
         /// <param name="startingCell">The starting cell of the path to apply directions to.</param>
         /// <param name="endingCell">The ending cell of the path to apply directions to.</param>
         /// <remarks>Calls DirectionsFromStart is not called already.</remarks>
-        public void AddSecondaryExitsOnPath(int startingCell, int endingCell)
+        public void AddSecondaryExitsOnPath(int startingCell, int endingCell, Direction exitDirection)
         {
             if (!_areDirectionsFromStartComputed) DirectionsFromStart();
             //if(!_isSolutionPathComputed) ComputeSolutionPath();
 
+            int node = -1;
+            int parent = -1;
             foreach (var edge in PathQuery<int, int>.FindPath(_maze, startingCell, endingCell))
             {
-                int node = edge.To;
-                int parent = edge.From;
+                node = edge.To;
+                parent = edge.From;
                 // Modify parent edges that are PrimaryExit, but not on the path to this cell.
                 Direction flow = DirectionExtensions.GetEdgeDirection(parent, node, _width);
-                _leftEdgeFlows[parent] = (_leftEdgeFlows[parent] == EdgeFlow.PrimaryExit) && ((flow & Direction.W) != Direction.None) ? EdgeFlow.SecondaryExit : _leftEdgeFlows[parent];
-                _topEdgeFlows[parent] = (_topEdgeFlows[parent] == EdgeFlow.PrimaryExit) && ((flow & Direction.N) != Direction.None) ? EdgeFlow.SecondaryExit : _topEdgeFlows[parent];
-                _rightEdgeFlows[parent] = (_rightEdgeFlows[parent] == EdgeFlow.PrimaryExit) && ((flow & Direction.E) != Direction.None) ? EdgeFlow.SecondaryExit : _rightEdgeFlows[parent];
-                _bottomEdgeFlows[parent] = (_bottomEdgeFlows[parent] == EdgeFlow.PrimaryExit) && ((flow & Direction.S) != Direction.None) ? EdgeFlow.SecondaryExit : _bottomEdgeFlows[parent];
+                _leftEdgeFlows[parent] = (_leftEdgeFlows[parent] == EdgeFlow.PrimaryExit) && ((flow & Direction.W) != Direction.W) ? EdgeFlow.SecondaryExit : _leftEdgeFlows[parent];
+                _topEdgeFlows[parent] = (_topEdgeFlows[parent] == EdgeFlow.PrimaryExit) && ((flow & Direction.N) != Direction.N) ? EdgeFlow.SecondaryExit : _topEdgeFlows[parent];
+                _rightEdgeFlows[parent] = (_rightEdgeFlows[parent] == EdgeFlow.PrimaryExit) && ((flow & Direction.E) != Direction.E) ? EdgeFlow.SecondaryExit : _rightEdgeFlows[parent];
+                _bottomEdgeFlows[parent] = (_bottomEdgeFlows[parent] == EdgeFlow.PrimaryExit) && ((flow & Direction.S) != Direction.S) ? EdgeFlow.SecondaryExit : _bottomEdgeFlows[parent];
+            }
+            if(node >=0)
+            {
+                Direction flow = exitDirection;
+                _leftEdgeFlows[node] = (_leftEdgeFlows[node] == EdgeFlow.PrimaryExit) && ((flow & Direction.W) != Direction.W) ? EdgeFlow.SecondaryExit : _leftEdgeFlows[node];
+                _topEdgeFlows[node] = (_topEdgeFlows[node] == EdgeFlow.PrimaryExit) && ((flow & Direction.N) != Direction.N) ? EdgeFlow.SecondaryExit : _topEdgeFlows[node];
+                _rightEdgeFlows[node] = (_rightEdgeFlows[node] == EdgeFlow.PrimaryExit) && ((flow & Direction.E) != Direction.E) ? EdgeFlow.SecondaryExit : _rightEdgeFlows[node];
+                _bottomEdgeFlows[node] = (_bottomEdgeFlows[node] == EdgeFlow.PrimaryExit) && ((flow & Direction.S) != Direction.S) ? EdgeFlow.SecondaryExit : _bottomEdgeFlows[node];
+
             }
         }
 
