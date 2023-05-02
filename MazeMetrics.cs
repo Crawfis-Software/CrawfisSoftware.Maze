@@ -27,10 +27,10 @@ namespace CrawfisSoftware.Collections.Maze
         public Nullable<int> NumberOfUndefinedCells;
         // Todo
         public Nullable<int> MaxBranchLevel;
-        // Todo
         public Nullable<int> MaxDeadEndLength;
         public Nullable<int> MaxDistanceFromStart;
         public Nullable<int> MaxDistanceToEnd;
+        public IList<int> SolutionPath;
     }
 
     public struct MazeCellMetrics
@@ -43,8 +43,8 @@ namespace CrawfisSoftware.Collections.Maze
         public Nullable<EdgeFlow> BottomEdgeFlow;
         // Todo
         public Nullable<int> BranchLevel;
-        // Todo
-        public Nullable<int> DistanceToSolution;
+        public Nullable<int> PathDistanceToSolution;
+        public Nullable<int> GridDistanceToSolution;
         public Nullable<int> Parent;
     }
 
@@ -53,17 +53,18 @@ namespace CrawfisSoftware.Collections.Maze
         private Maze<int, int> _maze;
         private int[] _distancesFromStart;
         private int[] _distancesToEnd;
-        private int[] _distancesFromSolutionPath;
+        private int[] _mazeDistancesFromSolutionPath;
+        private int[] _gridDistancesFromSolutionPath;
         private int[] _parents;
         private EdgeFlow[] _leftEdgeFlows;
         private EdgeFlow[] _topEdgeFlows;
         private EdgeFlow[] _rightEdgeFlows;
         private EdgeFlow[] _bottomEdgeFlows;
-        private int[] __branchLevels;
+        private int[] _branchLevels;
         private int _width;
         private int _height;
-        private bool _areDistancesFromStartComputed, _areDistancesToEndComputed, _areDirectionsFromStartComputed, _areBranchLevelsComputed, _areDistancesFromSolutionPathComputed;
         private MazeMetrics _overallMetrics;
+        private bool _areDistancesFromStartComputed, _areDistancesToEndComputed, _areDirectionsFromStartComputed, _areBranchLevelsComputed, _areMazeDistancesComputed, _areGridDistancesComputed, _isSolutionPathComputed;
 
         public MazeMetrics OverallMetrics { get { return _overallMetrics; } }
 
@@ -78,12 +79,29 @@ namespace CrawfisSoftware.Collections.Maze
             _height = maze.Height;
         }
 
-        public MazeCellMetrics CellMetrics(int row, int column)
+        /// <summary>
+        /// Compute all available per cell Metrics.
+        /// </summary>
+        /// <param name="random"></param>
+        public void ComputeAllMetrics(Random random)
         {
-            return CellMetrics(row * _width + column);
+            ComputeCellCounts();
+            ComputeDistancesFromStart();
+            ComputeDistancesToEnd();
+            DirectionsFromStart();
+            AddSecondaryExitsOnPath();
+            RandomlyAssignSecondaryExits(random);
+            RandomlyAssignTertiaryExits(random);
+            ComputeMazeDistanceFromSolutionPath();
+            ComputeBranchLevels();
         }
 
-        public MazeCellMetrics CellMetrics(int cellIndex)
+        public MazeCellMetrics GetCellMetrics(int row, int column)
+        {
+            return GetCellMetrics(row * _width + column);
+        }
+
+        public MazeCellMetrics GetCellMetrics(int cellIndex)
         {
             var cellMetrics = new MazeCellMetrics();
             if (_areDirectionsFromStartComputed)
@@ -100,28 +118,11 @@ namespace CrawfisSoftware.Collections.Maze
                 cellMetrics.RightEdgeFlow = _rightEdgeFlows[cellIndex];
                 cellMetrics.BottomEdgeFlow = _bottomEdgeFlows[cellIndex];
             }
-            if (_areDistancesFromSolutionPathComputed)
-                cellMetrics.DistanceToSolution = _distancesFromSolutionPath[cellIndex];
+            if (_areMazeDistancesComputed)
+                cellMetrics.PathDistanceToSolution = _mazeDistancesFromSolutionPath[cellIndex];
             if (_areBranchLevelsComputed)
-                cellMetrics.BranchLevel = __branchLevels[cellIndex];
+                cellMetrics.BranchLevel = _branchLevels[cellIndex];
             return cellMetrics;
-        }
-
-        /// <summary>
-        /// Compute all available per cell Metrics.
-        /// </summary>
-        /// <param name="random"></param>
-        public void ComputeAllMetrics(Random random)
-        {
-            ComputeCellCounts();
-            ComputeDistancesFromStart();
-            ComputeDistancesToEnd();
-            DirectionsFromStart();
-            AddSecondaryExitsOnPath();
-            RandomlyAssignSecondaryExits(random);
-            RandomlyAssignTertiaryExits(random);
-            ComputeDistanceFromSolutionPath();
-            ComputeBranchLevels();
         }
 
         private void ComputeCellCounts()
@@ -148,9 +149,44 @@ namespace CrawfisSoftware.Collections.Maze
             _overallMetrics.NumberOfUndefinedCells = _width * _height - occupiedCells;
         }
 
-        public void ComputeDistanceFromSolutionPath()
+        public void ComputeMazeDistanceFromSolutionPath(int unreachableDistance = 2000000)
         {
-            throw new NotImplementedException();
+            int maxDistance = 0;
+            if (!_isSolutionPathComputed) ComputeSolutionPath();
+            int[] distances = new int[_width * _height];
+            // Set the path distance to zero and all others to a large number.
+            for (int i = 0; i < distances.Length; i++) distances[i] = unreachableDistance;
+            foreach (var cellIndex in _overallMetrics.SolutionPath)
+            {
+                distances[cellIndex] = 0;
+            }
+
+            var mazeEnumerator = new IndexedGraphEdgeEnumerator<int, int>(_maze, new QueueAdaptor<IIndexedEdge<int>>());
+            foreach (var edge in mazeEnumerator.TraverseNodes(_overallMetrics.SolutionPath))
+            {
+                // Set the "To" node's distance to one plus the "From" node's distance.
+                int distance = distances[edge.From] + 1;
+                distances[edge.To] = distance;
+                maxDistance = Math.Max(maxDistance, distance);
+            }
+            _mazeDistancesFromSolutionPath = distances;
+            _overallMetrics.MaxDeadEndLength = maxDistance;
+            _areMazeDistancesComputed = true;
+        }
+
+        public void ComputeGridDistanceFromSolutionPath()
+        {
+            if (!_isSolutionPathComputed) ComputeSolutionPath();
+            int[] distances = new int[_width * _height];
+            var grid = new Graph.Grid<int,int>(_width, _height, null, null);
+            var gridEnumerator = new IndexedGraphEdgeEnumerator<int, int>(grid, new QueueAdaptor<IIndexedEdge<int>>());
+            foreach (var edge in gridEnumerator.TraverseNodes(_overallMetrics.SolutionPath))
+            {
+                // Set the "To" node's distance to one plus the "From" node's distance.
+                distances[edge.To] = distances[edge.From] + 1;
+            }
+            _gridDistancesFromSolutionPath = distances;
+            _areGridDistancesComputed = true;
         }
 
         public void ComputeBranchLevels()
@@ -210,7 +246,6 @@ namespace CrawfisSoftware.Collections.Maze
         /// <seealso cref="RandomlyAssignSecondaryExits"/>
         public void DirectionsFromStart()
         {
-            int solutionPathLength = 0;
             _leftEdgeFlows = new EdgeFlow[_width * _height];
             _topEdgeFlows = new EdgeFlow[_width * _height];
             _rightEdgeFlows = new EdgeFlow[_width * _height];
@@ -227,10 +262,19 @@ namespace CrawfisSoftware.Collections.Maze
                 _topEdgeFlows[node] = (cellOpenings & Direction.N) == Direction.N ? ((flow == Direction.N) ? EdgeFlow.Entrance : EdgeFlow.PrimaryExit) : EdgeFlow.None;
                 _rightEdgeFlows[node] = (cellOpenings & Direction.E) == Direction.E ? ((flow == Direction.E) ? EdgeFlow.Entrance : EdgeFlow.PrimaryExit) : EdgeFlow.None;
                 _bottomEdgeFlows[node] = (cellOpenings & Direction.S) == Direction.S ? ((flow == Direction.S) ? EdgeFlow.Entrance : EdgeFlow.PrimaryExit) : EdgeFlow.None;
-                solutionPathLength++;
             }
-            _overallMetrics.SolutionPathLength = solutionPathLength;
             _areDirectionsFromStartComputed = true;
+        }
+
+        public void ComputeSolutionPath()
+        {
+            var path = PathQuery<int, int>.FindPath(_maze, _maze.StartCell, _maze.EndCell);
+            var solutionPath = new List<int>();
+            foreach (var edge in path)
+                solutionPath.Add(edge.Value);
+            _overallMetrics.SolutionPath = solutionPath;
+            _overallMetrics.SolutionPathLength = solutionPath.Count;
+            _isSolutionPathComputed = true;
         }
 
         /// <summary>
@@ -251,6 +295,7 @@ namespace CrawfisSoftware.Collections.Maze
         public void AddSecondaryExitsOnPath(int startingCell, int endingCell)
         {
             if (!_areDirectionsFromStartComputed) DirectionsFromStart();
+            //if(!_isSolutionPathComputed) ComputeSolutionPath();
 
             foreach (var edge in PathQuery<int, int>.FindPath(_maze, startingCell, endingCell))
             {
