@@ -7,7 +7,8 @@
     <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DocumentationFile>bin\Debug\Maze.xml</DocumentationFile>
+    <DocumentationFile>$(SolutionDir)Documentation\Maze.xml</DocumentationFile>
+    <OutputPath>$(SolutionDir)bin\Debug\</OutputPath>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Collections\CrawfisSoftware.Collections.csproj" />
