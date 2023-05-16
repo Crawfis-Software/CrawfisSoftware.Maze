@@ -16,11 +16,11 @@ namespace CrawfisSoftware.Collections.Maze
         /// <summary>
         /// A list of the grid cell indices that the path passes through.
         /// </summary>
-        public List<int> gridCells;
+        public List<int> GridCells;
         /// <summary>
         /// The underlying grid width in terms of the number of columns.
         /// </summary>
-        public int gridWidth;
+        public int GridWidth;
         /// <summary>
         /// A (Column, Row) value tuple of the starting cell.
         /// </summary>
@@ -55,8 +55,8 @@ namespace CrawfisSoftware.Collections.Maze
         /// <param name="gridWidth">The width of the grid.</param>
         public PathMetric(List<int> gridCells, int gridWidth)
         {
-            this.gridCells = gridCells;
-            this.gridWidth = gridWidth;
+            this.GridCells = gridCells;
+            this.GridWidth = gridWidth;
             StartingCell = (gridCells[0] % gridWidth, gridCells[0] / gridWidth);
             EndingCell = (gridCells[gridCells.Count - 1] % gridWidth, gridCells[gridCells.Count - 1] / gridWidth);
             PathLength = gridCells.Count;
@@ -106,7 +106,7 @@ namespace CrawfisSoftware.Collections.Maze
             foreach (Match match in matches)
             {
                 int stringIndex = match.Index;
-                int cellIndex = gridCells[stringIndex];
+                int cellIndex = GridCells[stringIndex];
                 yield return cellIndex;
             }
         }
@@ -142,7 +142,7 @@ namespace CrawfisSoftware.Collections.Maze
             int turtleIndex = 0;
             while (stringIndex >=0)
             {
-                int cellIndex = gridCells[stringIndex+turtleIndex];
+                int cellIndex = GridCells[stringIndex+turtleIndex];
                 yield return cellIndex;
                 while (stringIndex < subString.Length && subString[stringIndex] == 'S') stringIndex++;
                 subString = subString.Substring(stringIndex);
