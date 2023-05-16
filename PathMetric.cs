@@ -1,6 +1,7 @@
 ﻿using CrawfisSoftware.Collections.Graph;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -16,7 +17,7 @@ namespace CrawfisSoftware.Collections.Maze
         /// <summary>
         /// A list of the grid cell indices that the path passes through.
         /// </summary>
-        public List<int> GridCells;
+        public List<int> PathGridCellIndices;
         /// <summary>
         /// The underlying grid width in terms of the number of columns.
         /// </summary>
@@ -51,41 +52,32 @@ namespace CrawfisSoftware.Collections.Maze
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="gridCells">The path defined as a sequence of grid cells on a grid with the given width.</param>
+        /// <param name="pathIndices">The path defined as a sequence of grid cells on a grid with the given width.</param>
         /// <param name="gridWidth">The width of the grid.</param>
-        public PathMetric(List<int> gridCells, int gridWidth)
+        public PathMetric(List<int> pathIndices, int gridWidth)
         {
-            this.GridCells = gridCells;
+            this.PathGridCellIndices = pathIndices;
             this.GridWidth = gridWidth;
-            StartingCell = (gridCells[0] % gridWidth, gridCells[0] / gridWidth);
-            EndingCell = (gridCells[gridCells.Count - 1] % gridWidth, gridCells[gridCells.Count - 1] / gridWidth);
-            PathLength = gridCells.Count;
+            StartingCell = (pathIndices[0] % gridWidth, pathIndices[0] / gridWidth);
+            EndingCell = (pathIndices[pathIndices.Count - 1] % gridWidth, pathIndices[pathIndices.Count - 1] / gridWidth);
+            PathLength = pathIndices.Count;
             MaximumConsecutiveTurns = 0;
             MaximumConsecutiveStraights = 0;
-            StringBuilder path = new StringBuilder(gridCells.Count);
+            StringBuilder path = new StringBuilder(pathIndices.Count);
             int numberOfTurns = 0;
             int numberOfStraights = 0;
-            for(int i = 1; i < gridCells.Count-1; i++)
+            for (int i = 1; i < pathIndices.Count - 1; i++)
             {
-                Direction cellDirection = DirectionExtensions.GetEdgeDirection(gridCells[i-1], gridCells[i], gridWidth);
-                cellDirection |= DirectionExtensions.GetEdgeDirection(gridCells[i+1], gridCells[i], gridWidth);
-                if (cellDirection.IsStraight())
+                string token = DetermineCellDirectionAt(pathIndices, gridWidth, i, false);
+                path.Append(token);
+                if (token == "S")
                 {
-                    path.Append("S");
                     numberOfTurns = 0;
                     numberOfStraights++;
                     MaximumConsecutiveStraights = (MaximumConsecutiveStraights >= numberOfStraights) ? MaximumConsecutiveStraights : numberOfStraights;
                 }
-                if (cellDirection.IsTurn())
+                if (token == "L" || token == "R")
                 {
-                    // Building a little logic table of (i-1)->i versus i->i+1 yeilds this.
-                    int deltai = gridCells[i] - gridCells[i - 1];
-                    int deltaii = gridCells[i+1] - gridCells[i];
-                    int testValue = (Math.Abs(deltai)-2) * deltai * deltaii;
-                    if(testValue < 0)
-                        path.Append("L");
-                    else
-                        path.Append("R");
                     numberOfStraights = 0;
                     numberOfTurns++;
                     MaximumConsecutiveTurns = (MaximumConsecutiveTurns >= numberOfTurns) ? MaximumConsecutiveTurns : numberOfTurns;
@@ -106,7 +98,7 @@ namespace CrawfisSoftware.Collections.Maze
             foreach (Match match in matches)
             {
                 int stringIndex = match.Index;
-                int cellIndex = GridCells[stringIndex];
+                int cellIndex = PathGridCellIndices[stringIndex];
                 yield return cellIndex;
             }
         }
@@ -140,9 +132,9 @@ namespace CrawfisSoftware.Collections.Maze
             string subString = TurtlePath;
             int stringIndex = subString.IndexOf(minStraightsSequence.ToString());
             int turtleIndex = 0;
-            while (stringIndex >=0)
+            while (stringIndex >= 0)
             {
-                int cellIndex = GridCells[stringIndex+turtleIndex];
+                int cellIndex = PathGridCellIndices[stringIndex + turtleIndex];
                 yield return cellIndex;
                 while (stringIndex < subString.Length && subString[stringIndex] == 'S') stringIndex++;
                 subString = subString.Substring(stringIndex);
@@ -162,17 +154,50 @@ namespace CrawfisSoftware.Collections.Maze
         {
             int numberOfStraights = 0;
             int numberOfTurns = 0;
-            int startIndex = Math.Max(0,pathIndex-halfWindowSize);
+            int startIndex = Math.Max(0, pathIndex - halfWindowSize);
             int endIndex = Math.Min(pathIndex + halfWindowSize, PathLength - 2);
             int windowSize = endIndex - startIndex + 1;
             if (windowSize == 1) return TurtlePath[startIndex] == 'S' ? 1 : 0;
             if (windowSize <= 0) return -1;
-            for(int i=startIndex; i <= endIndex; i++)
+            for (int i = startIndex; i <= endIndex; i++)
             {
                 if (TurtlePath[i] == 'S') numberOfStraights++;
                 else numberOfTurns++;
             }
             return (float)numberOfStraights / (float)windowSize;
+        }
+
+        /// <summary>
+        /// Utility function to determine whether a path goes straight (S) or turns left (L) or right (R).
+        /// </summary>
+        /// <param name="pathCells"></param>
+        /// <param name="gridWidth"></param>
+        /// <param name="i"></param>
+        /// <param name="isLoop"></param>
+        /// <returns></returns>
+        public static string DetermineCellDirectionAt(List<int> pathCells, int gridWidth, int i, bool isLoop = false)
+        {
+            int priorIndex = i - 1;
+            int nextindex = i + 1;
+            if(isLoop && priorIndex < 0) priorIndex = pathCells.Count - 1;
+            if (isLoop && nextindex >= pathCells.Count) nextindex = 0;
+            Direction cellDirection = DirectionExtensions.GetEdgeDirection(pathCells[priorIndex], pathCells[i], gridWidth);
+            cellDirection |= DirectionExtensions.GetEdgeDirection(pathCells[nextindex], pathCells[i], gridWidth);
+            if (cellDirection.IsStraight())
+            {
+                return "S";
+            }
+            if (cellDirection.IsTurn())
+            {
+                // Building a little logic table of (i-1)->i versus i->i+1 yeilds this.
+                int deltai = pathCells[i] - pathCells[priorIndex];
+                int deltaii = pathCells[nextindex] - pathCells[i];
+                int testValue = (Math.Abs(deltai) - 2) * deltai * deltaii;
+                if (testValue < 0)
+                    return "L";
+                return "R";
+            }
+            return "X";
         }
     }
 }
