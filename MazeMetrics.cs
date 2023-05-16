@@ -17,6 +17,7 @@ namespace CrawfisSoftware.Collections.Maze
     /// </summary>
     public struct MazeMetrics
     {
+        public PathMetric SolutionPathMetric;
         public Nullable<int> SolutionPathLength;
         public Nullable<int> NumberOfEmptyCells;
         public Nullable<int> NumberOfDeadEndCells;
@@ -85,11 +86,13 @@ namespace CrawfisSoftware.Collections.Maze
         /// Compute all available per cell Metrics.
         /// </summary>
         /// <param name="random"></param>
-        public void ComputeAllMetrics(Random random, Direction exitDirection)
+        /// <param name="exitDirection">Unless the exit is a dead-end, this should be specified to indicate how the solution path exits the grid.</param>
+        public void ComputeAllMetrics(Random random, Direction exitDirection = Direction.None)
         {
             ComputeCellCounts();
             ComputeDistancesFromStart();
             ComputeDistancesToEnd();
+            ComputeSolutionPath();
             DirectionsFromStart();
             AddSecondaryExitsOnPath(exitDirection);
             RandomlyAssignSecondaryExits(random);
@@ -336,6 +339,7 @@ namespace CrawfisSoftware.Collections.Maze
                 solutionPath.Add(edge.To);
             _overallMetrics.SolutionPath = solutionPath;
             _overallMetrics.SolutionPathLength = solutionPath.Count;
+            _overallMetrics.SolutionPathMetric = new PathMetric(solutionPath, _maze.Width);
             _isSolutionPathComputed = true;
         }
 
