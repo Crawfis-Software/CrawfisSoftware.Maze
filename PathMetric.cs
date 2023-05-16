@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading;
 
 // Todo: Move to Grid namespace of some other namespace.
 namespace CrawfisSoftware.Collections.Maze
