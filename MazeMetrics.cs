@@ -1,5 +1,6 @@
 ﻿using CrawfisSoftware.Collections;
 using CrawfisSoftware.Collections.Graph;
+using CrawfisSoftware.Collections.Path;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -17,7 +18,7 @@ namespace CrawfisSoftware.Collections.Maze
     /// </summary>
     public struct MazeMetrics
     {
-        public PathMetric SolutionPathMetric;
+        public GridPathMetrics<int,int> SolutionPathMetric;
         //public Nullable<int> SolutionPathLength;
         public Nullable<int> NumberOfEmptyCells;
         public Nullable<int> NumberOfDeadEndCells;
@@ -110,7 +111,7 @@ namespace CrawfisSoftware.Collections.Maze
         public MazeCellMetrics GetCellMetrics(int cellIndex)
         {
             var cellMetrics = new MazeCellMetrics();
-            if (_areDirectionsFromStartComputed)
+            if (_areDistancesFromStartComputed)
             {
                 cellMetrics.DistanceFromStart = _distancesFromStart[cellIndex];
                 cellMetrics.Parent = _parents[cellIndex];
@@ -167,13 +168,13 @@ namespace CrawfisSoftware.Collections.Maze
             int[] distances = new int[_width * _height];
             // Set the path distance to zero and all others to a large number.
             for (int i = 0; i < distances.Length; i++) distances[i] = unreachableDistance;
-            foreach (var cellIndex in _overallMetrics.SolutionPathMetric.PathGridCellIndices)
+            foreach (var cellIndex in _overallMetrics.SolutionPathMetric.Path)
             {
                 distances[cellIndex] = 0;
             }
 
             var mazeEnumerator = new IndexedGraphEdgeEnumerator<int, int>(_maze, new QueueAdaptor<IIndexedEdge<int>>());
-            foreach (var edge in mazeEnumerator.TraverseNodes(_overallMetrics.SolutionPathMetric.PathGridCellIndices))
+            foreach (var edge in mazeEnumerator.TraverseNodes(_overallMetrics.SolutionPathMetric.Path))
             {
                 // Set the "To" node's distance to one plus the "From" node's distance.
                 int distance = distances[edge.From] + 1;
@@ -191,7 +192,7 @@ namespace CrawfisSoftware.Collections.Maze
             int[] distances = new int[_width * _height];
             var grid = new Graph.Grid<int, int>(_width, _height, new GetGridLabel<int>((i, j) => {return 1; }), new GetEdgeLabel<int>((i, j, v) => { return 1; }));
             var gridEnumerator = new IndexedGraphEdgeEnumerator<int, int>(grid, new QueueAdaptor<IIndexedEdge<int>>());
-            foreach (var edge in gridEnumerator.TraverseNodes(_overallMetrics.SolutionPathMetric.PathGridCellIndices))
+            foreach (var edge in gridEnumerator.TraverseNodes(_overallMetrics.SolutionPathMetric.Path))
             {
                 // Set the "To" node's distance to one plus the "From" node's distance.
                 distances[edge.To] = distances[edge.From] + 1;
@@ -209,7 +210,7 @@ namespace CrawfisSoftware.Collections.Maze
             Direction[] solutionEdge = new Direction[_width * _height];
             // Set the path distance to zero and all others to a large number.
             for (int i = 0; i < branchLevels.Length; i++) branchLevels[i] = -1;
-            foreach (var cellIndex in _overallMetrics.SolutionPathMetric.PathGridCellIndices)
+            foreach (var cellIndex in _overallMetrics.SolutionPathMetric.Path)
             {
                 branchLevels[cellIndex] = 0;
             }
@@ -217,7 +218,7 @@ namespace CrawfisSoftware.Collections.Maze
             int currentBranchRoot = -1;
             Direction currentBranchEdge = Direction.None;
             var mazeEnumerator = new IndexedGraphEdgeEnumerator<int, int>(_maze, new QueueAdaptor<IIndexedEdge<int>>());
-            foreach (var edge in mazeEnumerator.TraverseNodes(_overallMetrics.SolutionPathMetric.PathGridCellIndices))
+            foreach (var edge in mazeEnumerator.TraverseNodes(_overallMetrics.SolutionPathMetric.Path))
             {
                 // Increment branch level if the parent's edge to me was a secondary or third exit.
                 int from = edge.From;
@@ -337,13 +338,14 @@ namespace CrawfisSoftware.Collections.Maze
             solutionPath.Add(_maze.StartCell);
             foreach (var edge in path)
                 solutionPath.Add(edge.To);
-            _overallMetrics.SolutionPathMetric = new PathMetric(solutionPath, _maze.Width);
+            _overallMetrics.SolutionPathMetric = new GridPathMetrics<int,int>(new GridPath<int,int>(new Grid<int, int>(_maze.Width, _maze.Height, null, null),solutionPath));
             _isSolutionPathComputed = true;
         }
 
         /// <summary>
         /// Convert multiple PrimaryExits on T-junctions and Cross-Junctions to Secondary Exits along the solution path to the maze.
         /// </summary>
+        /// <param name="exitDirection">Unless the exit is a dead-end, this should be specified to indicate how the solution path exits the grid.</param>
         /// <remarks>Calls DirectionsFromStart is not called already.</remarks>
         public void AddSecondaryExitsOnPath(Direction exitDirection)
         {
@@ -355,6 +357,7 @@ namespace CrawfisSoftware.Collections.Maze
         /// </summary>
         /// <param name="startingCell">The starting cell of the path to apply directions to.</param>
         /// <param name="endingCell">The ending cell of the path to apply directions to.</param>
+        /// <param name="exitDirection">Unless the exit is a dead-end, this should be specified to indicate how the solution path exits the grid.</param>
         /// <remarks>Calls DirectionsFromStart is not called already.</remarks>
         public void AddSecondaryExitsOnPath(int startingCell, int endingCell, Direction exitDirection)
         {
