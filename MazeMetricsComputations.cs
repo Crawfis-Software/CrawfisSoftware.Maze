@@ -163,7 +163,9 @@ namespace CrawfisSoftware.Collections.Maze
         /// <summary>
         /// Compute branch levels for the maze, where the level is based on the number of second and third exit crossings.
         /// </summary>
-        public void ComputeBranchLevels()
+        /// <param name="setBranchRootToSolution">If True (default), then the BranchID's are based on the solution path. 
+        /// If false, the BranchID's are the closest ancestor with a junction (a branch).</param>
+        public void ComputeBranchLevels(bool setBranchRootToSolution = true)
         {
             int maxBranchLevel = 0;
             if (!_isSolutionPathComputed) ComputeSolutionPath();
@@ -192,7 +194,7 @@ namespace CrawfisSoftware.Collections.Maze
                 if ((fromEdge & Direction.S) == Direction.S) edgeFlowList = _bottomEdgeFlows;
                 EdgeFlow flowLevel = edgeFlowList[from];
                 int branchLevel = branchLevels[edge.From];
-                if (branchLevel == 0)
+                if (setBranchRootToSolution && branchLevel == 0)
                 {
                     currentBranchRoot = from;
                     currentBranchEdge = fromEdge;
@@ -208,6 +210,11 @@ namespace CrawfisSoftware.Collections.Maze
                 {
                     branchLevel += 1;
                     maxBranchLevel = Math.Max(maxBranchLevel, branchLevel);
+                    if(!setBranchRootToSolution)
+                    {
+                        currentBranchRoot = from;
+                        currentBranchEdge = fromEdge;
+                    }
                 }
                 branchLevels[edge.To] = branchLevel;
                 solutionRoot[edge.To] = currentBranchRoot;
@@ -350,6 +357,31 @@ namespace CrawfisSoftware.Collections.Maze
                 _rightEdgeFlows[node] = (_rightEdgeFlows[node] == EdgeFlow.PrimaryExit) && ((flow & Direction.E) != Direction.E) ? EdgeFlow.SecondaryExit : _rightEdgeFlows[node];
                 _bottomEdgeFlows[node] = (_bottomEdgeFlows[node] == EdgeFlow.PrimaryExit) && ((flow & Direction.S) != Direction.S) ? EdgeFlow.SecondaryExit : _bottomEdgeFlows[node];
 
+            }
+        }
+
+        /// <summary>
+        /// Finds all Cross-sections and T-Junctions and relabel all PrimaryExits to SecondaryExits.
+        /// </summary>
+        /// <param name="ignoreSolutionPath">If true, no edges on the solution path will be changed.</param>
+        /// <remarks>Requires solution path metrics to be computed if ignoreSolutionPath is true.</remarks>
+        public void AssignSecondaryExitsToAllJunctions(bool ignoreSolutionPath)
+        {
+            foreach (var cell in MazeQuery.CrossSections(_maze).Concat(MazeQuery.TJunctions(_maze)))
+            {
+                int cellIndex = cell.Row * _width + cell.Column;
+                if (ignoreSolutionPath && _isSolutionPathComputed)
+                    if(_overallMetrics.SolutionPathMetric.Path.Contains(cellIndex)) continue;
+
+                var directions = _maze.GetDirection(cell.Column, cell.Row);
+                if (((directions & Direction.W) == Direction.W) && _leftEdgeFlows[cellIndex] == EdgeFlow.PrimaryExit)
+                    _leftEdgeFlows[cellIndex] = EdgeFlow.SecondaryExit;
+                if (((directions & Direction.N) == Direction.N) && _topEdgeFlows[cellIndex] == EdgeFlow.PrimaryExit)
+                    _topEdgeFlows[cellIndex] = EdgeFlow.SecondaryExit;
+                if (((directions & Direction.E) == Direction.E) && _rightEdgeFlows[cellIndex] == EdgeFlow.PrimaryExit)
+                    _rightEdgeFlows[cellIndex] = EdgeFlow.SecondaryExit;
+                if (((directions & Direction.S) == Direction.S) && _bottomEdgeFlows[cellIndex] == EdgeFlow.PrimaryExit)
+                    _bottomEdgeFlows[cellIndex] = EdgeFlow.SecondaryExit;
             }
         }
 
