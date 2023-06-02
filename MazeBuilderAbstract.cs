@@ -205,22 +205,35 @@ namespace CrawfisSoftware.Collections.Maze
         }
 
         /// <summary>
-        /// Add walls (inconsistenly currently) to the boundary of the define rectangle.
+        /// Add walls (inconsistently currently) to the boundary of the define rectangle.
         /// </summary>
         /// <param name="lowerLeftCell">The lower-left cell index.</param>
         /// <param name="upperRightCell">The upper -right cell index.</param>
-        public void WallBoundary(int lowerLeftCell, int upperRightCell)
+        public void WallBoundary(int lowerLeftCell, int upperRightCell, bool preserveExistingCells = false)
         {
             int lowerRightCell = upperRightCell % Width + Width * (int)(lowerLeftCell / Width);
             int upperLeftCell = lowerLeftCell % Width + Width * (int)(upperRightCell / Width);
-            FillRegion(lowerLeftCell, lowerRightCell, ~Direction.S);
-            FillRegion(lowerRightCell, upperRightCell, ~Direction.E);
-            FillRegion(lowerLeftCell, upperLeftCell, ~Direction.W);
-            FillRegion(upperLeftCell, upperRightCell, ~Direction.N);
-            directions[lowerLeftCell % Width, lowerLeftCell / Width] = (~Direction.S & ~Direction.W);
-            directions[lowerRightCell % Width, lowerRightCell / Width] = (~Direction.S & ~Direction.E);
-            directions[upperLeftCell % Width, upperLeftCell / Width] = (~Direction.N & ~Direction.W);
-            directions[upperRightCell % Width, upperRightCell / Width] = (~Direction.N & ~Direction.E);
+            int row = lowerLeftCell / Width;
+            int col;
+            for (col = lowerLeftCell % Width; col <= upperRightCell % Width; col++)
+            {
+                directions[col, row] = directions[col, row] & ~Direction.S;
+            }
+            row = upperRightCell / Width;
+            for (col = lowerLeftCell % Width; col <= upperRightCell % Width; col++)
+            {
+                directions[col, row] = directions[col, row] & ~Direction.N;
+            }
+            col = lowerLeftCell % Width;
+            for (row = lowerLeftCell / Width; row <= upperRightCell / Width; row++)
+            {
+                directions[col, row] = directions[col, row] & ~Direction.W;
+            }
+            col = upperRightCell % Width;
+            for (row = lowerLeftCell / Width; row <= upperRightCell / Width; row++)
+            {
+                directions[col, row] = directions[col, row] & ~Direction.E;
+            }
         }
 
         /// <inheritdoc/>
