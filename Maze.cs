@@ -236,7 +236,7 @@ namespace CrawfisSoftware.Collections.Maze
             {
                 rowBody.Remove(0, rowBody.Length);
                 Direction dirs = directions[0,row];
-                string westString = (dirs & Direction.W) == Direction.W ? cellSpace : "|";
+                string westString = (dirs & Direction.W) == Direction.W ? " " : "|";
                 rowBody.Append(westString);
                 bottomOfRow.Remove(0, bottomOfRow.Length);
                 bottomOfRow.Append("+");
