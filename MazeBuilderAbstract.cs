@@ -276,7 +276,7 @@ namespace CrawfisSoftware.Collections.Maze
         }
 
         /// <summary>
-        /// Provides a weave for the maze, randomly connecting dead-end cell to a neighbor. 
+        /// Provides a braid for the maze, randomly connecting dead-end cell to a neighbor. 
         /// </summary>
         /// <param name="preserveExistingCells">Boolean indicating whether to only replace maze cells that are undefined.</param>
         /// <param name="carveNeighbors">True to keep the underlying maze consistent. False to just modify the dead-end cell.</param>
