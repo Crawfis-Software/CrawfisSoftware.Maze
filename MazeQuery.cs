@@ -1,5 +1,6 @@
 ﻿using CrawfisSoftware.Collections.Graph;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
 
 namespace CrawfisSoftware.Collections.Maze
@@ -13,7 +14,7 @@ namespace CrawfisSoftware.Collections.Maze
         /// Lists the grid (row,column) tuple of each dead-end.
         /// </summary>
         /// <param name="maze">The maze to query.</param>
-        /// <returns>An IEnumberable of Tuples containing the row and column).</returns>
+        /// <returns>An IEnumberable of Tuples containing the row and column.</returns>
         public static IEnumerable<(int Row, int Column)> DeadEnds(this Maze<int, int> maze)
         {
             for (int row = 0; row < maze.Height; row++)
@@ -33,7 +34,7 @@ namespace CrawfisSoftware.Collections.Maze
         /// Lists the grid (row,column) tuple of each TJunction.
         /// </summary>
         /// <param name="maze">The maze to query.</param>
-        /// <returns>An IEnumberable of Tuples containing the row and column).</returns>
+        /// <returns>An IEnumberable of Tuples containing the row and column.</returns>
         public static IEnumerable<(int Row, int Column)> TJunctions(this Maze<int, int> maze)
         {
             //var query = from cell in maze
@@ -54,10 +55,10 @@ namespace CrawfisSoftware.Collections.Maze
         }
 
         /// <summary>
-        /// Lists the grid (row,column) tuple of each horizontal or straight cell.
+        /// Lists the grid (row,column) tuple of each horizontal or vertical cell.
         /// </summary>
         /// <param name="maze">The maze to query.</param>
-        /// <returns>An IEnumberable of Tuples containing the row and column).</returns>
+        /// <returns>An IEnumberable of Tuples containing the row and column.</returns>
         public static IEnumerable<(int Row, int Column)> Straights(this Maze<int, int> maze)
         {
             for (int row = 0; row < maze.Height; row++)
@@ -74,10 +75,70 @@ namespace CrawfisSoftware.Collections.Maze
         }
 
         /// <summary>
+        /// Lists the grid (row,column) tuple of each start of a sequence of horizontal or vertical cells.
+        /// </summary>
+        /// <param name="maze">The maze to query.</param>
+        /// <returns>An IEnumberable of Tuples containing the starting cell index, the direction and the length of the straightaway.</returns>
+        /// <remarks>Uses Depth-First Search from the Maze's starting cell.</remarks>
+        public static IEnumerable<(int CellIndex, Direction StraightAwayDirection, int StraightAwayLength)> StraightAways(this Maze<int, int> maze)
+        {
+            int start = maze.StartCell;
+            var dfs = new IndexedGraphEdgeEnumerator<int, int>(maze);
+            int currentStraightAwayIndex = -1;
+            int currentStraightAwayLength = 0;
+            Direction currentDirection = Direction.None;
+            int lastCellIndex = -1;
+            int width = maze.Width;
+            int row = start / width;
+            int column = start % width;
+            Direction direction = maze.GetDirection(column, row);
+            if (direction.IsStraight())
+            {
+                currentStraightAwayIndex = start;
+                currentStraightAwayLength = 1;
+                currentDirection = Direction.N;
+                lastCellIndex = start;
+            }
+            foreach (var edge in dfs.TraverseGraph(start))
+            {
+                row = edge.To / width;
+                column = edge.To % width;
+                direction = maze.GetDirection(column, row);
+                if (direction.IsStraight())
+                {
+                    // This is either a continuation or a new straight away.
+                    if(edge.From == lastCellIndex)
+                    {
+                        currentStraightAwayLength++;
+                        lastCellIndex = edge.To;
+                    }
+                    else
+                    {
+                        if(currentStraightAwayIndex >= 0)
+                            yield return (currentStraightAwayIndex, currentDirection, currentStraightAwayLength);
+                        currentStraightAwayIndex = edge.To;
+                        currentStraightAwayLength = 1;
+                        currentDirection = DirectionExtensions.GetEdgeDirection(edge.From, edge.To, width);
+                        lastCellIndex = edge.To;
+                    }
+                }
+                else // Not a straight away. Reset.
+                {
+                    if (currentStraightAwayIndex >= 0)
+                        yield return (currentStraightAwayIndex, currentDirection, currentStraightAwayLength);
+                    currentStraightAwayIndex = -1;
+                    currentStraightAwayLength = 0;
+                    currentDirection = Direction.None;
+                    lastCellIndex = -1;
+                }
+            }
+        }
+
+        /// <summary>
         /// Lists the grid (row,column) tuple of each cell containing only a turn.
         /// </summary>
         /// <param name="maze">The maze to query.</param>
-        /// <returns>An IEnumberable of Tuples containing the row and column).</returns>
+        /// <returns>An IEnumberable of Tuples containing the row and column.</returns>
         public static IEnumerable<(int Row, int Column)> Turns(this Maze<int, int> maze)
         {
             for (int row = 0; row < maze.Height; row++)
@@ -97,7 +158,7 @@ namespace CrawfisSoftware.Collections.Maze
         /// Lists the grid (row,column) tuple of each cross-section.
         /// </summary>
         /// <param name="maze">The maze to query.</param>
-        /// <returns>An IEnumberable of Tuples containing the row and column).</returns>
+        /// <returns>An IEnumberable of Tuples containing the row and column.</returns>
         public static IEnumerable<(int Row, int Column)> CrossSections(this Maze<int, int> maze)
         {
             for (int row = 0; row < maze.Height; row++)
@@ -118,7 +179,7 @@ namespace CrawfisSoftware.Collections.Maze
         /// </summary>
         /// <param name="maze">The maze to query.</param>
         /// <param name="directions">An set of directions as a Direction Flag (enum).</param>
-        /// <returns>An IEnumberable of Tuples containing the row and column).</returns>
+        /// <returns>An IEnumberable of Tuples containing the row and column.</returns>
         public static IEnumerable<(int Row, int Column)> MatchingExactly(this Maze<int, int> maze, Direction directions)
         {
             for (int row = 0; row < maze.Height; row++)
@@ -139,7 +200,7 @@ namespace CrawfisSoftware.Collections.Maze
         /// </summary>
         /// <param name="maze">The maze to query.</param>
         /// <param name="directions">An set of directions as a Direction Flag (enum).</param>
-        /// <returns>An IEnumberable of Tuples containing the row and column).</returns>
+        /// <returns>An IEnumberable of Tuples containing the row and column.</returns>
         public static IEnumerable<(int Row, int Column)> ContainsAll(this Maze<int, int> maze, Direction directions)
         {
             for (int row = 0; row < maze.Height; row++)
@@ -160,7 +221,7 @@ namespace CrawfisSoftware.Collections.Maze
         /// </summary>
         /// <param name="maze">The maze to query.</param>
         /// <param name="directions">An set of directions as a Direction Flag (enum).</param>
-        /// <returns>An IEnumberable of Tuples containing the row and column).</returns>
+        /// <returns>An IEnumberable of Tuples containing the row and column.</returns>
         public static IEnumerable<(int Row, int Column)> ContainsAny(this Maze<int, int> maze, Direction directions)
         {
             for (int row = 0; row < maze.Height; row++)
@@ -191,12 +252,12 @@ namespace CrawfisSoftware.Collections.Maze
             {
                 for (column = 1; column < width; column++)
                 {
-                    if (!IsEastWestConsistentWithAffendingCell(maze, column, row, out (int,int) eastWestEdge))
+                    if (!IsEastWestConsistentWithWesternCell(maze, column, row, out (int,int) eastWestEdge))
                     {
                         yield return eastWestEdge;
                     }
 
-                    if (!IsNorthSouthConsistentWithAffendingCell(maze, column, row, out (int, int) northSouthEdge))
+                    if (!IsNorthSouthConsistentWithSouthernCell(maze, column, row, out (int, int) northSouthEdge))
                     {
                         yield return northSouthEdge;
                     }
@@ -205,7 +266,7 @@ namespace CrawfisSoftware.Collections.Maze
             row = 0;
             for (column = 1; column < width; column++)
             {
-                if (!IsEastWestConsistentWithAffendingCell(maze, column, row, out (int, int) eastWestEdge))
+                if (!IsEastWestConsistentWithWesternCell(maze, column, row, out (int, int) eastWestEdge))
                 {
                     yield return eastWestEdge;
                 }
@@ -214,14 +275,14 @@ namespace CrawfisSoftware.Collections.Maze
             column = 0;
             for (row = 1; row < maze.Height; row++)
             {
-                if (!IsNorthSouthConsistentWithAffendingCell(maze, column, row, out (int, int) northSouthEdge))
+                if (!IsNorthSouthConsistentWithSouthernCell(maze, column, row, out (int, int) northSouthEdge))
                 {
                     yield return northSouthEdge;
                 }
             }
         }
 
-        static bool IsEastWestConsistentWithAffendingCell(Maze<int,int> maze, int column, int row, out (int,int) edge)
+        static bool IsEastWestConsistentWithWesternCell(Maze<int,int> maze, int column, int row, out (int,int) edge)
         {
             int width = maze.Width;
             int currentCell = row * width + column;
@@ -245,7 +306,7 @@ namespace CrawfisSoftware.Collections.Maze
             return true;
         }
 
-        static bool IsNorthSouthConsistentWithAffendingCell(Maze<int, int> maze, int column, int row, out (int, int) edge)
+        static bool IsNorthSouthConsistentWithSouthernCell(Maze<int, int> maze, int column, int row, out (int, int) edge)
         {
             int width = maze.Width;
             int currentCell = row * width + column;
