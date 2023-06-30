@@ -7,7 +7,7 @@ using System.Linq;
 namespace CrawfisSoftware.Collections.Maze
 {
     /// <summary>
-    /// Abstract base class to build mazes with some concrete implemetations
+    /// Abstract base class to build mazes with some concrete implementations
     /// </summary>
     /// <typeparam name="N">The type used for node labels</typeparam>
     /// <typeparam name="E">The type used for edge weights</typeparam>
@@ -352,13 +352,13 @@ namespace CrawfisSoftware.Collections.Maze
         }
 
         /// <inheritdoc/>
-        public void MakeBidirectionallyConsistent()
+        public void MakeBidirectionallyConsistent(bool carvingMissingPassages = true)
         {
             MakeBidirectionallyConsistent(0, 0, Width-1, Height-1);
         }
 
         /// <inheritdoc/>
-        public void MakeBidirectionallyConsistent(int lowerLeftCell, int upperRightCell)
+        public void MakeBidirectionallyConsistent(int lowerLeftCell, int upperRightCell, bool carvingMissingPassages = true)
         {
             int currentRow = lowerLeftCell / Width;
             int currentColumn = lowerLeftCell % Width;
@@ -369,7 +369,7 @@ namespace CrawfisSoftware.Collections.Maze
 
         /// <inheritdoc/>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
-        public void MakeBidirectionallyConsistent(int currentColumn, int currentRow, int endColumn, int endRow)
+        public void MakeBidirectionallyConsistent(int currentColumn, int currentRow, int endColumn, int endRow, bool carvingMissingPassages = true)
         {
             if (currentColumn < 0 || currentColumn >= grid.Width || endColumn < 0 || endColumn >= grid.Width)
             {
@@ -385,19 +385,47 @@ namespace CrawfisSoftware.Collections.Maze
                 {
                     Direction dir = directions[column, row];
                     if (column > 0 && (dir & Direction.W) == Direction.W)
-                        directions[column - 1, row] |= Direction.E;
+                        if (carvingMissingPassages)
+                        {
+                            directions[column - 1, row] |= Direction.E;
+                        }
+                        else
+                        {
+                            directions[column, row] = dir & ~Direction.W;
+                        }
                     //else if (column > 0)
                     //    directions[column - 1, row] &= ~Direction.E;
                     if ((row < Height) && (dir & Direction.N) == Direction.N)
-                        directions[column, row + 1] |= Direction.S;
+                        if (carvingMissingPassages)
+                        {
+                            directions[column, row + 1] |= Direction.S;
+                        }
+                        else
+                        {
+                            directions[column, row] = dir & ~Direction.N;
+                        }
                     //else if (row < Height)
                     //    directions[column, row + 1] &= ~Direction.S;
                     if ((column < Width) && (dir & Direction.E) == Direction.E)
-                        directions[column + 1, row] |= Direction.W;
+                        if (carvingMissingPassages)
+                        {
+                            directions[column + 1, row] |= Direction.W;
+                        }
+                        else
+                        {
+                            directions[column, row] = dir & ~Direction.E;
+                        }
                     //else if(column < Width)
                     //    directions[column + 1, row] &= ~Direction.W;
                     if ((row > 0) && (dir & Direction.S) == Direction.S)
-                        directions[column, row - 1] |= Direction.N;
+                        if (carvingMissingPassages)
+                        {
+                            directions[column, row - 1] |= Direction.N;
+                        }
+                        else
+                        {
+                            directions[column, row] = dir & ~Direction.S;
+                        }
                     //else if(row > 0)
                     //    directions[column, row - 1] &= ~Direction.N;
                 }

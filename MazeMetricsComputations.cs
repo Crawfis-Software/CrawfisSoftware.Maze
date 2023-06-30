@@ -9,9 +9,9 @@ namespace CrawfisSoftware.Collections.Maze
     /// <summary>
     /// Computes metrics on a maze and allows for easy access to both global metrics and per cell metrics.
     /// </summary>
-    public class MazeMetricsComputations
+    public class MazeMetricsComputations<N, E>
     {
-        private Maze<int, int> _maze;
+        private Maze<N, E> _maze;
         private int[] _distancesFromStart;
         private int[] _distancesToEnd;
         private int[] _mazeDistancesFromSolutionPath;
@@ -40,7 +40,7 @@ namespace CrawfisSoftware.Collections.Maze
         /// <param name="maze">The maze to compute analytics on.</param>
         /// <remarks>Call the various Computation methods prior to accessing data. This allows the use to pick and choose which computations should be 
         /// performed <seealso cref="ComputeAllMetrics(Random, Direction)"/>.</remarks>
-        public MazeMetricsComputations(Maze<int, int> maze)
+        public MazeMetricsComputations(Maze<N, E> maze)
         {
             _maze = maze;
             _width = maze.Width;
@@ -128,7 +128,7 @@ namespace CrawfisSoftware.Collections.Maze
                 distances[cellIndex] = 0;
             }
 
-            var mazeEnumerator = new IndexedGraphEdgeEnumerator<int, int>(_maze, new QueueAdaptor<IIndexedEdge<int>>());
+            var mazeEnumerator = new IndexedGraphEdgeEnumerator<N,E>(_maze, new QueueAdaptor<IIndexedEdge<E>>());
             foreach (var edge in mazeEnumerator.TraverseNodes(_overallMetrics.SolutionPathMetric.Path))
             {
                 // Set the "To" node's distance to one plus the "From" node's distance.
@@ -181,7 +181,7 @@ namespace CrawfisSoftware.Collections.Maze
 
             int currentBranchRoot = -1;
             Direction currentBranchEdge = Direction.None;
-            var mazeEnumerator = new IndexedGraphEdgeEnumerator<int, int>(_maze, new QueueAdaptor<IIndexedEdge<int>>());
+            var mazeEnumerator = new IndexedGraphEdgeEnumerator<N, E>(_maze, new QueueAdaptor<IIndexedEdge<E>>());
             foreach (var edge in mazeEnumerator.TraverseNodes(_overallMetrics.SolutionPathMetric.Path))
             {
                 // Increment branch level if the parent's edge to me was a secondary or third exit.
@@ -235,7 +235,7 @@ namespace CrawfisSoftware.Collections.Maze
             int[] distances = new int[_width * _height];
             _parents = new int[_width * _height];
             int furthestDistance = 0;
-            var graphEnumerator = new IndexedGraphEdgeEnumerator<int, int>(_maze, new QueueAdaptor<IIndexedEdge<int>>());
+            var graphEnumerator = new IndexedGraphEdgeEnumerator<N, E>(_maze, new QueueAdaptor<IIndexedEdge<E>>());
             var breadthFirstSearch = graphEnumerator.TraverseGraph(_maze.StartCell);
             foreach (var edge in breadthFirstSearch)
             {
@@ -258,7 +258,7 @@ namespace CrawfisSoftware.Collections.Maze
         {
             int[] distances = new int[_width * _height];
             int furthestDistance = 0;
-            var graphEnumerator = new IndexedGraphEdgeEnumerator<int, int>(_maze, new QueueAdaptor<IIndexedEdge<int>>());
+            var graphEnumerator = new IndexedGraphEdgeEnumerator<N, E>(_maze, new QueueAdaptor<IIndexedEdge<E>>());
             var breadthFirstSearch = graphEnumerator.TraverseGraph(_maze.EndCell);
             foreach (var edge in breadthFirstSearch)
             {
@@ -284,7 +284,7 @@ namespace CrawfisSoftware.Collections.Maze
             _topEdgeFlows = new EdgeFlow[_width * _height];
             _rightEdgeFlows = new EdgeFlow[_width * _height];
             _bottomEdgeFlows = new EdgeFlow[_width * _height];
-            var graphEnumerator = new IndexedGraphEdgeEnumerator<int, int>(_maze, new QueueAdaptor<IIndexedEdge<int>>());
+            var graphEnumerator = new IndexedGraphEdgeEnumerator<N, E>(_maze, new QueueAdaptor<IIndexedEdge<E>>());
             var breadthFirstSearch = graphEnumerator.TraverseGraph(_maze.StartCell);
             foreach (var edge in breadthFirstSearch)
             {
@@ -305,7 +305,7 @@ namespace CrawfisSoftware.Collections.Maze
         /// </summary>
         public void ComputeSolutionPath()
         {
-            var path = PathQuery<int, int>.FindPath(_maze, _maze.StartCell, _maze.EndCell);
+            var path = PathQuery<N, E>.FindPath(_maze, _maze.StartCell, _maze.EndCell);
             var solutionPath = new List<int>();
             solutionPath.Add(_maze.StartCell);
             foreach (var edge in path)
@@ -338,7 +338,7 @@ namespace CrawfisSoftware.Collections.Maze
 
             int node = -1;
             int parent = -1;
-            foreach (var edge in PathQuery<int, int>.FindPath(_maze, startingCell, endingCell))
+            foreach (var edge in PathQuery<N, E>.FindPath(_maze, startingCell, endingCell))
             {
                 node = edge.To;
                 parent = edge.From;
