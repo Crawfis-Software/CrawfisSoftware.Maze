@@ -1,10 +1,6 @@
 ﻿using CrawfisSoftware.Collections.Graph;
-using CrawfisSoftware.Collections.Maze;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace CrawfisSoftware.Maze
+namespace CrawfisSoftware.Collections.Maze
 {
     /// <summary>
     /// Modify amaze based on maze metrics.
