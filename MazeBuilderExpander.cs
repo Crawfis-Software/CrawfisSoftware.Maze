@@ -24,21 +24,29 @@ namespace CrawfisSoftware.Collections.Maze
         }
 
         /// <summary>
-        /// Set the size of the wall thickness in terms of the number of cells (default is 0).
+        /// Set the size of the wall thickness in terms of the number of cells The default wall size is 0.
         /// </summary>
         /// <param name="numberOfTilesToExpandBy">The number of cells to expand each wall to.</param>
         public void ExpandWalls(int numberOfTilesToExpandBy)
         {
+            if(numberOfTilesToExpandBy < 0)
+            {
+                throw new System.ArgumentOutOfRangeException("Wall expansion needs to be zero or positive.");
+            }
             _numberOfOpeningTiles = numberOfTilesToExpandBy;
         }
 
 
         /// <summary>
-        /// Set the size of the opening thickness in terms of the number of cells (default is 0).
+        /// Increase the opening thickness in terms of the number of cells. The default opening size is 1.
         /// </summary>
         /// <param name="numberOfTilesToExpandBy">The number of cells to expand each opening to.</param>
         public void ExpandOpenings(int numberOfTilesToExpandBy)
         {
+            if (numberOfTilesToExpandBy < 0)
+            {
+                throw new System.ArgumentOutOfRangeException("Wall expansion needs to be zero or positive.");
+            }
             _numberOfWallTiles = numberOfTilesToExpandBy;
         }
 
@@ -47,8 +55,14 @@ namespace CrawfisSoftware.Collections.Maze
         /// Set the size of a border on all sides in terms of the number of cells (default is 0).
         /// </summary>
         /// <param name="numberOfTilesToExpandBy">The number of cells for the border.</param>
+        /// <remarks>Note: The Start and End cells will be set to the interior of the maze corresponding to the mapped cell location previously. 
+        /// Use one of the path carving algorithms to create an exit out of the boundary.</remarks>
         public void AddBorder(int numberOfTilesToExpandBy)
         {
+            if (numberOfTilesToExpandBy < 0)
+            {
+                throw new System.ArgumentOutOfRangeException("Wall expansion needs to be zero or positive.");
+            }
             _numberOfBorderTiles = numberOfTilesToExpandBy;
         }
 
@@ -81,6 +95,7 @@ namespace CrawfisSoftware.Collections.Maze
                     newDirections[column, row] = Direction.None;
                     int oldColumn = (column - _numberOfBorderTiles) / expansionSize;
                     Direction direction = directions[oldColumn, oldRow];
+                    if ((direction | Direction.Undefined) == (Direction.None | Direction.Undefined)) continue;
                     if ((column - _numberOfBorderTiles) % expansionSize == 0)
                     {
                         if ((row - _numberOfBorderTiles) % expansionSize == 0)

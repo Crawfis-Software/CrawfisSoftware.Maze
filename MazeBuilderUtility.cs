@@ -100,7 +100,7 @@ namespace CrawfisSoftware.Collections.Maze
         /// <param name="directions">A 2D array of Directions for the maze</param>
         /// <param name="nodeAccessor">A function to retrieve any node labels</param>
         /// <param name="edgeAccessor">A function to retrieve any edge weights</param>
-        /// <returns></returns>
+        /// <returns>A maze</returns>
         public static Maze<N, E> CreateMaze(Direction[,] directions, GetGridLabel<N> nodeAccessor, GetEdgeLabel<E> edgeAccessor)
         {
             int width = directions.GetLength(0);

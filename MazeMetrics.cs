@@ -25,7 +25,7 @@ namespace CrawfisSoftware.Collections.Maze
         /// </summary>
         public Nullable<int> NumberOfTurnCells;
         /// <summary>
-        /// Count of the number of cells with T-junctions.
+        /// Count of the number of cells with E-junctions.
         /// </summary>
         public Nullable<int> NumberOfTJuntionCells;
         /// <summary>
