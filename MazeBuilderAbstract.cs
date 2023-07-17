@@ -209,6 +209,8 @@ namespace CrawfisSoftware.Collections.Maze
         /// </summary>
         /// <param name="lowerLeftCell">The lower-left cell index.</param>
         /// <param name="upperRightCell">The upper -right cell index.</param>
+        /// <param name="preserveExistingCells">Boolean indicating whether to only replace maze cells that are undefined.
+        /// Default is false.</param>
         public void WallBoundary(int lowerLeftCell, int upperRightCell, bool preserveExistingCells = false)
         {
             int lowerRightCell = upperRightCell % Width + Width * (int)(lowerLeftCell / Width);

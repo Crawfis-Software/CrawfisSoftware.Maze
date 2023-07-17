@@ -188,8 +188,8 @@ namespace CrawfisSoftware.Collections.Maze
         /// </summary>
         /// <param name="lowerLeftCell">The lower-left corner of the region to fix.</param>
         /// <param name="upperRightCell">The upper-right corner of the region to fix.</param>
+        /// <param name="carvingMissingPassages">If true, fix inconsistencies by opening up both sides. If false, wall up  both sides.</param>
         /// <remarks>This will open up all inconsistencies.</remarks>
-        /// <paramref name="carvingMissingPassages">If true, fix inconsistencies by opening up both sides. If false, wall up  both sides.</paramref>
         void MakeBidirectionallyConsistent(int lowerLeftCell, int upperRightCell, bool carvingMissingPassages = true);
 
         /// <summary>
@@ -199,7 +199,7 @@ namespace CrawfisSoftware.Collections.Maze
         /// <param name="currentRow">Lower-left row</param>
         /// <param name="endColumn">upper-left column inclusive</param>
         /// <param name="endRow">upper-right row inclusive</param>
-        /// <paramref name="carvingMissingPassages">If true, fix inconsistencies by opening up both sides. If false, wall up  both sides.</paramref>
+        /// <param name="carvingMissingPassages">If true, fix inconsistencies by opening up both sides. If false, wall up  both sides.</param>
         void MakeBidirectionallyConsistent(int currentColumn, int currentRow, int endColumn, int endRow, bool carvingMissingPassages = true);
     }
 }
