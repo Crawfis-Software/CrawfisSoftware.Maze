@@ -112,10 +112,90 @@ namespace CrawfisSoftware.Collections.Maze
             for (int i = 0; i <= 15; i++)
             {
                 Direction direction = (Direction)i;
-                var stamp = CreateStampClosed2x2(direction);
+                var stamp = CreateStamp2x2(direction);
                 stampSet.RegisterStamp(direction, stamp);
             }
             return stampSet;
+        }
+
+        public static StampSet<Direction> CreateStampSetOpenNxM(int width, int height, int horizontalWallThickness, int verticalWallThickness)
+        {
+            var stampSet = new StampSet<Direction>(width, height, null);
+            for (int i = 0; i <= 15; i++)
+            {
+                Direction direction = (Direction)i;
+                var stamp = CreateStampOpen(direction, width, height, horizontalWallThickness, verticalWallThickness);
+                stampSet.RegisterStamp(direction, stamp);
+            }
+            return stampSet;
+
+        }
+
+        public static StampSet<Direction> CreateStampSetClosedNxM(int width, int height, int horizontalWallThickness, int verticalWallThickness)
+        {
+            var stampSet = new StampSet<Direction>(width, height, null);
+            for (int i = 0; i <= 15; i++)
+            {
+                Direction direction = (Direction)i;
+                var stamp = CreateStampClosed(direction, width, height, horizontalWallThickness, verticalWallThickness);
+                stampSet.RegisterStamp(direction, stamp);
+            }
+            return stampSet;
+
+        }
+
+        public static OccupancyGrid CreateStampOpen(Direction direction, int width, int height, int horizontalWallThickness, int verticalWallThickness)
+        {
+            var occupancyGrid = new OccupancyGrid(width, height);
+            if (direction == Direction.None) return occupancyGrid;
+            occupancyGrid.Fill(true);
+            if (!direction.HasFlag(Direction.S))
+            {
+                for (int row = 0; row < horizontalWallThickness; row++)
+                {
+                    for (int column = 0; column < width; column++)
+                    {
+                        occupancyGrid.MarkCell(column, row, false);
+                    }
+                }
+            }
+
+            if (!direction.HasFlag(Direction.W))
+            {
+                for (int row = 0; row < height; row++)
+                {
+                    for (int column = 0; column < verticalWallThickness; column++)
+                    {
+                        occupancyGrid.MarkCell(column, row, false);
+                    }
+                }
+            }
+
+            return occupancyGrid;
+        }
+
+        public static OccupancyGrid CreateStampClosed(Direction direction, int width, int height, int horizontalWallThickness, int verticalWallThickness)
+        {
+            var occupancyGrid = new OccupancyGrid(width, height);
+            if (direction == Direction.None) return occupancyGrid;
+            occupancyGrid.Fill(true, verticalWallThickness, width-1-verticalWallThickness, horizontalWallThickness, height-1-horizontalWallThickness);
+            if (direction.HasFlag(Direction.W))
+            {
+                occupancyGrid.Fill(true, 0, verticalWallThickness - 1, horizontalWallThickness, height - 1 - horizontalWallThickness);
+            }
+            if (direction.HasFlag(Direction.N))
+            {
+                occupancyGrid.Fill(true, verticalWallThickness, width - 1 - verticalWallThickness,  height - 1 - horizontalWallThickness, height-1);
+            }
+            if (direction.HasFlag(Direction.E))
+            {
+                occupancyGrid.Fill(true, width - 1 - verticalWallThickness, width-1, horizontalWallThickness, height - 1 - horizontalWallThickness);
+            }
+            if (direction.HasFlag(Direction.S))
+            {
+                occupancyGrid.Fill(true, verticalWallThickness, width - 1 - verticalWallThickness, 0, horizontalWallThickness - 1);
+            }
+            return occupancyGrid;
         }
 
         private static OccupancyGrid CreateStampOpen3x3(Direction dir)
@@ -181,7 +261,7 @@ namespace CrawfisSoftware.Collections.Maze
             return occupancyGrid;
         }
 
-        private static OccupancyGrid CreateStampClosed2x2(Direction dir)
+        private static OccupancyGrid CreateStamp2x2(Direction dir)
         {
             var occupancyGrid = new OccupancyGrid(2, 2);
             bool any = (dir != Direction.None);
