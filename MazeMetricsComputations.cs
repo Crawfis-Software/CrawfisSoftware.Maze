@@ -315,7 +315,7 @@ namespace CrawfisSoftware.Collections.Maze
         }
 
         /// <summary>
-        /// Convert multiple PrimaryExits on E-junctions and Cross-Junctions to Secondary Exits along the solution path to the maze.
+        /// Convert multiple PrimaryExits on T-junctions and Cross-Junctions to Secondary Exits along the solution path to the maze.
         /// </summary>
         /// <param name="exitDirection">Unless the exit is a dead-end, this should be specified to indicate how the solution path exits the grid.</param>
         /// <remarks>Calls DirectionsFromStart is not called already.</remarks>
@@ -325,7 +325,7 @@ namespace CrawfisSoftware.Collections.Maze
         }
 
         /// <summary>
-        /// Convert multiple PrimaryExits on E-junctions and Cross-Junctions to Secondary Exits along the path from the specified startingCell to the endingCell.
+        /// Convert multiple PrimaryExits on T-junctions and Cross-Junctions to Secondary Exits along the path from the specified startingCell to the endingCell.
         /// </summary>
         /// <param name="startingCell">The starting cell of the path to apply directions to.</param>
         /// <param name="endingCell">The ending cell of the path to apply directions to.</param>
@@ -361,7 +361,7 @@ namespace CrawfisSoftware.Collections.Maze
         }
 
         /// <summary>
-        /// Finds all Cross-sections and E-Junctions and relabel all PrimaryExits to SecondaryExits.
+        /// Finds all Cross-sections and T-Junctions and relabel all PrimaryExits to SecondaryExits.
         /// </summary>
         /// <param name="ignoreSolutionPath">If true, no edges on the solution path will be changed.</param>
         /// <remarks>Requires solution path metrics to be computed if ignoreSolutionPath is true.</remarks>
@@ -386,7 +386,7 @@ namespace CrawfisSoftware.Collections.Maze
         }
 
         /// <summary>
-        /// Finds all Cross-sections and E-Junctions where the EdgeFlow directions contain multiple PrimaryExits and converts all but one to SecondaryExits.
+        /// Finds all Cross-sections and T-Junctions where the EdgeFlow directions contain multiple PrimaryExits and converts all but one to SecondaryExits.
         /// </summary>
         /// <param name="random">A Random number generator</param>
         public void RandomlyAssignSecondaryExits(Random random)
