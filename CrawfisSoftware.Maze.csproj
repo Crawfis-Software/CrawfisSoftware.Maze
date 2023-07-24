@@ -5,9 +5,10 @@
     <RootNamespace>CrawfisSoftware.Maze</RootNamespace>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
+    <DocumentationFile>$(SolutionDir)Documentation\CrawfisSoftware.Maze.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DocumentationFile>$(SolutionDir)Documentation\Maze.xml</DocumentationFile>
+    <DocumentationFile>$(SolutionDir)Documentation\CrawfisSoftware.Maze.xml</DocumentationFile>
     <OutputPath>$(SolutionDir)bin\Debug\</OutputPath>
   </PropertyGroup>
   <ItemGroup>
