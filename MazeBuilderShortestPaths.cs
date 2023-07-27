@@ -10,7 +10,7 @@ namespace CrawfisSoftware.Collections.Maze
         public int MaxRandomValue { get; set; } = int.MaxValue - 1;
         public int TargetCell { get; set; }
         public int PreservedOpeningValue { get; set; } = 0;
-        public int PreservedClosedvalue { get; set; } = int.MaxValue - 1;
+        public int PreservedClosedValue { get; set; } = int.MaxValue - 1;
 
         private int[,,] _randomValues;
         
@@ -25,7 +25,14 @@ namespace CrawfisSoftware.Collections.Maze
         /// <inheritdoc/>
         public override void CreateMaze(bool preserveExistingCells = false)
         {
-            _randomValues = GetRandomValues();
+            if (preserveExistingCells)
+            {
+                _randomValues = RandomValuesWithExistingEdges();
+            }
+            else
+            {
+                _randomValues = RandomValues();
+            }
             CarveShortestPaths(preserveExistingCells, TargetCell);
         }
 
@@ -39,7 +46,7 @@ namespace CrawfisSoftware.Collections.Maze
                     int targetNode = column + row * Width;
                     foreach (var cell in pathQuery.GetPath(targetNode))
                     {
-                        CarvePassage(cell.From, cell.To, preserveExistingCells);
+                        CarvePassage(cell.From, cell.To, false);
                     }
                 }
             }
@@ -54,7 +61,7 @@ namespace CrawfisSoftware.Collections.Maze
             return fromValue;
         }
 
-        private int[,,] GetRandomValues()
+        private int[,,] RandomValues()
         {
             int[,,] randomValues = new int[Width, Height, 4];
             var randomGen = this.RandomGenerator;
@@ -62,38 +69,73 @@ namespace CrawfisSoftware.Collections.Maze
             {
                 for (int column = 0; column < Width; column++)
                 {
+                    for(int direction = 0; direction < 4; direction++)
+                    {
+                        randomValues[column, row, direction] = randomGen.Next(MinRandomValue, MaxRandomValue);
+                    }
+                }
+            }
+            return randomValues;
+        }
+
+        private int[,,] RandomValuesWithExistingEdges()
+        {
+            int[,,] randomValues = new int[Width, Height, 4];
+            var randomGen = this.RandomGenerator;
+            for (int row = 0; row < Height; row++)
+            {
+                for (int column = 0; column < Width; column++)
+                {
+                    bool cellsCanBeModified = true;
+                    cellsCanBeModified = (directions[column, row] & Direction.Undefined) == Direction.Undefined;
                     Direction direction = this.directions[column, row];
                     if ((direction & Direction.W) == Direction.W)
                     {
-                        randomValues[column, row, 0] = PreservedOpeningValue;
+                        bool useRandom = cellsCanBeModified & column != 0 && (directions[column-1, row] & Direction.Undefined) == Direction.Undefined;
+                        if (useRandom) randomValues[column, row, 0] = randomGen.Next(MinRandomValue, MaxRandomValue);
+                        else randomValues[column, row, 0] = PreservedOpeningValue;
                     }
                     else
                     {
-                        randomValues[column, row, 0] = randomGen.Next(MinRandomValue, MaxRandomValue);
+                        bool useRandom = cellsCanBeModified & column != 0 && (directions[column - 1, row] & Direction.Undefined) == Direction.Undefined;
+                        if (useRandom) randomValues[column, row, 0] = randomGen.Next(MinRandomValue, MaxRandomValue);
+                        else randomValues[column, row, 0] = PreservedClosedValue;
                     }
                     if ((direction & Direction.N) == Direction.N)
                     {
-                        randomValues[column, row, 1] = PreservedOpeningValue;
+                        bool useRandom = cellsCanBeModified & row != Height-1 && (directions[column, row+1] & Direction.Undefined) == Direction.Undefined;
+                        if (useRandom) randomValues[column, row, 1] = randomGen.Next(MinRandomValue, MaxRandomValue);
+                        else randomValues[column, row, 1] = PreservedOpeningValue;
                     }
                     else
                     {
-                        randomValues[column, row, 1] = randomGen.Next(MinRandomValue, MaxRandomValue);
+                        bool useRandom = cellsCanBeModified & row != Height - 1 && (directions[column, row + 1] & Direction.Undefined) == Direction.Undefined;
+                        if (useRandom) randomValues[column, row, 1] = randomGen.Next(MinRandomValue, MaxRandomValue);
+                        else randomValues[column, row, 1] = PreservedClosedValue;
                     }
-                    if ((direction & Direction.E) == Direction.W)
+                    if ((direction & Direction.E) == Direction.E)
                     {
-                        randomValues[column, row, 2] = PreservedOpeningValue;
+                        bool useRandom = cellsCanBeModified & column != Width - 1 && (directions[column + 1, row] & Direction.Undefined) == Direction.Undefined;
+                        if (useRandom) randomValues[column, row, 2] = randomGen.Next(MinRandomValue, MaxRandomValue);
+                        else randomValues[column, row, 2] = PreservedOpeningValue;
                     }
                     else
                     {
-                        randomValues[column, row, 2] = randomGen.Next(MinRandomValue, MaxRandomValue);
+                        bool useRandom = cellsCanBeModified & column != Width - 1 && (directions[column + 1, row] & Direction.Undefined) == Direction.Undefined;
+                        if (useRandom) randomValues[column, row, 2] = randomGen.Next(MinRandomValue, MaxRandomValue);
+                        else randomValues[column, row, 2] = PreservedClosedValue;
                     }
                     if ((direction & Direction.S) == Direction.S)
                     {
-                        randomValues[column, row, 3] = PreservedOpeningValue;
+                        bool useRandom = cellsCanBeModified & row != 0 && (directions[column, row - 1] & Direction.Undefined) == Direction.Undefined;
+                        if (useRandom) randomValues[column, row, 3] = randomGen.Next(MinRandomValue, MaxRandomValue);
+                        else randomValues[column, row, 3] = PreservedOpeningValue;
                     }
                     else
                     {
-                        randomValues[column, row, 3] = randomGen.Next(MinRandomValue, MaxRandomValue);
+                        bool useRandom = cellsCanBeModified & row != 0 && (directions[column, row - 1] & Direction.Undefined) == Direction.Undefined;
+                        if (useRandom) randomValues[column, row, 3] = randomGen.Next(MinRandomValue, MaxRandomValue);
+                        else randomValues[column, row, 3] = PreservedClosedValue;
                     }
                 }
             }
