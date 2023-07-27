@@ -12,18 +12,23 @@ namespace CrawfisSoftware.Collections.Maze
         public int PreservedOpeningValue { get; set; } = 0;
         public int PreservedClosedValue { get; set; } = int.MaxValue - 1;
 
+        public EdgeCostDelegate<E> EdgeFunction { get; set; }
+
         private int[,,] _randomValues;
         
         public MazeBuilderShortestPaths(MazeBuilderAbstract<N, E> mazeBuilder) : base(mazeBuilder)
         {
+            if (this.edgeFunction == null)
+                EdgeFunction = RandomEdgeCost;
         }
 
         public MazeBuilderShortestPaths(int width, int height, GetGridLabel<N> nodeAccessor = null, GetEdgeLabel<E> edgeAccessor = null) : base(width, height, nodeAccessor, edgeAccessor)
         {
+            if (edgeAccessor == null)
+                EdgeFunction = RandomEdgeCost;
         }
 
-        /// <inheritdoc/>
-        public override void CreateMaze(bool preserveExistingCells = false)
+        public void CarveAllShortestPathsToTarget(bool preserveExistingCells = false)
         {
             if (preserveExistingCells)
             {
@@ -34,11 +39,17 @@ namespace CrawfisSoftware.Collections.Maze
                 _randomValues = RandomValues();
             }
             CarveShortestPaths(preserveExistingCells, TargetCell);
+
+        }
+
+        /// <inheritdoc/>
+        public override void CreateMaze(bool preserveExistingCells = false)
+        {
         }
 
         private void CarveShortestPaths(bool preserveExistingCells, int targetCell)
         {
-            var pathQuery = new Graph.SourceShortestPaths<N, E>(grid, targetCell, RandomEdgeCost);
+            var pathQuery = new Graph.SourceShortestPaths<N, E>(grid, targetCell, EdgeFunction);
             for (int row = 0; row < Height; row++)
             {
                 for (int column = 0; column < Width; column++)
@@ -57,8 +68,18 @@ namespace CrawfisSoftware.Collections.Maze
         {
             Direction direction = DirectionExtensions.GetEdgeDirection(edge.From, edge.To, Width);
             direction = direction & ~Direction.Undefined;
-            int fromValue = _randomValues[edge.From % Width, edge.From / Width, _directionIndex[direction]];
-            return fromValue;
+            int edgeValue = _randomValues[edge.From % Width, edge.From / Width, _directionIndex[direction]];
+            return edgeValue;
+        }
+
+        public float EdgeComparerUsingGetEdgeLabel(IIndexedEdge<float> edge)
+        {
+            return edge.Value;
+        }
+
+        public float EdgeComparerUsingGetEdgeLabel(IIndexedEdge<int> edge)
+        {
+            return edge.Value;
         }
 
         private int[,,] RandomValues()
