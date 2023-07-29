@@ -28,6 +28,22 @@ namespace CrawfisSoftware.Collections.Maze
                 EdgeFunction = RandomEdgeCost;
         }
 
+        public void CarvePath(int startingCell, int endingCell, bool preserveExistingCells = false)
+        {
+            if (preserveExistingCells)
+            {
+                _randomValues = RandomValuesWithExistingEdges();
+            }
+            else
+            {
+                _randomValues = RandomValues();
+            }
+            foreach (var cell in PathQuery<N, E>.FindPath(grid, startingCell, endingCell, EdgeFunction))
+            {
+                CarvePassage(cell.From, cell.To, false);
+            }
+        }
+
         public void CarveAllShortestPathsToTarget(bool preserveExistingCells = false)
         {
             if (preserveExistingCells)
