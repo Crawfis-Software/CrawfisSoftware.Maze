@@ -44,7 +44,7 @@ namespace CrawfisSoftware.Collections.Maze
             }
         }
 
-        public void CarveAllShortestPathsToTarget(bool preserveExistingCells = false)
+        public void CarveAllShortestPathsToTarget(bool preserveExistingCells = false, float maxCost = float.MaxValue)
         {
             if (preserveExistingCells)
             {
@@ -54,7 +54,7 @@ namespace CrawfisSoftware.Collections.Maze
             {
                 _randomValues = RandomValues();
             }
-            CarveShortestPaths(preserveExistingCells, TargetCell);
+            CarveShortestPaths(preserveExistingCells, TargetCell, maxCost);
 
         }
 
@@ -63,7 +63,7 @@ namespace CrawfisSoftware.Collections.Maze
         {
         }
 
-        private void CarveShortestPaths(bool preserveExistingCells, int targetCell)
+        private void CarveShortestPaths(bool preserveExistingCells, int targetCell, float maxCost = float.MaxValue)
         {
             var pathQuery = new Graph.SourceShortestPaths<N, E>(grid, targetCell, EdgeFunction);
             for (int row = 0; row < Height; row++)
@@ -71,6 +71,7 @@ namespace CrawfisSoftware.Collections.Maze
                 for (int column = 0; column < Width; column++)
                 {
                     int targetNode = column + row * Width;
+                    if (pathQuery.GetCost(targetNode) >= maxCost) continue;
                     foreach (var cell in pathQuery.GetPath(targetNode))
                     {
                         CarvePassage(cell.From, cell.To, false);
