@@ -6,55 +6,63 @@ namespace CrawfisSoftware.Collections.Maze
 {
     public class MazeBuilderShortestPaths<N, E> : MazeBuilderAbstract<N, E>
     {
-        public int MinRandomValue { get; set; } = 100;
-        public int MaxRandomValue { get; set; } = int.MaxValue - 1;
-        public int TargetCell { get; set; }
-        public int PreservedOpeningValue { get; set; } = 0;
-        public int PreservedClosedValue { get; set; } = int.MaxValue - 1;
 
-        public EdgeCostDelegate<E> EdgeFunction { get; set; }
+        public static float EdgeComparerUsingGetEdgeLabel(IIndexedEdge<float> edge, Direction fromCell, Direction toCell)
+        {
+            return edge.Value;
+        }
+
+        public static float ConstantOfOne(IIndexedEdge<E> edge, Direction fromCell, Direction toCell)
+        {
+            return 1;
+        }
+
+        public static float EdgeComparerUsingGetEdgeLabel(IIndexedEdge<int> edge, Direction fromCell, Direction toCell)
+        {
+            return edge.Value;
+        }
+
+        public Func<IIndexedEdge<E>, Direction, Direction, float> EdgeFunction { get; set; }
 
         private int[,,] _randomValues;
         
         public MazeBuilderShortestPaths(MazeBuilderAbstract<N, E> mazeBuilder) : base(mazeBuilder)
         {
-            if (this.edgeFunction == null)
-                EdgeFunction = RandomEdgeCost;
+                EdgeFunction = ConstantOfOne;
         }
 
         public MazeBuilderShortestPaths(int width, int height, GetGridLabel<N> nodeAccessor = null, GetEdgeLabel<E> edgeAccessor = null) : base(width, height, nodeAccessor, edgeAccessor)
         {
-            if (edgeAccessor == null)
-                EdgeFunction = RandomEdgeCost;
+                EdgeFunction = ConstantOfOne;
         }
 
         public void CarvePath(int startingCell, int endingCell, bool preserveExistingCells = false)
         {
-            if (preserveExistingCells)
-            {
-                _randomValues = RandomValuesWithExistingEdges();
-            }
-            else
-            {
-                _randomValues = RandomValues();
-            }
-            foreach (var cell in PathQuery<N, E>.FindPath(grid, startingCell, endingCell, EdgeFunction))
+            //if (preserveExistingCells)
+            //{
+            //    _randomValues = RandomValuesWithExistingEdges();
+            //}
+            //else
+            //{
+            //    _randomValues = RandomValues();
+            //}
+            foreach (var cell in PathQuery<N, E>.FindPath(grid, startingCell, endingCell, EdgeComparerUsingGetEdgeLabel))
             {
                 CarvePassage(cell.From, cell.To, false);
             }
         }
 
-        public void CarveAllShortestPathsToTarget(bool preserveExistingCells = false, float maxCost = float.MaxValue)
+        public void CarveAllShortestPathsToTarget(int targetCell, bool preserveExistingCells = false, float maxCost = float.MaxValue)
         {
-            if (preserveExistingCells)
-            {
-                _randomValues = RandomValuesWithExistingEdges();
-            }
-            else
-            {
-                _randomValues = RandomValues();
-            }
-            CarveShortestPaths(preserveExistingCells, TargetCell, maxCost);
+            //if (preserveExistingCells)
+            //{
+            //    _randomValues = RandomValuesWithExistingEdges();
+            //}
+            //else
+            //{
+            //    _randomValues = RandomValues();
+            //}
+            CarveShortestPaths(preserveExistingCells, targetCell, maxCost);
 
         }
 
@@ -65,7 +73,7 @@ namespace CrawfisSoftware.Collections.Maze
 
         private void CarveShortestPaths(bool preserveExistingCells, int targetCell, float maxCost = float.MaxValue)
         {
-            var pathQuery = new Graph.SourceShortestPaths<N, E>(grid, targetCell, EdgeFunction);
+            var pathQuery = new Graph.SourceShortestPaths<N, E>(grid, targetCell, EdgeComparerUsingGetEdgeLabel);
             for (int row = 0; row < Height; row++)
             {
                 for (int column = 0; column < Width; column++)
@@ -80,104 +88,9 @@ namespace CrawfisSoftware.Collections.Maze
             }
         }
 
-        private static Dictionary<Direction, int> _directionIndex = new Dictionary<Direction, int>() { { Direction.W, 0 }, { Direction.N, 1 }, {Direction.E, 2 }, {Direction.S, 3 } };
-        private float RandomEdgeCost(IIndexedEdge<E> edge)
+        public float EdgeComparerUsingGetEdgeLabel(IIndexedEdge<E> edge)
         {
-            Direction direction = DirectionExtensions.GetEdgeDirection(edge.From, edge.To, Width);
-            direction = direction & ~Direction.Undefined;
-            int edgeValue = _randomValues[edge.From % Width, edge.From / Width, _directionIndex[direction]];
-            return edgeValue;
-        }
-
-        public float EdgeComparerUsingGetEdgeLabel(IIndexedEdge<float> edge)
-        {
-            return edge.Value;
-        }
-
-        public float EdgeComparerUsingGetEdgeLabel(IIndexedEdge<int> edge)
-        {
-            return edge.Value;
-        }
-
-        private int[,,] RandomValues()
-        {
-            int[,,] randomValues = new int[Width, Height, 4];
-            var randomGen = this.RandomGenerator;
-            for (int row = 0; row < Height; row++)
-            {
-                for (int column = 0; column < Width; column++)
-                {
-                    for(int direction = 0; direction < 4; direction++)
-                    {
-                        randomValues[column, row, direction] = randomGen.Next(MinRandomValue, MaxRandomValue);
-                    }
-                }
-            }
-            return randomValues;
-        }
-
-        private int[,,] RandomValuesWithExistingEdges()
-        {
-            int[,,] randomValues = new int[Width, Height, 4];
-            var randomGen = this.RandomGenerator;
-            for (int row = 0; row < Height; row++)
-            {
-                for (int column = 0; column < Width; column++)
-                {
-                    bool cellsCanBeModified = true;
-                    cellsCanBeModified = (directions[column, row] & Direction.Undefined) == Direction.Undefined;
-                    Direction direction = this.directions[column, row];
-                    if ((direction & Direction.W) == Direction.W)
-                    {
-                        bool useRandom = cellsCanBeModified & column != 0 && (directions[column-1, row] & Direction.Undefined) == Direction.Undefined;
-                        if (useRandom) randomValues[column, row, 0] = randomGen.Next(MinRandomValue, MaxRandomValue);
-                        else randomValues[column, row, 0] = PreservedOpeningValue;
-                    }
-                    else
-                    {
-                        bool useRandom = cellsCanBeModified & column != 0 && (directions[column - 1, row] & Direction.Undefined) == Direction.Undefined;
-                        if (useRandom) randomValues[column, row, 0] = randomGen.Next(MinRandomValue, MaxRandomValue);
-                        else randomValues[column, row, 0] = PreservedClosedValue;
-                    }
-                    if ((direction & Direction.N) == Direction.N)
-                    {
-                        bool useRandom = cellsCanBeModified & row != Height-1 && (directions[column, row+1] & Direction.Undefined) == Direction.Undefined;
-                        if (useRandom) randomValues[column, row, 1] = randomGen.Next(MinRandomValue, MaxRandomValue);
-                        else randomValues[column, row, 1] = PreservedOpeningValue;
-                    }
-                    else
-                    {
-                        bool useRandom = cellsCanBeModified & row != Height - 1 && (directions[column, row + 1] & Direction.Undefined) == Direction.Undefined;
-                        if (useRandom) randomValues[column, row, 1] = randomGen.Next(MinRandomValue, MaxRandomValue);
-                        else randomValues[column, row, 1] = PreservedClosedValue;
-                    }
-                    if ((direction & Direction.E) == Direction.E)
-                    {
-                        bool useRandom = cellsCanBeModified & column != Width - 1 && (directions[column + 1, row] & Direction.Undefined) == Direction.Undefined;
-                        if (useRandom) randomValues[column, row, 2] = randomGen.Next(MinRandomValue, MaxRandomValue);
-                        else randomValues[column, row, 2] = PreservedOpeningValue;
-                    }
-                    else
-                    {
-                        bool useRandom = cellsCanBeModified & column != Width - 1 && (directions[column + 1, row] & Direction.Undefined) == Direction.Undefined;
-                        if (useRandom) randomValues[column, row, 2] = randomGen.Next(MinRandomValue, MaxRandomValue);
-                        else randomValues[column, row, 2] = PreservedClosedValue;
-                    }
-                    if ((direction & Direction.S) == Direction.S)
-                    {
-                        bool useRandom = cellsCanBeModified & row != 0 && (directions[column, row - 1] & Direction.Undefined) == Direction.Undefined;
-                        if (useRandom) randomValues[column, row, 3] = randomGen.Next(MinRandomValue, MaxRandomValue);
-                        else randomValues[column, row, 3] = PreservedOpeningValue;
-                    }
-                    else
-                    {
-                        bool useRandom = cellsCanBeModified & row != 0 && (directions[column, row - 1] & Direction.Undefined) == Direction.Undefined;
-                        if (useRandom) randomValues[column, row, 3] = randomGen.Next(MinRandomValue, MaxRandomValue);
-                        else randomValues[column, row, 3] = PreservedClosedValue;
-                    }
-                }
-            }
-            return randomValues;
+            return EdgeFunction(edge, directions[edge.From % Width, edge.From / Width], directions[edge.To % Width, edge.To / Width]);
         }
     }
 }
