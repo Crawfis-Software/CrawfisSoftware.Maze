@@ -33,7 +33,7 @@ namespace CrawfisSoftware.Collections.Maze
             {
                 throw new System.ArgumentOutOfRangeException("Wall expansion needs to be zero or positive.");
             }
-            _numberOfOpeningTiles = numberOfTilesToExpandBy;
+            _numberOfWallTiles = numberOfTilesToExpandBy;
         }
 
 
@@ -47,7 +47,7 @@ namespace CrawfisSoftware.Collections.Maze
             {
                 throw new System.ArgumentOutOfRangeException("Wall expansion needs to be zero or positive.");
             }
-            _numberOfWallTiles = numberOfTilesToExpandBy;
+            _numberOfOpeningTiles = numberOfTilesToExpandBy;
         }
 
 
