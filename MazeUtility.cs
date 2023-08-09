@@ -24,6 +24,14 @@ namespace CrawfisSoftware.Collections.Maze
     /// </summary>
     public static class MazeUtility
     {
+        /// <summary>
+        /// Given a maze and a stamp set associating directions to stamps, create and return an occupancy grid.
+        /// </summary>
+        /// <typeparam name="N">The type used for node labels in the maze.</typeparam>
+        /// <typeparam name="E">The type used for edge weights in the maze.</typeparam>
+        /// <param name="maze">The maze.</param>
+        /// <param name="stampSet">A stamp set with Direction as the associated type for id's.</param>
+        /// <returns>An OccupancyGrid.</returns>
         public static OccupancyGrid ReplaceDirectionsWithStamps<N, E>(Maze<N, E> maze, StampSet<Direction> stampSet)
         {
             int width = stampSet.Width * maze.Width;
@@ -40,6 +48,14 @@ namespace CrawfisSoftware.Collections.Maze
             return newMaze;
         }
 
+        /// <summary>
+        /// Given a maze and a stamp set associating directions to stamps, create and return an occupancy grid.
+        /// </summary>
+        /// <typeparam name="N">The type used for node labels in the maze.</typeparam>
+        /// <typeparam name="E">The type used for edge weights in the maze.</typeparam>
+        /// <param name="maze">The maze.</param>
+        /// <param name="stampSet">A stamp set with Direction as the associated type for id's.</param>
+        /// <returns>An OccupancyGrid.</returns>
         public static OccupancyGrid CreateOccupancyGridFromMaze<N, E>(Maze<N, E> maze, StampSet<Direction> stampSet)
         {
             var tempGrid = ReplaceDirectionsWithStamps<N, E>(maze, stampSet);
@@ -64,24 +80,39 @@ namespace CrawfisSoftware.Collections.Maze
             return occupancyGraph;
         }
 
-        public static OccupancyGrid CreateOccupancyGridFromMaze<N, E>(Maze<N, E> maze, TileStyle tileStyle)
+        /// <summary>
+        /// Given a maze create and return an occupancy grid.
+        /// </summary>
+        /// <typeparam name="N">The type used for node labels in the maze.</typeparam>
+        /// <typeparam name="E">The type used for edge weights in the maze.</typeparam>
+        /// <param name="maze">The maze.</param>
+        /// <param name="tileStyle">The style of the underlying stamp set to use. Default is to replace each cell with a 3x3 occupancy grid having all of the corners blocked.</param>
+        /// <returns>An OccupancyGrid.</returns>
+        public static OccupancyGrid CreateOccupancyGridFromMaze<N, E>(Maze<N, E> maze, TileStyle tileStyle = TileStyle.Tight3x3)
         {
             StampSet<Direction> stampSet;
             switch(tileStyle)
             {
                 case TileStyle.Small2x2:
                     stampSet = CreateStampSet2x2Bool();
-                    break;
+                    return CreateOccupancyGridFromMaze(maze, stampSet);
+                    //break;
                 case TileStyle.Open3x3:
                     stampSet = CreateStampSet3x3BoolOpen();
-                    break;
+                    return ReplaceDirectionsWithStamps(maze, stampSet);
+                    //return CreateOccupancyGridFromMaze(maze, stampSet);
+                    //break;
                 default:
                     stampSet = CreateStampSet3x3Bool();
-                    break;
+                    return ReplaceDirectionsWithStamps(maze, stampSet);
+                    //break;
             }
-            return CreateOccupancyGridFromMaze(maze, stampSet);
         }
 
+        /// <summary>
+        /// Create a 3x3 stamp set for all direction sets. All corners are closed.
+        /// </summary>
+        /// <returns>A stamp set of Direction's to OccupancyGrid's.</returns>
         public static StampSet<Direction> CreateStampSet3x3Bool()
         {
             var stampSet = new StampSet<Direction>(3, 3, null);
@@ -94,6 +125,10 @@ namespace CrawfisSoftware.Collections.Maze
             return stampSet;
         }
 
+        /// <summary>
+        /// Create a 3x3 stamp set for all direction sets. Corners shared by two openings are open.
+        /// </summary>
+        /// <returns>A stamp set of Direction's to OccupancyGrid's.</returns>
         public static StampSet<Direction> CreateStampSet3x3BoolOpen()
         {
             var stampSet = new StampSet<Direction>(3, 3, null);
@@ -106,6 +141,10 @@ namespace CrawfisSoftware.Collections.Maze
             return stampSet;
         }
 
+        /// <summary>
+        /// Create a 2x2 stamp set for all direction sets. bottom-left corner is closed.
+        /// </summary>
+        /// <returns>A stamp set of Direction's to OccupancyGrid's.</returns>
         public static StampSet<Direction> CreateStampSet2x2Bool()
         {
             var stampSet = new StampSet<Direction>(2, 2, null);
@@ -118,6 +157,14 @@ namespace CrawfisSoftware.Collections.Maze
             return stampSet;
         }
 
+        /// <summary>
+        /// Creates a StampSet foreach Direction where the right and top edges are open if there is a passage.
+        /// </summary>
+        /// <param name="width">The width of the stamps.</param>
+        /// <param name="height">The heights of the stamps.</param>
+        /// <param name="horizontalWallThickness">The thickness of the walls. Must be less than width-1 for any passages. Width minus this will be the passageway width.</param>
+        /// <param name="verticalWallThickness">The thickness of the walls. Must be less than height-1 for any passages. Width minus this will be the passageway height.</param>
+        /// <returns>A stamp set of Direction's to OccupancyGrid's</returns>
         public static StampSet<Direction> CreateStampSetOpenNxM(int width, int height, int horizontalWallThickness, int verticalWallThickness)
         {
             var stampSet = new StampSet<Direction>(width, height, null);
@@ -131,6 +178,15 @@ namespace CrawfisSoftware.Collections.Maze
 
         }
 
+
+        /// <summary>
+        /// Creates a StampSet foreach Direction where the corners are closed off.
+        /// </summary>
+        /// <param name="width">The width of the stamps.</param>
+        /// <param name="height">The heights of the stamps.</param>
+        /// <param name="horizontalWallThickness">The thickness of the walls. Must be less than width-1 for any passages. Width minus this will be the passageway width.</param>
+        /// <param name="verticalWallThickness">The thickness of the walls. Must be less than height-1 for any passages. Width minus this will be the passageway height.</param>
+        /// <returns>A stamp set of Direction's to OccupancyGrid's</returns>
         public static StampSet<Direction> CreateStampSetClosedNxM(int width, int height, int horizontalWallThickness, int verticalWallThickness)
         {
             var stampSet = new StampSet<Direction>(width, height, null);
@@ -144,6 +200,16 @@ namespace CrawfisSoftware.Collections.Maze
 
         }
 
+
+        /// <summary>
+        /// Creates a Stamp for a specified Direction where the right and top edges are open if there is a passage.
+        /// </summary>
+        /// <param name="direction">The Direction(s) that this stamp should support.</param>
+        /// <param name="width">The width of the stamps.</param>
+        /// <param name="height">The heights of the stamps.</param>
+        /// <param name="horizontalWallThickness">The thickness of the walls. Must be less than width-1 for any passages. Width minus this will be the passageway width.</param>
+        /// <param name="verticalWallThickness">The thickness of the walls. Must be less than height-1 for any passages. Width minus this will be the passageway height.</param>
+        /// <returns>A stamp associated with the input Direction.</returns>
         public static OccupancyGrid CreateStampOpen(Direction direction, int width, int height, int horizontalWallThickness, int verticalWallThickness)
         {
             var occupancyGrid = new OccupancyGrid(width, height);
@@ -174,6 +240,15 @@ namespace CrawfisSoftware.Collections.Maze
             return occupancyGrid;
         }
 
+        /// <summary>
+        /// Creates a Stamp for a specified Direction where the corners are closed.
+        /// </summary>
+        /// <param name="direction">The Direction(s) that this stamp should support.</param>
+        /// <param name="width">The width of the stamps.</param>
+        /// <param name="height">The heights of the stamps.</param>
+        /// <param name="horizontalWallThickness">The thickness of the walls. Must be less than width-1 for any passages. Width minus this will be the passageway width.</param>
+        /// <param name="verticalWallThickness">The thickness of the walls. Must be less than height-1 for any passages. Width minus this will be the passageway height.</param>
+        /// <returns>A stamp associated with the input Direction.</returns>
         public static OccupancyGrid CreateStampClosed(Direction direction, int width, int height, int horizontalWallThickness, int verticalWallThickness)
         {
             var occupancyGrid = new OccupancyGrid(width, height);
