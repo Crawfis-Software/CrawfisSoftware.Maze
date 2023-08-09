@@ -6,5 +6,5 @@
 using System.Diagnostics.CodeAnalysis;
 
 [assembly: SuppressMessage("Performance", "CA1814:Prefer jagged arrays over multidimensional", Justification = "<Pending>")]
-[assembly: SuppressMessage("Naming", "CA1715:Identifiers should have correct prefix", Justification = "<Pending>")]
+//[assembly: SuppressMessage("Naming", "CA1715:Identifiers should have correct prefix", Justification = "<Pending>")]
 [assembly: SuppressMessage("Style", "IDE0008:Use explicit type", Justification = "<Pending>")]
