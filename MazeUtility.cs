@@ -162,8 +162,8 @@ namespace CrawfisSoftware.Collections.Maze
         /// </summary>
         /// <param name="width">The width of the stamps.</param>
         /// <param name="height">The heights of the stamps.</param>
-        /// <param name="horizontalWallThickness">The thickness of the walls. Must be less than width-1 for any passages. Width minus this will be the passageway width.</param>
-        /// <param name="verticalWallThickness">The thickness of the walls. Must be less than height-1 for any passages. Width minus this will be the passageway height.</param>
+        /// <param name="horizontalWallThickness">The thickness of the walls. Must be less than (width-1)/2 for any passages. Width minus twice this will be the passageway width.</param>
+        /// <param name="verticalWallThickness">The thickness of the walls. Must be less than (height-1)/2 for any passages. Width minus twice this will be the passageway height.</param>
         /// <returns>A stamp set of Direction's to OccupancyGrid's</returns>
         public static StampSet<Direction> CreateStampSetOpenNxM(int width, int height, int horizontalWallThickness, int verticalWallThickness)
         {
@@ -184,8 +184,8 @@ namespace CrawfisSoftware.Collections.Maze
         /// </summary>
         /// <param name="width">The width of the stamps.</param>
         /// <param name="height">The heights of the stamps.</param>
-        /// <param name="horizontalWallThickness">The thickness of the walls. Must be less than width-1 for any passages. Width minus this will be the passageway width.</param>
-        /// <param name="verticalWallThickness">The thickness of the walls. Must be less than height-1 for any passages. Width minus this will be the passageway height.</param>
+        /// <param name="horizontalWallThickness">The thickness of the walls. Must be less than (width-1)/2 for any passages. Width minus twice this will be the passageway width.</param>
+        /// <param name="verticalWallThickness">The thickness of the walls. Must be less than (height-1)/2 for any passages. Width minus twice this will be the passageway height.</param>
         /// <returns>A stamp set of Direction's to OccupancyGrid's</returns>
         public static StampSet<Direction> CreateStampSetClosedNxM(int width, int height, int horizontalWallThickness, int verticalWallThickness)
         {
@@ -207,8 +207,8 @@ namespace CrawfisSoftware.Collections.Maze
         /// <param name="direction">The Direction(s) that this stamp should support.</param>
         /// <param name="width">The width of the stamps.</param>
         /// <param name="height">The heights of the stamps.</param>
-        /// <param name="horizontalWallThickness">The thickness of the walls. Must be less than width-1 for any passages. Width minus this will be the passageway width.</param>
-        /// <param name="verticalWallThickness">The thickness of the walls. Must be less than height-1 for any passages. Width minus this will be the passageway height.</param>
+        /// <param name="horizontalWallThickness">The thickness of the walls. Must be less than (width-1)/2 for any passages. Width minus twice this will be the passageway width.</param>
+        /// <param name="verticalWallThickness">The thickness of the walls. Must be less than (height-1)/2 for any passages. Width minus twice this will be the passageway height.</param>
         /// <returns>A stamp associated with the input Direction.</returns>
         public static OccupancyGrid CreateStampOpen(Direction direction, int width, int height, int horizontalWallThickness, int verticalWallThickness)
         {
@@ -246,8 +246,8 @@ namespace CrawfisSoftware.Collections.Maze
         /// <param name="direction">The Direction(s) that this stamp should support.</param>
         /// <param name="width">The width of the stamps.</param>
         /// <param name="height">The heights of the stamps.</param>
-        /// <param name="horizontalWallThickness">The thickness of the walls. Must be less than width-1 for any passages. Width minus this will be the passageway width.</param>
-        /// <param name="verticalWallThickness">The thickness of the walls. Must be less than height-1 for any passages. Width minus this will be the passageway height.</param>
+        /// <param name="horizontalWallThickness">The thickness of the walls. Must be less than (width-1)/2 for any passages. Width minus twice this will be the passageway width.</param>
+        /// <param name="verticalWallThickness">The thickness of the walls. Must be less than (height-1)/2 for any passages. Width minus twice this will be the passageway height.</param>
         /// <returns>A stamp associated with the input Direction.</returns>
         public static OccupancyGrid CreateStampClosed(Direction direction, int width, int height, int horizontalWallThickness, int verticalWallThickness)
         {
