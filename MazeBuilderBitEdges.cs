@@ -56,7 +56,7 @@ namespace CrawfisSoftware.Collections.Maze
 
         private int ConvertVBP(int numberOfBits, int bitVector)
         {
-            // Reorder the bits to be rowwise and not column wise.
+            // Reorder the bits to be row-wise and not column wise.
             int newVBP = 0;
             for (int i = numberOfBits - 1; i >= 0; i--)
             {

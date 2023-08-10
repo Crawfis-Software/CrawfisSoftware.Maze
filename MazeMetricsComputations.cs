@@ -205,7 +205,7 @@ namespace CrawfisSoftware.Collections.Maze
                     currentBranchEdge = solutionEdge[from];
                 }
                 if (flowLevel != EdgeFlow.PrimaryExit)
-                    Console.WriteLine($"Edgeflow is {flowLevel}");
+                    Console.WriteLine($"Edge flow is {flowLevel}");
                 if (flowLevel == EdgeFlow.SecondaryExit || flowLevel == EdgeFlow.ThirdExit)
                 {
                     branchLevel += 1;
@@ -457,7 +457,7 @@ namespace CrawfisSoftware.Collections.Maze
             _overallMetrics.NumberOfCrossJunctionCells = crossSections;
             occupiedCells += crossSections;
             int tJunctions = MazeQuery.TJunctions(_maze).Count();
-            _overallMetrics.NumberOfTJuntionCells = tJunctions;
+            _overallMetrics.NumberOfTJunctionCells = tJunctions;
             occupiedCells += tJunctions;
             int straights = MazeQuery.Straights(_maze).Count();
             _overallMetrics.NumberOfStraightCells = straights;
