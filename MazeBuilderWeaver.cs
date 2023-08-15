@@ -14,6 +14,8 @@ namespace CrawfisSoftware.Collections.Maze
     public class MazeBuilderWeaver<N, E> : MazeBuilderAbstract<N, E>
     {
         private MazeMetricsComputations<N, E> _mazeMetricsComputations;
+        private bool _isDirty = false;
+        private Maze<N, E> _currentMaze;
         /// <summary>
         /// Constructor.
         /// </summary>
@@ -22,6 +24,7 @@ namespace CrawfisSoftware.Collections.Maze
         public MazeBuilderWeaver(MazeBuilderAbstract<N, E> mazeBuilder, MazeMetricsComputations<N, E> mazeMetricsComputations = null) : base(mazeBuilder)
         {
             _mazeMetricsComputations = mazeMetricsComputations;
+            _isDirty = _mazeMetricsComputations == null;
         }
 
         /// <inheritdoc/>
@@ -80,16 +83,39 @@ namespace CrawfisSoftware.Collections.Maze
             }
         }
 
-        public void MergeCells(bool preserveExistingCells = false)
+        public void MergeAdjacentCells(Func<IIndexedEdge<E>, MazeCellMetrics, MazeCellMetrics, float> computeWallScore, float thresholdToRemove, bool sortResults, Func<int, float, IIndexedEdge<E>, bool> keepCarvingPredicate, bool preserveExistingCells = false)
         {
-            _mazeMetricsComputations ??= ComputeMetrics(preserveExistingCells);
+            if(_isDirty)
+                _mazeMetricsComputations = ComputeMetrics(preserveExistingCells);
+            var candidateEdges = new List<(float,IIndexedEdge<E>)>();
+            foreach(var wall in grid.Edges)
+            {
+                var fromMetrics = _mazeMetricsComputations.GetCellMetrics(wall.From);
+                var toMetrics = _mazeMetricsComputations.GetCellMetrics(wall.To);
+                float score = computeWallScore(wall, fromMetrics, toMetrics);
+                if (score > thresholdToRemove)
+                    candidateEdges.Add((score,wall));
+                if(sortResults) 
+                    candidateEdges.Sort((a,b) =>  a.Item1.CompareTo(b.Item1));
+            }
+            int carvedCount = 0;
+            foreach(var edgeTuple in candidateEdges)
+            {
+                IIndexedEdge<E> edge = edgeTuple.Item2;
+                if (!keepCarvingPredicate(carvedCount, edgeTuple.Item1, edge)) break;
+                bool carved = CarvePassage(edge.From, edge.To, preserveExistingCells);
+                if (carved) carvedCount++;
+            }
+            _isDirty = true;
         }
 
         private MazeMetricsComputations<N, E> ComputeMetrics(bool preserveExistingCells = false)
         {
             this.CreateMaze(preserveExistingCells);
-            var maze = this.GetMaze();
-            return new MazeMetricsComputations<N, E>(maze);
+            _currentMaze = this.GetMaze();
+            var metrics = new MazeMetricsComputations<N, E>(_currentMaze);
+            metrics.ComputeAllMetrics(RandomGenerator);
+            return metrics;
         }
     }
 }
