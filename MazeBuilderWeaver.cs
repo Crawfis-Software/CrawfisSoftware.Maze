@@ -95,14 +95,17 @@ namespace CrawfisSoftware.Collections.Maze
                 float score = computeWallScore(wall, fromMetrics, toMetrics);
                 if (score > thresholdToRemove)
                     candidateEdges.Add((score,wall));
-                if(sortResults) 
-                    candidateEdges.Sort((a,b) =>  a.Item1.CompareTo(b.Item1));
             }
+            if (sortResults)
+                candidateEdges.Sort((a, b) => a.Item1.CompareTo(b.Item1));
             int carvedCount = 0;
             foreach(var edgeTuple in candidateEdges)
             {
                 IIndexedEdge<E> edge = edgeTuple.Item2;
-                if (!keepCarvingPredicate(carvedCount, edgeTuple.Item1, edge)) break;
+                Direction edgeDirection = DirectionExtensions.GetEdgeDirection(edge.From, edge.To, Width);
+                if ((directions[edge.From % Width, edge.From / Width] & edgeDirection) == edgeDirection) continue;
+                if (!keepCarvingPredicate(carvedCount, edgeTuple.Item1, edge))
+                    break;
                 bool carved = CarvePassage(edge.From, edge.To, preserveExistingCells);
                 if (carved) carvedCount++;
             }
