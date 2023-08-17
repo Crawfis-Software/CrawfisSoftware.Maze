@@ -204,8 +204,8 @@ namespace CrawfisSoftware.Collections.Maze
                     currentBranchRoot = solutionRoot[from];
                     currentBranchEdge = solutionEdge[from];
                 }
-                if (flowLevel != EdgeFlow.PrimaryExit)
-                    Console.WriteLine($"Edge flow is {flowLevel}");
+                //if (flowLevel != EdgeFlow.PrimaryExit)
+                //    Console.WriteLine($"Edge flow is {flowLevel}");
                 if (flowLevel == EdgeFlow.SecondaryExit || flowLevel == EdgeFlow.ThirdExit)
                 {
                     branchLevel += 1;

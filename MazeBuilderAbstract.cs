@@ -277,57 +277,6 @@ namespace CrawfisSoftware.Collections.Maze
             }
         }
 
-        /// <summary>
-        /// Provides a braid for the maze, randomly connecting dead-end cell to a neighbor. 
-        /// </summary>
-        /// <param name="preserveExistingCells">Boolean indicating whether to only replace maze cells that are undefined.</param>
-        /// <param name="carveNeighbors">True to keep the underlying maze consistent. False to just modify the dead-end cell.</param>
-        public void MergeDeadEnds(bool preserveExistingCells = false, bool carveNeighbors = true)
-        {
-            for (int row = 0; row < Height; row++)
-            {
-                for (int column = 0; column < Width; column++)
-                {
-                    Direction dir = directions[column, row] & ~Direction.Undefined;
-                    int incomingCellIndex = -1;
-                    switch (dir)
-                    {
-                        case Direction.W:
-                            incomingCellIndex = column - 1 + row * Width;
-                            break;
-                        case Direction.N:
-                            incomingCellIndex = column + (row+1) * Width;
-                            break;
-                        case Direction.E:
-                            incomingCellIndex = column + 1 + row * Width;
-                            break;
-                        case Direction.S:
-                            incomingCellIndex = column + (row-1) * Width;
-                            break;
-                    }
-                    if (incomingCellIndex != -1)
-                    {
-                        IList<int> neighborDirs = grid.Neighbors(column + row * Width).ToList();
-                        foreach (var neighborIndex in neighborDirs.Shuffle<int>(RandomGenerator))
-                        {
-                            if (neighborIndex == incomingCellIndex) continue;
-                            if (carveNeighbors)
-                            {
-                                if (CarvePassage(column + row * Width, neighborIndex, preserveExistingCells)) break;
-                            }
-                            else
-                            {
-                                // This will lead to an inconsistent edge, which is useful is certain situations.
-                                var directionToCarve = DirectionExtensions.GetEdgeDirection(column + row * Width, neighborIndex, Width);
-                                directions[column, row] |= directionToCarve;
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
         /// <inheritdoc/>
         public void RemoveUndefines()
         {
