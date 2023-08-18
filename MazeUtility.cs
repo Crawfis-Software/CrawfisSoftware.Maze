@@ -1,4 +1,6 @@
 ﻿using CrawfisSoftware.Collections.Graph;
+using System;
+using System.Collections.Generic;
 
 namespace CrawfisSoftware.Collections.Maze
 {
@@ -273,6 +275,24 @@ namespace CrawfisSoftware.Collections.Maze
             return occupancyGrid;
         }
 
+        public static Maze<N, E> Inverse<N, E>(this Maze<N, E> maze)
+        {
+            var mazeBuilder = new MazeBuilderExplicit<N, E>(maze.Width, maze.Height);
+            Direction allDirections = Direction.None;
+            //foreach (Direction dir in Enum.GetValues<Direction>()) allDirections |= dir; // Generic version not available in .Net Standard 2.1
+            foreach (var dir in Enum.GetValues(typeof(Direction))) allDirections |= (Direction) dir;
+            for (int row = 0; row < maze.Height; row++)
+            {
+                for (int column = 0; column < maze.Width; column++)
+                {
+                    Direction directions = maze.GetDirection(column, row);
+                    Direction inverseDirection = allDirections & ~directions;
+                    mazeBuilder.SetCell(column, row, inverseDirection);
+                }
+            }
+            mazeBuilder.RemoveUndefines();
+            return mazeBuilder.GetMaze();
+        }
         private static OccupancyGrid CreateStampOpen3x3(Direction dir)
         {
             var occupancyGrid = new OccupancyGrid(3, 3);
