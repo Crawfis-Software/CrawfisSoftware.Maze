@@ -384,6 +384,31 @@ namespace CrawfisSoftware.Collections.Maze
 
         }
 
+        /// <summary>
+        /// Invert all of the directions, keeping Undefine's as they are.
+        /// </summary>
+        public void InvertDirections()
+        {
+            Direction allDirections = Direction.None;
+            //foreach (Direction dir in Enum.GetValues<Direction>()) allDirections |= dir; // Generic version not available in .Net Standard 2.1
+            foreach (var dir in Enum.GetValues(typeof(Direction))) allDirections |= (Direction)dir;
+            // Masks out Undefined.
+            allDirections &= ~Direction.Undefined;
+            for (int row = 0; row < Height; row++)
+            {
+                for (int column = 0; column < Width; column++)
+                {
+                    Direction cellDirections = directions[column, row];
+                    Direction isUndefined = cellDirections & Direction.Undefined;
+                    Direction inverseDirection = allDirections & ~cellDirections;
+                    // Add Undefine back in if it was set.
+                    inverseDirection |= isUndefined;
+                    directions[column,row] = inverseDirection;
+                }
+            }
+
+        }
+
         /// <inheritdoc/>
         public abstract void CreateMaze(bool preserveExistingCells = false);
 
