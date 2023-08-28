@@ -12,6 +12,7 @@
     <OutputPath>$(SolutionDir)bin\Debug\</OutputPath>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="GridTraversalExtensions.cs" />
     <Compile Remove="StampSet.cs" />
   </ItemGroup>
   <ItemGroup>
