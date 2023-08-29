@@ -99,7 +99,7 @@ namespace CrawfisSoftware.Collections.Maze
                 currentDirection = Direction.N;
                 lastCellIndex = start;
             }
-            foreach (var edge in dfs.TraverseGraph(start))
+            foreach (var edge in dfs.TraverseNodes(start))
             {
                 row = edge.To / width;
                 column = edge.To % width;

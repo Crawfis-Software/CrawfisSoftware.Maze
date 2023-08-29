@@ -236,7 +236,7 @@ namespace CrawfisSoftware.Collections.Maze
             _parents = new int[_width * _height];
             int furthestDistance = 0;
             var graphEnumerator = new IndexedGraphEdgeEnumerator<N, E>(_maze, new QueueAdaptor<IIndexedEdge<E>>());
-            var breadthFirstSearch = graphEnumerator.TraverseGraph(_maze.StartCell);
+            var breadthFirstSearch = graphEnumerator.TraverseNodes(_maze.StartCell);
             foreach (var edge in breadthFirstSearch)
             {
                 int node = edge.To;
@@ -259,7 +259,7 @@ namespace CrawfisSoftware.Collections.Maze
             int[] distances = new int[_width * _height];
             int furthestDistance = 0;
             var graphEnumerator = new IndexedGraphEdgeEnumerator<N, E>(_maze, new QueueAdaptor<IIndexedEdge<E>>());
-            var breadthFirstSearch = graphEnumerator.TraverseGraph(_maze.EndCell);
+            var breadthFirstSearch = graphEnumerator.TraverseNodes(_maze.EndCell);
             foreach (var edge in breadthFirstSearch)
             {
                 int node = edge.To;
@@ -285,7 +285,7 @@ namespace CrawfisSoftware.Collections.Maze
             _rightEdgeFlows = new EdgeFlow[_width * _height];
             _bottomEdgeFlows = new EdgeFlow[_width * _height];
             var graphEnumerator = new IndexedGraphEdgeEnumerator<N, E>(_maze, new QueueAdaptor<IIndexedEdge<E>>());
-            var breadthFirstSearch = graphEnumerator.TraverseGraph(_maze.StartCell);
+            var breadthFirstSearch = graphEnumerator.TraverseNodes(_maze.StartCell);
             foreach (var edge in breadthFirstSearch)
             {
                 int node = edge.To;
