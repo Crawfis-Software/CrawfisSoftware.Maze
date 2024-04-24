@@ -83,6 +83,15 @@ namespace CrawfisSoftware.Collections.Maze
             }
         }
 
+        /// <summary>
+        /// General routine to merge adjacent cells using scores and functions.
+        /// </summary>
+        /// <param name="computeWallScore">A function that computes a "score" for a wall using cell metrics and edge properties.</param>
+        /// <param name="thresholdToRemove">If the wall score is greater than this threshold it is added to a candidate set to carve.</param>
+        /// <param name="sortResults">If true, sort the candidate set according to the score.</param>
+        /// <param name="keepCarvingPredicate">A predicate to stop the carving based on the number of walls carved, the current score and the edge.</param>
+        /// <param name="preserveExistingCells">Boolean indicating whether to only replace maze cells that are undefined.
+        /// Default is false.</param>
         public void MergeAdjacentCells(Func<IIndexedEdge<E>, MazeCellMetrics, MazeCellMetrics, float> computeWallScore, float thresholdToRemove, bool sortResults, Func<int, float, IIndexedEdge<E>, bool> keepCarvingPredicate, bool preserveExistingCells = false)
         {
             if(_isDirty)
