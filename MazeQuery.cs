@@ -1,4 +1,5 @@
 ﻿using CrawfisSoftware.Collections.Graph;
+
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
@@ -75,11 +76,11 @@ namespace CrawfisSoftware.Collections.Maze
         }
 
         /// <summary>
-        /// Lists the grid (row,column) tuple of each start of a sequence of horizontal or vertical cells.
+        /// Lists the grid (row,column) tuple of each start of a sequence of horizontal or vertical cells (no junctions).
         /// </summary>
         /// <param name="maze">The maze to query.</param>
         /// <returns>An IEnumerable of Tuples containing the starting cell index, the direction and the length of the straightaway.</returns>
-        /// <remarks>Uses Depth-First Search from the Maze's starting cell.</remarks>
+        /// <remarks>Uses Depth-First Search from the Maze's starting cell. This should be a turn/junction cell.</remarks>
         public static IEnumerable<(int CellIndex, Direction StraightAwayDirection, int StraightAwayLength)> StraightAways<N, E>(this Maze<N, E> maze)
         {
             int start = maze.StartCell;
@@ -107,14 +108,14 @@ namespace CrawfisSoftware.Collections.Maze
                 if (direction.IsStraight())
                 {
                     // This is either a continuation or a new straight away.
-                    if(edge.From == lastCellIndex)
+                    if (edge.From == lastCellIndex)
                     {
                         currentStraightAwayLength++;
                         lastCellIndex = edge.To;
                     }
                     else
                     {
-                        if(currentStraightAwayIndex >= 0)
+                        if (currentStraightAwayIndex >= 0)
                             yield return (currentStraightAwayIndex, currentDirection, currentStraightAwayLength);
                         currentStraightAwayIndex = edge.To;
                         currentStraightAwayLength = 1;
@@ -252,7 +253,7 @@ namespace CrawfisSoftware.Collections.Maze
             {
                 for (column = 1; column < width; column++)
                 {
-                    if (!IsEastWestConsistentWithWesternCell(maze, column, row, out (int,int) eastWestEdge))
+                    if (!IsEastWestConsistentWithWesternCell(maze, column, row, out (int, int) eastWestEdge))
                     {
                         yield return eastWestEdge;
                     }
@@ -282,13 +283,13 @@ namespace CrawfisSoftware.Collections.Maze
             }
         }
 
-        static bool IsEastWestConsistentWithWesternCell<N, E>(Maze<N, E> maze, int column, int row, out (int,int) edge)
+        static bool IsEastWestConsistentWithWesternCell<N, E>(Maze<N, E> maze, int column, int row, out (int, int) edge)
         {
             int width = maze.Width;
             int currentCell = row * width + column;
             int eastCell = currentCell - 1;
             Direction direction = maze.GetDirection(column, row);
-            Direction eastDirs = maze.GetDirection(column-1, row);
+            Direction eastDirs = maze.GetDirection(column - 1, row);
             if ((direction & Direction.W) == Direction.W)
             {
                 if ((eastDirs & Direction.E) != Direction.E)
@@ -312,7 +313,7 @@ namespace CrawfisSoftware.Collections.Maze
             int currentCell = row * width + column;
             int southCell = currentCell - width;
             Direction direction = maze.GetDirection(column, row);
-            Direction southDirs = maze.GetDirection(column, row-1);
+            Direction southDirs = maze.GetDirection(column, row - 1);
             if ((direction & Direction.S) == Direction.S)
             {
                 if ((southDirs & Direction.N) != Direction.N)
