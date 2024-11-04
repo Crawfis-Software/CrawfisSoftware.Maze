@@ -1,4 +1,5 @@
 ﻿using CrawfisSoftware.Collections.Graph;
+
 using System;
 
 namespace CrawfisSoftware.Collections.Maze
@@ -10,29 +11,41 @@ namespace CrawfisSoftware.Collections.Maze
     /// <typeparam name="E">The type used for edge weights</typeparam>
     public class MazeBuilderBitEdges<N, E> : MazeBuilderAbstract<N, E>
     {
+        private int _verticalBits = 725552;
+        private int _horizontalBits = 5421551;
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="width">The width of the desired maze</param>
-        /// <param name="height">The height of the desired maze</param>
+        /// <param name="width">The width of the desired maze. Must be less than 7.</param>
+        /// <param name="height">The height of the desired maze. Must be less than 7.</param>
+        /// <param name="verticalBits">A bit pattern representing the vertical passages in a small maze. E.g., 725552</param>
+        /// <param name="horizontalBits">A bit pattern representing the horizontal passages in a small maze. E.g., 5421551</param>
         /// <param name="nodeAccessor">A function to retrieve any node labels</param>
         /// <param name="edgeAccessor">A function to retrieve any edge weights</param>
-        public MazeBuilderBitEdges(int width, int height, GetGridLabel<N> nodeAccessor, GetEdgeLabel<E> edgeAccessor) : base(width, height, nodeAccessor, edgeAccessor)
+        public MazeBuilderBitEdges(int width, int height, int verticalBits, int horizontalBits, GetGridLabel<N> nodeAccessor, GetEdgeLabel<E> edgeAccessor) : base(width, height, nodeAccessor, edgeAccessor)
         {
+            if ((width > 6) || (height > 6))
+                throw new ArgumentException("Width or Height are too large!");
+            _verticalBits = verticalBits;
+            _horizontalBits = horizontalBits;
         }
 
         /// <summary>
         /// Constructor, Takes an existing maze builder (derived from MazeBuilderAbstract) and copies the state over.
         /// </summary>
         /// <param name="mazeBuilder">A maze builder</param>
-        public MazeBuilderBitEdges(MazeBuilderAbstract<N, E> mazeBuilder) : base(mazeBuilder)
+        /// <param name="verticalBits">A bit pattern representing the vertical passages in a small maze.</param>
+        /// <param name="horizontalBits">A bit pattern representing the horizontal passages in a small maze.</param>
+        public MazeBuilderBitEdges(MazeBuilderAbstract<N, E> mazeBuilder, int verticalBits, int horizontalBits) : base(mazeBuilder)
         {
+            if ((Width > 6) || (Height > 6))
+                throw new ArgumentException("Width or Height are too large!");
+            _verticalBits = verticalBits;
+            _horizontalBits = horizontalBits;
         }
 
         private void PassageBits(int VBP, int EBP)
         {
-            if ((Width > 6) || (Height > 6))
-                throw new ArgumentException("Width and Height are too large!");
             int numberOfBits = Width * (Height - 1);
             // Loop through the vertical passages adding directions. Then loop through the horizontal passages.
             VBP = ConvertVBP(numberOfBits, VBP);
@@ -73,7 +86,7 @@ namespace CrawfisSoftware.Collections.Maze
         /// <inheritdoc/>
         public override void CreateMaze(bool preserveExistingCells = false)
         {
-            PassageBits(725552, 5421551);
+            PassageBits(_verticalBits, _horizontalBits);
         }
     }
 }

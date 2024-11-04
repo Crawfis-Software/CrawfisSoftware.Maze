@@ -1,5 +1,6 @@
 ﻿using CrawfisSoftware.Collections;
 using CrawfisSoftware.Collections.Graph;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -39,7 +40,7 @@ namespace CrawfisSoftware.Collections.Maze
         {
             this.Width = width;
             this.Height = height;
-            nodeFunction = nodeAccessor != null ? nodeAccessor : MazeBuilderUtility<N,E>.DummyNodeValues;
+            nodeFunction = nodeAccessor != null ? nodeAccessor : MazeBuilderUtility<N, E>.DummyNodeValues;
             edgeFunction = edgeAccessor != null ? edgeAccessor : MazeBuilderUtility<N, E>.DummyEdgeValues;
             grid = new Grid<N, E>(width, height, nodeFunction, edgeFunction);
             directions = new Direction[width, height];
@@ -175,7 +176,10 @@ namespace CrawfisSoftware.Collections.Maze
         public void OpenRegion(int lowerLeftCell, int upperRightCell)
         {
             // Todo: Add preserveCells logic. 
-            FillRegion(lowerLeftCell, upperRightCell, Direction.E | Direction.N | Direction.W | Direction.S | Direction.Undefined);
+            Direction dirs = Direction.N | Direction.E | Direction.S | Direction.W;
+            // Todo: Add Undefined logic.
+            dirs |= Direction.Undefined;
+            FillRegion(lowerLeftCell, upperRightCell, dirs);
         }
 
         /// <inheritdoc/>
@@ -305,7 +309,7 @@ namespace CrawfisSoftware.Collections.Maze
         /// <inheritdoc/>
         public void MakeBidirectionallyConsistent(bool carvingMissingPassages = true)
         {
-            MakeBidirectionallyConsistent(0, 0, Width-1, Height-1);
+            MakeBidirectionallyConsistent(0, 0, Width - 1, Height - 1);
         }
 
         /// <inheritdoc/>
@@ -385,7 +389,7 @@ namespace CrawfisSoftware.Collections.Maze
         }
 
         /// <summary>
-        /// Invert all of the directions, keeping Undefine's as they are.
+        /// Invert all of the directions, keeping Undefine's unchanged.
         /// </summary>
         public void InvertDirections()
         {
@@ -403,7 +407,7 @@ namespace CrawfisSoftware.Collections.Maze
                     Direction inverseDirection = allDirections & ~cellDirections;
                     // Add Undefine back in if it was set.
                     inverseDirection |= isUndefined;
-                    directions[column,row] = inverseDirection;
+                    directions[column, row] = inverseDirection;
                 }
             }
 

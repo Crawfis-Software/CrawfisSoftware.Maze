@@ -1,4 +1,5 @@
 ﻿using CrawfisSoftware.Collections.Graph;
+
 using System.Collections.Generic;
 
 namespace CrawfisSoftware.Collections.Maze
@@ -35,7 +36,8 @@ namespace CrawfisSoftware.Collections.Maze
         private void RecursiveBackTracker(bool preserveExistingCells = true)
         {
         }
-    private void RecursiveBackTracker(int startingNode, bool preserveExistingCells = true)
+
+        private void RecursiveBackTracker(int startingNode, bool preserveExistingCells = true)
         {
             Stack<int> currentPath = new Stack<int>();
             currentPath.Push(startingNode);
@@ -51,9 +53,9 @@ namespace CrawfisSoftware.Collections.Maze
                 {
                     int row = neighbor / Width;
                     int column = neighbor % Width;
-                        if (!visited[column,row])
-                        {
-                            neighbors.Add(neighbor);
+                    if (!visited[column, row])
+                    {
+                        neighbors.Add(neighbor);
                     }
                 }
                 bool pathCarved = false;

@@ -6,6 +6,7 @@
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
     <DocumentationFile>$(SolutionDir)Documentation\CrawfisSoftware.Maze.xml</DocumentationFile>
+    <AssemblyVersion></AssemblyVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DocumentationFile>$(SolutionDir)Documentation\CrawfisSoftware.Maze.xml</DocumentationFile>

@@ -1,4 +1,5 @@
 ﻿using CrawfisSoftware.Collections.Graph;
+
 using System.Collections.Generic;
 using System.Text;
 
@@ -51,18 +52,6 @@ namespace CrawfisSoftware.Collections.Maze
             this.NumberOfNodes = System.Linq.Enumerable.Count<int>(this.Nodes);
             this.NumberOfEdges = System.Linq.Enumerable.Count<IIndexedEdge<E>>(this.Edges);
         }
-
-        // Removed this to keep Maze immutable.
-        ///// <summary>
-        ///// Carve an opening in the maze from the indicated cell to the neighbor specified by the direction.
-        ///// </summary>
-        ///// <param name="column">The i index of the cell</param>
-        ///// <param name="row">The j index of the cell</param>
-        ///// <param name="openingDirection">A direction (multiple flags are allowed)</param>
-        //public void AddOpening(int column, int row, Direction openingDirection)
-        //{
-        //    directions[column, row] |= openingDirection;
-        //}
 
         /// <summary>
         /// Get the set of opening directions in the current cell
@@ -223,7 +212,7 @@ namespace CrawfisSoftware.Collections.Maze
             mazeString.Append("+");
             for (int i = 0; i < width; i++)
             {
-                Direction dirs = directions[i, grid.Height-1];
+                Direction dirs = directions[i, grid.Height - 1];
                 string northString = (dirs & Direction.N) == Direction.N ? cellSpace : "---";
                 mazeString.Append(northString);
                 mazeString.Append("+");
@@ -235,7 +224,7 @@ namespace CrawfisSoftware.Collections.Maze
             for (int row = grid.Height - 1; row >= 0; row--)
             {
                 rowBody.Remove(0, rowBody.Length);
-                Direction dirs = directions[0,row];
+                Direction dirs = directions[0, row];
                 string westString = (dirs & Direction.W) == Direction.W ? " " : "|";
                 rowBody.Append(westString);
                 bottomOfRow.Remove(0, bottomOfRow.Length);

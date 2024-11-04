@@ -1,4 +1,5 @@
 ﻿using CrawfisSoftware.Collections.Graph;
+
 using System;
 
 namespace CrawfisSoftware.Collections.Maze
@@ -57,7 +58,7 @@ namespace CrawfisSoftware.Collections.Maze
         /// <param name="mazeBuilder">A maze builder.</param>
         public MazeBuilderShortestPaths(MazeBuilderAbstract<N, E> mazeBuilder) : base(mazeBuilder)
         {
-                EdgeFunction = ConstantOfOne;
+            EdgeFunction = ConstantOfOne;
         }
 
         /// <summary>
@@ -69,7 +70,7 @@ namespace CrawfisSoftware.Collections.Maze
         /// <param name="edgeAccessor">A function to retrieve any edge weights</param>
         public MazeBuilderShortestPaths(int width, int height, GetGridLabel<N> nodeAccessor = null, GetEdgeLabel<E> edgeAccessor = null) : base(width, height, nodeAccessor, edgeAccessor)
         {
-                EdgeFunction = ConstantOfOne;
+            EdgeFunction = ConstantOfOne;
         }
 
         /// <summary>
@@ -83,7 +84,7 @@ namespace CrawfisSoftware.Collections.Maze
         {
             foreach (var cell in PathQuery<N, E>.FindPath(grid, startingCell, endingCell, EdgeComparerUsingGetEdgeLabel))
             {
-                CarvePassage(cell.From, cell.To, false);
+                CarvePassage(cell.From, cell.To, preserveExistingCells);
             }
         }
 
@@ -96,7 +97,7 @@ namespace CrawfisSoftware.Collections.Maze
         /// <param name="maxCost">The maximum cost that a node is reachable.</param>
         public void CarveAllShortestPathsToTarget(int targetCell, bool preserveExistingCells = false, float maxCost = float.MaxValue)
         {
-           CarveShortestPaths(preserveExistingCells, targetCell, maxCost);
+            CarveShortestPaths(preserveExistingCells, targetCell, maxCost);
 
         }
 
@@ -121,7 +122,7 @@ namespace CrawfisSoftware.Collections.Maze
                     if (pathQuery.GetCost(targetNode) >= maxCost) continue;
                     foreach (var cell in pathQuery.GetPath(targetNode))
                     {
-                        CarvePassage(cell.From, cell.To, false);
+                        CarvePassage(cell.From, cell.To, preserveExistingCells);
                     }
                 }
             }

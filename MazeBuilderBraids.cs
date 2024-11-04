@@ -11,7 +11,7 @@ namespace CrawfisSoftware.Collections.Maze
     /// </summary>
     /// <typeparam name="N">The type used for node labels</typeparam>
     /// <typeparam name="E">The type used for edge weights</typeparam>
-    public class MazeBuilderWeaver<N, E> : MazeBuilderAbstract<N, E>
+    public class MazeBuilderBraids<N, E> : MazeBuilderAbstract<N, E>
     {
         private MazeMetricsComputations<N, E> _mazeMetricsComputations;
         private bool _isDirty = false;
@@ -21,7 +21,7 @@ namespace CrawfisSoftware.Collections.Maze
         /// </summary>
         /// <param name="mazeBuilder">A previous MazeBuilder</param>
         /// <param name="mazeMetricsComputations">(optional) Pre-computed maze metrics. If null, these will be computed if needed.</param>
-        public MazeBuilderWeaver(MazeBuilderAbstract<N, E> mazeBuilder, MazeMetricsComputations<N, E> mazeMetricsComputations = null) : base(mazeBuilder)
+        public MazeBuilderBraids(MazeBuilderAbstract<N, E> mazeBuilder, MazeMetricsComputations<N, E> mazeMetricsComputations = null) : base(mazeBuilder)
         {
             _mazeMetricsComputations = mazeMetricsComputations;
             _isDirty = _mazeMetricsComputations == null;
