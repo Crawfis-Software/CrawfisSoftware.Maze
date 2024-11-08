@@ -1,5 +1,6 @@
 ﻿using CrawfisSoftware.Collections;
 using CrawfisSoftware.Collections.Graph;
+using CrawfisSoftware.Maze;
 
 using System;
 using System.Collections.Generic;
@@ -28,6 +29,24 @@ namespace CrawfisSoftware.Collections.Maze
 
         /// <inheritdoc/>
         public int Height { get; protected set; }
+        public IList<int> TraversalOrder { get { return _cellChangedOrder; } }
+        public bool KeepTrackOfChanges
+        {
+            get { return _keepTrackOfChanges; }
+            set
+            {
+                _keepTrackOfChanges = value;
+                if (_keepTrackOfChanges)
+                {
+                    _cellChangedOrder = new List<int>(Width * Height);
+                    directions.DirectionChanged += (row, column, oldValue, newValue) => _cellChangedOrder.Add(column + row * Width);
+                }
+                else
+                {
+                    _cellChangedOrder = null;
+                }
+            }
+        }
 
         /// <summary>
         /// Constructor
@@ -43,7 +62,7 @@ namespace CrawfisSoftware.Collections.Maze
             nodeFunction = nodeAccessor != null ? nodeAccessor : MazeBuilderUtility<N, E>.DummyNodeValues;
             edgeFunction = edgeAccessor != null ? edgeAccessor : MazeBuilderUtility<N, E>.DummyEdgeValues;
             grid = new Grid<N, E>(width, height, nodeFunction, edgeFunction);
-            directions = new Direction[width, height];
+            directions = new DirectionsInstrumented(width, height);
             Clear();
             RandomGenerator = new Random();
         }
@@ -419,7 +438,7 @@ namespace CrawfisSoftware.Collections.Maze
         /// <inheritdoc/>
         public virtual Maze<N, E> GetMaze()
         {
-            var maze = new Maze<N, E>(grid, directions, StartCell, EndCell);
+            var maze = new Maze<N, E>(grid, directions.Directions, StartCell, EndCell);
             return maze;
         }
 
@@ -481,10 +500,13 @@ namespace CrawfisSoftware.Collections.Maze
         /// A function used to look up edge weights
         /// </summary>
         protected GetEdgeLabel<E> edgeFunction;
+        private bool _keepTrackOfChanges;
+
         /// <summary>
         /// A 2D array storing the structure of the maze as a 2D array of directions
         /// </summary>
-        protected Direction[,] directions;
+        protected DirectionsInstrumented directions;
+        private List<int> _cellChangedOrder;
         #endregion
     }
 }
