@@ -1,4 +1,5 @@
 ﻿using CrawfisSoftware.Collections.Graph;
+using CrawfisSoftware.Maze;
 
 namespace CrawfisSoftware.Collections.Maze
 {
@@ -29,7 +30,7 @@ namespace CrawfisSoftware.Collections.Maze
         /// <param name="numberOfTilesToExpandBy">The number of cells to expand each wall to.</param>
         public void ExpandWalls(int numberOfTilesToExpandBy)
         {
-            if(numberOfTilesToExpandBy < 0)
+            if (numberOfTilesToExpandBy < 0)
             {
                 throw new System.ArgumentOutOfRangeException("Wall expansion needs to be zero or positive.");
             }
@@ -83,14 +84,14 @@ namespace CrawfisSoftware.Collections.Maze
             directions = ExpandDirections(directions);
         }
 
-        private Direction[,] ExpandDirections(Direction[,] directions)
+        private DirectionsInstrumented ExpandDirections(DirectionsInstrumented directions)
         {
-            Direction[,] newDirections = new Direction[Width, Height];
-            for(int row = _numberOfBorderTiles; row < Height-_numberOfBorderTiles; row++)
+            DirectionsInstrumented newDirections = new DirectionsInstrumented(Width, Height);
+            for (int row = _numberOfBorderTiles; row < Height - _numberOfBorderTiles; row++)
             {
                 int expansionSize = (1 + _numberOfOpeningTiles + _numberOfWallTiles);
                 int oldRow = (row - _numberOfBorderTiles) / expansionSize;
-                for(int column = _numberOfBorderTiles; column < Width-_numberOfBorderTiles; column++)
+                for (int column = _numberOfBorderTiles; column < Width - _numberOfBorderTiles; column++)
                 {
                     newDirections[column, row] = Direction.None;
                     int oldColumn = (column - _numberOfBorderTiles) / expansionSize;
@@ -107,13 +108,13 @@ namespace CrawfisSoftware.Collections.Maze
                             newDirections[column, row] = Direction.N | Direction.S;
                         }
                     }
-                    else if((row - _numberOfBorderTiles) % expansionSize == 0 && ((direction & Direction.E) == Direction.E))
+                    else if ((row - _numberOfBorderTiles) % expansionSize == 0 && ((direction & Direction.E) == Direction.E))
                     {
                         newDirections[column, row] = Direction.E | Direction.W;
                     }
                 }
             }
-            
+
             return newDirections;
         }
     }
