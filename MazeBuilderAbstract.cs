@@ -48,6 +48,8 @@ namespace CrawfisSoftware.Collections.Maze
             }
         }
 
+        public Grid<N, E> Grid { get { return grid; } }
+
         /// <summary>
         /// Constructor
         /// </summary>
