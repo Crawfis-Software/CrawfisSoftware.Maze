@@ -29,6 +29,15 @@ namespace CrawfisSoftware.Maze
             _directions = new Direction[width, height];
         }
 
+        public DirectionsInstrumented(Direction[,] directions)
+        {
+            _directions = directions;
+        }
+
+        public void ReplaceDirections(Direction[,] newDirections)
+        {
+            _directions = newDirections;
+        }
         public int GetLength(int dimension)
         {
             return _directions.GetLength(dimension);

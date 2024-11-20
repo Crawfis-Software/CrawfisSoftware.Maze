@@ -108,7 +108,7 @@ namespace CrawfisSoftware.Collections.Maze
 
         private float EdgeComparerUsingGetEdgeLabel(IIndexedEdge<E> edge)
         {
-            return EdgeFunction(edge, directions[edge.From % Width, edge.From / Width], directions[edge.To % Width, edge.To / Width]);
+            return EdgeFunction(edge, GetDirection(edge.From % Width, edge.From / Width), GetDirection(edge.To % Width, edge.To / Width));
         }
 
         private void CarveShortestPaths(bool preserveExistingCells, int targetCell, float maxCost = float.MaxValue)

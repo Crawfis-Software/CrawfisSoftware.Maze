@@ -1,4 +1,5 @@
 ﻿using CrawfisSoftware.Collections.Graph;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,14 +19,14 @@ namespace CrawfisSoftware.Collections.Maze
         /// should split horizontally, false if it should split vertically. 
         /// Default implementation splits the axes with the longer side length.
         /// </summary>
-        public Func<int,int,bool> SplitHorizontalOrVertical { get; set; }
+        public Func<int, int, bool> SplitHorizontalOrVertical { get; set; }
 
         /// <summary>
         /// Function to take the current column and width and return the column to split.
         /// Should return -1 if the splitting should stop (width &lt; 2). Default implementation
         /// splits a randomly from column to column+width-1.
         /// </summary>
-        public Func<int,int,int> HorizontalSplitDecision { get; set; }
+        public Func<int, int, int> HorizontalSplitDecision { get; set; }
 
         /// <summary>
         /// Function to take the current row and height and return the row to split.
@@ -67,22 +68,25 @@ namespace CrawfisSoftware.Collections.Maze
         /// <param name="mazeBuilder">A maze builder</param>
         public MazeBuilderRecursiveDivision(MazeBuilderAbstract<N, E> mazeBuilder) : base(mazeBuilder)
         {
+            this.SplitHorizontalOrVertical = SplitLargestArea;
+            this.HorizontalSplitDecision = SplitDecision;
+            this.VerticalSplitDecision = SplitDecision;
         }
 
         private void RecursiveDivision(int column, int row, int width, int height, bool preserveExistingCells = false)
         {
             if (width > 1 && height > 1)
             {
-                if (SplitHorizontalOrVertical(width,height))
+                if (SplitHorizontalOrVertical(width, height))
                     DivideHorizontally(column, row, width, height, preserveExistingCells);
                 else
                     DivideVertically(column, row, width, height, preserveExistingCells);
             }
-            else if(width > 1)
+            else if (width > 1)
             {
                 DivideVertically(column, row, width, height, preserveExistingCells);
             }
-            else if(height>1)
+            else if (height > 1)
             {
                 DivideHorizontally(column, row, width, height, preserveExistingCells);
             }
@@ -92,32 +96,32 @@ namespace CrawfisSoftware.Collections.Maze
         {
             int dividingRow = HorizontalSplitDecision(row, height);
             if (dividingRow < 0) return;
-            for (int col=column; col < column+width; col++)
+            for (int col = column; col < column + width; col++)
             {
                 int currentCell = col + dividingRow * Width;
-                AddWall(currentCell, currentCell+Width);
+                AddWall(currentCell, currentCell + Width);
             }
             int openPassageColumn = column + RandomGenerator.Next(0, width);
             int cellIndex = openPassageColumn + dividingRow * Width;
             CarvePassage(cellIndex, cellIndex + Width);
-            RecursiveDivision(column, row, width, dividingRow-row+1, preserveExistingCells);
-            RecursiveDivision(column, dividingRow+1, width, row+height-dividingRow-1, preserveExistingCells);
+            RecursiveDivision(column, row, width, dividingRow - row + 1, preserveExistingCells);
+            RecursiveDivision(column, dividingRow + 1, width, row + height - dividingRow - 1, preserveExistingCells);
         }
 
         private void DivideVertically(int column, int row, int width, int height, bool preserveExistingCells)
         {
             int dividingColumn = VerticalSplitDecision(column, width);
-            if(dividingColumn < 0) return;
-            for (int r = row; r < row+height; r++)
+            if (dividingColumn < 0) return;
+            for (int r = row; r < row + height; r++)
             {
                 int currentCell = dividingColumn + r * Width;
-                AddWall(currentCell, currentCell+1);
+                AddWall(currentCell, currentCell + 1);
             }
-            int openPassageRow = row + RandomGenerator.Next(0, height-1);
+            int openPassageRow = row + RandomGenerator.Next(0, height - 1);
             int cellIndex = dividingColumn + openPassageRow * Width;
             CarvePassage(cellIndex, cellIndex + 1);
             RecursiveDivision(column, row, dividingColumn - column + 1, height, preserveExistingCells);
-            RecursiveDivision(dividingColumn+1, row, column + width - dividingColumn-1, height, preserveExistingCells);
+            RecursiveDivision(dividingColumn + 1, row, column + width - dividingColumn - 1, height, preserveExistingCells);
         }
 
         /// <inheritdoc/>

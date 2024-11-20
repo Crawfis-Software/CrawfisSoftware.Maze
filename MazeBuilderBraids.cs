@@ -1,4 +1,5 @@
 ﻿using CrawfisSoftware.Collections.Graph;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -43,7 +44,7 @@ namespace CrawfisSoftware.Collections.Maze
             {
                 for (int column = 0; column < Width; column++)
                 {
-                    Direction dir = directions[column, row] & ~Direction.Undefined;
+                    Direction dir = GetDirection(column, row) & ~Direction.Undefined;
                     int incomingCellIndex = -1;
                     switch (dir)
                     {
@@ -74,7 +75,7 @@ namespace CrawfisSoftware.Collections.Maze
                             {
                                 // This will lead to an inconsistent edge, which is useful is certain situations.
                                 var directionToCarve = DirectionExtensions.GetEdgeDirection(column + row * Width, neighborIndex, Width);
-                                directions[column, row] |= directionToCarve;
+                                AddDirectionExplicitly(column, row, directionToCarve);
                                 break;
                             }
                         }
@@ -94,25 +95,25 @@ namespace CrawfisSoftware.Collections.Maze
         /// Default is false.</param>
         public void MergeAdjacentCells(Func<IIndexedEdge<E>, MazeCellMetrics, MazeCellMetrics, float> computeWallScore, float thresholdToRemove, bool sortResults, Func<int, float, IIndexedEdge<E>, bool> keepCarvingPredicate, bool preserveExistingCells = false)
         {
-            if(_isDirty)
+            if (_isDirty)
                 _mazeMetricsComputations = ComputeMetrics(preserveExistingCells);
-            var candidateEdges = new List<(float,IIndexedEdge<E>)>();
-            foreach(var wall in grid.Edges)
+            var candidateEdges = new List<(float, IIndexedEdge<E>)>();
+            foreach (var wall in grid.Edges)
             {
                 var fromMetrics = _mazeMetricsComputations.GetCellMetrics(wall.From);
                 var toMetrics = _mazeMetricsComputations.GetCellMetrics(wall.To);
                 float score = computeWallScore(wall, fromMetrics, toMetrics);
                 if (score > thresholdToRemove)
-                    candidateEdges.Add((score,wall));
+                    candidateEdges.Add((score, wall));
             }
             if (sortResults)
                 candidateEdges.Sort((a, b) => a.Item1.CompareTo(b.Item1));
             int carvedCount = 0;
-            foreach(var edgeTuple in candidateEdges)
+            foreach (var edgeTuple in candidateEdges)
             {
                 IIndexedEdge<E> edge = edgeTuple.Item2;
                 Direction edgeDirection = DirectionExtensions.GetEdgeDirection(edge.From, edge.To, Width);
-                if ((directions[edge.From % Width, edge.From / Width] & edgeDirection) == edgeDirection) continue;
+                if ((GetDirection(edge.From % Width, edge.From / Width) & edgeDirection) == edgeDirection) continue;
                 if (!keepCarvingPredicate(carvedCount, edgeTuple.Item1, edge))
                     break;
                 bool carved = CarvePassage(edge.From, edge.To, preserveExistingCells);

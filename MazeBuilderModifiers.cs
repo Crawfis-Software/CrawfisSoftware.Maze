@@ -3,7 +3,7 @@
 namespace CrawfisSoftware.Collections.Maze
 {
     /// <summary>
-    /// Modify amaze based on maze metrics.
+    /// Modify a maze based on maze metrics.
     /// </summary>
     // Todo: Add Generics <N, E> - requires MazeMetrics to be generic
     public class MazeBuilderModifiers<N, E> : MazeBuilderAbstract<N, E>
@@ -23,7 +23,7 @@ namespace CrawfisSoftware.Collections.Maze
             {
                 for (int column = 0; column < Width; column++)
                 {
-                    directions[column, row] = maze.GetDirection(column, row);
+                    this.SetCell(column, row, maze.GetDirection(column, row));
                 }
             }
             _metricsComputations = metricsComputations;
@@ -45,14 +45,14 @@ namespace CrawfisSoftware.Collections.Maze
                 for (int column = 0; column < Width; column++)
                 {
                     var metrics = _metricsComputations.GetCellMetrics(column, row);
-                    int? distance= metrics.PathDistanceToSolution;
+                    int? distance = metrics.PathDistanceToSolution;
                     if (distance.HasValue)
                     {
                         int cellsFromSolution = distance.Value;
-                        if(cellsFromSolution > maxDeadEndLength)
+                        if (cellsFromSolution > maxDeadEndLength)
                         {
                             // Find all cells > mazDeadEndLength and set to Direction.None (| Undefined?)
-                            directions[column, row] = directions[column, row] & Direction.Undefined;
+                            this.SetCell(column, row, GetDirection(column, row) & Direction.Undefined);
                         }
                         else if (cellsFromSolution == maxDeadEndLength)
                         {
@@ -66,7 +66,7 @@ namespace CrawfisSoftware.Collections.Maze
                                 entranceEdge = Direction.E;
                             if (metrics.BottomEdgeFlow == EdgeFlow.Entrance)
                                 entranceEdge = Direction.S;
-                            directions[column, row] = entranceEdge & Direction.Undefined;
+                            this.SetCell(column, row, entranceEdge & Direction.Undefined);
                         }
                     }
                 }
@@ -87,13 +87,13 @@ namespace CrawfisSoftware.Collections.Maze
                     var metrics = _metricsComputations.GetCellMetrics(column, row);
                     var branch = metrics.BranchId;
                     int? distance = metrics.PathDistanceToSolution;
-                    if (distance.HasValue && branch.HasValue && branch.Value.solutionPathCell  == branchId)
+                    if (distance.HasValue && branch.HasValue && branch.Value.solutionPathCell == branchId)
                     {
                         int cellsFromSolution = distance.Value;
                         if (cellsFromSolution > maxDeadEndLength)
                         {
                             // Find all cells > mazDeadEndLength and set to Direction.None (| Undefined?)
-                            directions[column, row] = directions[column, row] & Direction.Undefined;
+                            this.SetCell(column, row, GetDirection(column, row) & Direction.Undefined);
                         }
                         else if (cellsFromSolution == maxDeadEndLength)
                         {
@@ -107,7 +107,7 @@ namespace CrawfisSoftware.Collections.Maze
                                 entranceEdge = Direction.E;
                             if (metrics.BottomEdgeFlow == EdgeFlow.Entrance)
                                 entranceEdge = Direction.S;
-                            directions[column, row] = entranceEdge & Direction.Undefined;
+                            this.SetCell(column, row, entranceEdge & Direction.Undefined);
                         }
                     }
                 }
