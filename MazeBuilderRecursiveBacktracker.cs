@@ -22,7 +22,7 @@ namespace CrawfisSoftware.Collections.Maze
         public MazeBuilderRecursiveBacktracker(int width, int height, GetGridLabel<N> nodeAccessor = null, GetEdgeLabel<E> edgeAccessor = null)
             : base(width, height, nodeAccessor, edgeAccessor)
         {
-            visited = new bool[directions.GetLength(0), directions.GetLength(1)];
+            visited = new bool[Width, Height];
         }
 
         /// <summary>
@@ -31,7 +31,7 @@ namespace CrawfisSoftware.Collections.Maze
         /// <param name="mazeBuilder">A maze builder</param>
         public MazeBuilderRecursiveBacktracker(MazeBuilderAbstract<N, E> mazeBuilder) : base(mazeBuilder)
         {
-            visited = new bool[directions.GetLength(0), directions.GetLength(1)];
+            visited = new bool[Width, Height];
         }
         private void RecursiveBackTracker(bool preserveExistingCells = true)
         {

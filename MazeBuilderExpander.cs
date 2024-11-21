@@ -81,12 +81,13 @@ namespace CrawfisSoftware.Collections.Maze
             Width = Width + Width * _numberOfOpeningTiles + Width * _numberOfWallTiles + 2 * _numberOfBorderTiles;
             Height = Height + Height * _numberOfOpeningTiles + Height * _numberOfWallTiles + 2 * _numberOfBorderTiles;
             grid = new Grid<N, E>(Width, Height, nodeFunction, edgeFunction);
-            directions = ExpandDirections(directions);
+            var newDirections = ExpandDirections(this.Directions);
+            this.ReplaceDirections(newDirections);
         }
 
-        private DirectionsInstrumented ExpandDirections(DirectionsInstrumented directions)
+        private Direction[,] ExpandDirections(Direction[,] directions)
         {
-            DirectionsInstrumented newDirections = new DirectionsInstrumented(Width, Height);
+            var newDirections = new Direction[Width, Height];
             for (int row = _numberOfBorderTiles; row < Height - _numberOfBorderTiles; row++)
             {
                 int expansionSize = (1 + _numberOfOpeningTiles + _numberOfWallTiles);

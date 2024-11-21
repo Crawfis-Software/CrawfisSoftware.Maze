@@ -48,6 +48,8 @@ namespace CrawfisSoftware.Collections.Maze
             }
         }
 
+        public Grid<N, E> Grid { get { return grid; } }
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -76,11 +78,24 @@ namespace CrawfisSoftware.Collections.Maze
             this.Height = mazeBuilder.Height;
             this.StartCell = mazeBuilder.StartCell;
             this.EndCell = mazeBuilder.EndCell;
+            this.RandomGenerator = mazeBuilder.RandomGenerator;
             nodeFunction = mazeBuilder.nodeFunction;
             edgeFunction = mazeBuilder.edgeFunction;
             grid = mazeBuilder.grid;
             directions = mazeBuilder.directions;
-            RandomGenerator = mazeBuilder.RandomGenerator;
+            _cellChangedOrder = mazeBuilder._cellChangedOrder;
+            _keepTrackOfChanges = mazeBuilder._keepTrackOfChanges;
+        }
+
+        /// <summary>
+        /// Get the direction for the specified cell.
+        /// </summary>
+        /// <param name="column">The column index of the cell.</param>
+        /// <param name="row">The row index of the cell.</param>
+        /// <returns>The Direction flags.</returns>
+        public Direction GetDirection(int column, int row)
+        {
+            return directions[column, row];
         }
 
         /// <inheritdoc/>
@@ -276,6 +291,7 @@ namespace CrawfisSoftware.Collections.Maze
         /// <inheritdoc/>
         public void RemoveDeadEnds(bool preserveExistingCells = false)
         {
+            var deadEnds = new List<(int col1, int row1, int col2, int row2)>();
             for (int row = 0; row < Height; row++)
             {
                 for (int column = 0; column < Width; column++)
@@ -284,18 +300,26 @@ namespace CrawfisSoftware.Collections.Maze
                     switch (dir)
                     {
                         case Direction.W:
-                            AddWall(column, row, column - 1, row, preserveExistingCells);
+                            //AddWall(column, row, column - 1, row, preserveExistingCells);
+                            deadEnds.Add((column, row, column - 1, row));
                             break;
                         case Direction.N:
-                            AddWall(column, row, column, row + 1, preserveExistingCells);
+                            //AddWall(column, row, column, row + 1, preserveExistingCells);
+                            deadEnds.Add((column, row, column, row + 1));
                             break;
                         case Direction.E:
-                            AddWall(column, row, column + 1, row, preserveExistingCells);
+                            //AddWall(column, row, column + 1, row, preserveExistingCells);
+                            deadEnds.Add((column, row, column + 1, row));
                             break;
                         case Direction.S:
-                            AddWall(column, row, column, row - 1, preserveExistingCells);
+                            //AddWall(column, row, column, row - 1, preserveExistingCells);
+                            deadEnds.Add((column, row, column, row - 1));
                             break;
                     }
+                }
+                foreach (var deadEnd in deadEnds)
+                {
+                    AddWall(deadEnd.col1, deadEnd.row1, deadEnd.col2, deadEnd.row2, preserveExistingCells);
                 }
             }
         }
@@ -487,6 +511,15 @@ namespace CrawfisSoftware.Collections.Maze
             directions[i, j] |= dirs;
         }
 
+        protected Direction[,] Directions
+        {
+            get { return directions.Directions; }
+        }
+
+        protected void ReplaceDirections(Direction[,] newDirections)
+        {
+            directions.ReplaceDirections(newDirections);
+        }
         #region Member variables
         /// <summary>
         /// The underlying grid data structure
@@ -505,7 +538,7 @@ namespace CrawfisSoftware.Collections.Maze
         /// <summary>
         /// A 2D array storing the structure of the maze as a 2D array of directions
         /// </summary>
-        protected DirectionsInstrumented directions;
+        private DirectionsInstrumented directions;
         private List<int> _cellChangedOrder;
         #endregion
     }
