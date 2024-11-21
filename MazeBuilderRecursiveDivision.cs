@@ -50,18 +50,6 @@ namespace CrawfisSoftware.Collections.Maze
             this.VerticalSplitDecision = SplitDecision;
         }
 
-        private bool SplitLargestArea(int width, int height)
-        {
-            if (width < height)
-                return true;
-            return false;
-        }
-        private int SplitDecision(int index, int size)
-        {
-            if (size <= 1) return -1;
-            return index + RandomGenerator.Next(0, size - 1);
-        }
-
         /// <summary>
         /// Constructor, Takes an existing maze builder (derived from MazeBuilderAbstract) and copies the state over.
         /// </summary>
@@ -90,6 +78,18 @@ namespace CrawfisSoftware.Collections.Maze
             {
                 DivideHorizontally(column, row, width, height, preserveExistingCells);
             }
+        }
+
+        private bool SplitLargestArea(int width, int height)
+        {
+            if (width < height)
+                return true;
+            return false;
+        }
+        private int SplitDecision(int index, int size)
+        {
+            if (size <= 1) return -1;
+            return index + RandomGenerator.Next(0, size - 1);
         }
 
         private void DivideHorizontally(int column, int row, int width, int height, bool preserveExistingCells)

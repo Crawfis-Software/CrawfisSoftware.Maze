@@ -291,6 +291,7 @@ namespace CrawfisSoftware.Collections.Maze
         /// <inheritdoc/>
         public void RemoveDeadEnds(bool preserveExistingCells = false)
         {
+            var deadEnds = new List<(int col1, int row1, int col2, int row2)>();
             for (int row = 0; row < Height; row++)
             {
                 for (int column = 0; column < Width; column++)
@@ -299,18 +300,26 @@ namespace CrawfisSoftware.Collections.Maze
                     switch (dir)
                     {
                         case Direction.W:
-                            AddWall(column, row, column - 1, row, preserveExistingCells);
+                            //AddWall(column, row, column - 1, row, preserveExistingCells);
+                            deadEnds.Add((column, row, column - 1, row));
                             break;
                         case Direction.N:
-                            AddWall(column, row, column, row + 1, preserveExistingCells);
+                            //AddWall(column, row, column, row + 1, preserveExistingCells);
+                            deadEnds.Add((column, row, column, row + 1));
                             break;
                         case Direction.E:
-                            AddWall(column, row, column + 1, row, preserveExistingCells);
+                            //AddWall(column, row, column + 1, row, preserveExistingCells);
+                            deadEnds.Add((column, row, column + 1, row));
                             break;
                         case Direction.S:
-                            AddWall(column, row, column, row - 1, preserveExistingCells);
+                            //AddWall(column, row, column, row - 1, preserveExistingCells);
+                            deadEnds.Add((column, row, column, row - 1));
                             break;
                     }
+                }
+                foreach (var deadEnd in deadEnds)
+                {
+                    AddWall(deadEnd.col1, deadEnd.row1, deadEnd.col2, deadEnd.row2, preserveExistingCells);
                 }
             }
         }
