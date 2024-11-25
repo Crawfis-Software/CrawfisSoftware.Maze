@@ -11,8 +11,9 @@ namespace CrawfisSoftware.Collections.Maze
     /// </summary>
     /// <typeparam name="N">The type used for node labels</typeparam>
     /// <typeparam name="E">The type used for edge weights</typeparam>
-    public class MazeBuilderRecursiveDivision<N, E> : MazeBuilderAbstract<N, E>
+    public class MazeBuilderRecursiveDivision<N, E>
     {
+        private MazeBuilderAbstract<N, E> _mazeBuilder;
         /// <summary>
         /// A function to determine whether to split horizontally or vertically.
         /// It takes in the width and height of the region and return true if it
@@ -35,30 +36,27 @@ namespace CrawfisSoftware.Collections.Maze
         /// </summary>
         public Func<int, int, int> VerticalSplitDecision { get; set; }
 
-        /// Constructor
         /// <summary>
-        /// <param name="width">The width of the desired maze</param>
-        /// <param name="height">The height of the desired maze</param>
-        /// <param name="nodeAccessor">A function to retrieve any node labels</param>
-        /// <param name="edgeAccessor">A function to retrieve any edge weights</param>
+        /// Constructor, Takes an existing maze builder (derived from MazeBuilderAbstract) and copies the state over.
         /// </summary>
-        public MazeBuilderRecursiveDivision(int width, int height, GetGridLabel<N> nodeAccessor = null, GetEdgeLabel<E> edgeAccessor = null)
-            : base(width, height, nodeAccessor, edgeAccessor)
+        /// <param name="mazeBuilder">A maze builder</param>
+        public MazeBuilderRecursiveDivision(MazeBuilderAbstract<N, E> mazeBuilder)
         {
+            _mazeBuilder = mazeBuilder;
             this.SplitHorizontalOrVertical = SplitLargestArea;
             this.HorizontalSplitDecision = SplitDecision;
             this.VerticalSplitDecision = SplitDecision;
         }
 
         /// <summary>
-        /// Constructor, Takes an existing maze builder (derived from MazeBuilderAbstract) and copies the state over.
+        /// Create a maze using the Recursive Division algorithm.
         /// </summary>
-        /// <param name="mazeBuilder">A maze builder</param>
-        public MazeBuilderRecursiveDivision(MazeBuilderAbstract<N, E> mazeBuilder) : base(mazeBuilder)
+        /// <param name="preserveExistingCells">Boolean indicating whether to only replace maze cells that are undefined. Default is false.</param>
+        public void CreateMaze(bool preserveExistingCells = false)
         {
-            this.SplitHorizontalOrVertical = SplitLargestArea;
-            this.HorizontalSplitDecision = SplitDecision;
-            this.VerticalSplitDecision = SplitDecision;
+            _mazeBuilder.OpenRegion(0, _mazeBuilder.Width * _mazeBuilder.Height - 1, preserveExistingCells);
+            _mazeBuilder.WallBoundary(0, _mazeBuilder.Width * _mazeBuilder.Height - 1, preserveExistingCells);
+            RecursiveDivision(0, 0, _mazeBuilder.Width, _mazeBuilder.Height, preserveExistingCells);
         }
 
         private void RecursiveDivision(int column, int row, int width, int height, bool preserveExistingCells = false)
@@ -89,7 +87,7 @@ namespace CrawfisSoftware.Collections.Maze
         private int SplitDecision(int index, int size)
         {
             if (size <= 1) return -1;
-            return index + RandomGenerator.Next(0, size - 1);
+            return index + _mazeBuilder.RandomGenerator.Next(0, size - 1);
         }
 
         private void DivideHorizontally(int column, int row, int width, int height, bool preserveExistingCells)
@@ -98,12 +96,12 @@ namespace CrawfisSoftware.Collections.Maze
             if (dividingRow < 0) return;
             for (int col = column; col < column + width; col++)
             {
-                int currentCell = col + dividingRow * Width;
-                AddWall(currentCell, currentCell + Width, preserveExistingCells);
+                int currentCell = col + dividingRow * _mazeBuilder.Width;
+                _mazeBuilder.AddWall(currentCell, currentCell + _mazeBuilder.Width, preserveExistingCells);
             }
-            int openPassageColumn = column + RandomGenerator.Next(0, width);
-            int cellIndex = openPassageColumn + dividingRow * Width;
-            CarvePassage(cellIndex, cellIndex + Width, preserveExistingCells);
+            int openPassageColumn = column + _mazeBuilder.RandomGenerator.Next(0, width);
+            int cellIndex = openPassageColumn + dividingRow * _mazeBuilder.Width;
+            _mazeBuilder.CarvePassage(cellIndex, cellIndex + _mazeBuilder.Width, preserveExistingCells);
             RecursiveDivision(column, row, width, dividingRow - row + 1, preserveExistingCells);
             RecursiveDivision(column, dividingRow + 1, width, row + height - dividingRow - 1, preserveExistingCells);
         }
@@ -114,23 +112,14 @@ namespace CrawfisSoftware.Collections.Maze
             if (dividingColumn < 0) return;
             for (int r = row; r < row + height; r++)
             {
-                int currentCell = dividingColumn + r * Width;
-                AddWall(currentCell, currentCell + 1, preserveExistingCells);
+                int currentCell = dividingColumn + r * _mazeBuilder.Width;
+                _mazeBuilder.AddWall(currentCell, currentCell + 1, preserveExistingCells);
             }
-            int openPassageRow = row + RandomGenerator.Next(0, height - 1);
-            int cellIndex = dividingColumn + openPassageRow * Width;
-            CarvePassage(cellIndex, cellIndex + 1, preserveExistingCells);
+            int openPassageRow = row + _mazeBuilder.RandomGenerator.Next(0, height - 1);
+            int cellIndex = dividingColumn + openPassageRow * _mazeBuilder.Width;
+            _mazeBuilder.CarvePassage(cellIndex, cellIndex + 1, preserveExistingCells);
             RecursiveDivision(column, row, dividingColumn - column + 1, height, preserveExistingCells);
             RecursiveDivision(dividingColumn + 1, row, column + width - dividingColumn - 1, height, preserveExistingCells);
         }
-
-        /// <inheritdoc/>
-        public override void CreateMaze(bool preserveExistingCells = false)
-        {
-            this.OpenRegion(0, Width * Height - 1, preserveExistingCells);
-            WallBoundary(0, Width * Height - 1, preserveExistingCells);
-            RecursiveDivision(0, 0, Width, Height, preserveExistingCells);
-        }
-
     }
 }

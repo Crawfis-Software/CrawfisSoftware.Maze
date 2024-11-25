@@ -9,8 +9,9 @@ namespace CrawfisSoftware.Collections.Maze
     /// </summary>
     /// <typeparam name="N">The type used for node labels</typeparam>
     /// <typeparam name="E">The type used for edge weights</typeparam>
-    public class MazeBuilderShortestPaths<N, E> : MazeBuilderAbstract<N, E>
+    public class MazeBuilderShortestPaths<N, E>
     {
+        private MazeBuilderAbstract<N, E> _mazeBuilder;
         /// <summary>
         /// Static function that can be assigned to the EdgeFunction. This one just returns the edge's value when the Edge Type is a float.
         /// </summary>
@@ -56,20 +57,9 @@ namespace CrawfisSoftware.Collections.Maze
         /// Constructor initialized with a prior MazeBuilder.
         /// </summary>
         /// <param name="mazeBuilder">A maze builder.</param>
-        public MazeBuilderShortestPaths(MazeBuilderAbstract<N, E> mazeBuilder) : base(mazeBuilder)
+        public MazeBuilderShortestPaths(MazeBuilderAbstract<N, E> mazeBuilder)
         {
-            EdgeFunction = ConstantOfOne;
-        }
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        /// <param name="width">The width of the desired maze</param>
-        /// <param name="height">The height of the desired maze</param>
-        /// <param name="nodeAccessor">A function to retrieve any node labels</param>
-        /// <param name="edgeAccessor">A function to retrieve any edge weights</param>
-        public MazeBuilderShortestPaths(int width, int height, GetGridLabel<N> nodeAccessor = null, GetEdgeLabel<E> edgeAccessor = null) : base(width, height, nodeAccessor, edgeAccessor)
-        {
+            _mazeBuilder = mazeBuilder;
             EdgeFunction = ConstantOfOne;
         }
 
@@ -82,9 +72,9 @@ namespace CrawfisSoftware.Collections.Maze
         /// Default is false.</param>
         public void CarvePath(int startingCell, int endingCell, bool preserveExistingCells = false)
         {
-            foreach (var cell in PathQuery<N, E>.FindPath(grid, startingCell, endingCell, EdgeComparerUsingGetEdgeLabel))
+            foreach (var cell in PathQuery<N, E>.FindPath(_mazeBuilder.Grid, startingCell, endingCell, EdgeComparerUsingGetEdgeLabel))
             {
-                CarvePassage(cell.From, cell.To, preserveExistingCells);
+                _mazeBuilder.CarvePassage(cell.From, cell.To, preserveExistingCells);
             }
         }
 
@@ -101,28 +91,26 @@ namespace CrawfisSoftware.Collections.Maze
 
         }
 
-        /// <inheritdoc/>
-        public override void CreateMaze(bool preserveExistingCells = false)
-        {
-        }
-
         private float EdgeComparerUsingGetEdgeLabel(IIndexedEdge<E> edge)
         {
-            return EdgeFunction(edge, GetDirection(edge.From % Width, edge.From / Width), GetDirection(edge.To % Width, edge.To / Width));
+            int width = _mazeBuilder.Width;
+            return EdgeFunction(edge, _mazeBuilder.GetDirection(edge.From % width, edge.From / width), _mazeBuilder.GetDirection(edge.To % width, edge.To / width));
         }
 
         private void CarveShortestPaths(bool preserveExistingCells, int targetCell, float maxCost = float.MaxValue)
         {
-            var pathQuery = new Graph.SourceShortestPaths<N, E>(grid, targetCell, EdgeComparerUsingGetEdgeLabel);
-            for (int row = 0; row < Height; row++)
+            int width = _mazeBuilder.Width;
+            int height = _mazeBuilder.Height;
+            var pathQuery = new Graph.SourceShortestPaths<N, E>(_mazeBuilder.Grid, targetCell, EdgeComparerUsingGetEdgeLabel);
+            for (int row = 0; row < height; row++)
             {
-                for (int column = 0; column < Width; column++)
+                for (int column = 0; column < width; column++)
                 {
-                    int targetNode = column + row * Width;
+                    int targetNode = column + row * width;
                     if (pathQuery.GetCost(targetNode) >= maxCost) continue;
                     foreach (var cell in pathQuery.GetPath(targetNode))
                     {
-                        CarvePassage(cell.From, cell.To, preserveExistingCells);
+                        _mazeBuilder.CarvePassage(cell.From, cell.To, preserveExistingCells);
                     }
                 }
             }
