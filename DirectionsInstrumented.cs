@@ -1,46 +1,52 @@
-﻿using CrawfisSoftware.Collections.Graph;
+﻿using CrawfisSoftware.Collections;
+using CrawfisSoftware.Collections.Graph;
 
 using System;
 
 namespace CrawfisSoftware.Maze
 {
-    public class DirectionsInstrumented
+    /// <summary>
+    /// A 2D array with an event to notify you every time the array is possibly changed.
+    /// </summary>
+    public class DirectionsInstrumented : Instrumented2DArray<Direction>
     {
-        protected Direction[,] _directions;
-
-        public event Action<int, int, Direction, Direction> DirectionChanged;
-        public Direction this[int column, int row]
+        /// <summary>
+        /// A renamed event to indicate that a direction in the array has changed.
+        /// </summary>
+        /// <remarks>Same as ValueChanged event.</remarks>
+        public event Action<int, int, Direction, Direction> DirectionChanged
         {
-            get { return _directions[column, row]; }
-            set
-            {
-                DirectionChanged?.Invoke(row, column, value, _directions[row, column]);
-                _directions[column, row] = value;
-            }
+            add { ValueChanged += value; }
+            remove { ValueChanged -= value; }
         }
 
+        /// <summary>
+        /// Get a 2D array of Directions.
+        /// </summary>
         public Direction[,] Directions
         {
-            get { return _directions; }
+            get { return GetArray(); }
         }
 
-        public DirectionsInstrumented(int width, int height)
+        /// <inheritdoc/>
+        public DirectionsInstrumented(int width, int height) : base(width, height)
         {
-            _directions = new Direction[width, height];
         }
 
-        public DirectionsInstrumented(Direction[,] directions)
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="directions">A 2D array of Direction's.</param>
+        public DirectionsInstrumented(Direction[,] directions) : base(directions)
         {
-            _directions = directions;
         }
-
+        /// <summary>
+        /// Replace the underlying data with a new 2D array of Direction's. Shallow copy.
+        /// </summary>
+        /// <param name="newDirections">An array of type T.</param>
         public void ReplaceDirections(Direction[,] newDirections)
         {
-            _directions = newDirections;
-        }
-        public int GetLength(int dimension)
-        {
-            return _directions.GetLength(dimension);
+            ReplaceArray(newDirections);
         }
     }
 }

@@ -99,11 +99,11 @@ namespace CrawfisSoftware.Collections.Maze
             for (int col = column; col < column + width; col++)
             {
                 int currentCell = col + dividingRow * Width;
-                AddWall(currentCell, currentCell + Width);
+                AddWall(currentCell, currentCell + Width, preserveExistingCells);
             }
             int openPassageColumn = column + RandomGenerator.Next(0, width);
             int cellIndex = openPassageColumn + dividingRow * Width;
-            CarvePassage(cellIndex, cellIndex + Width);
+            CarvePassage(cellIndex, cellIndex + Width, preserveExistingCells);
             RecursiveDivision(column, row, width, dividingRow - row + 1, preserveExistingCells);
             RecursiveDivision(column, dividingRow + 1, width, row + height - dividingRow - 1, preserveExistingCells);
         }
@@ -115,11 +115,11 @@ namespace CrawfisSoftware.Collections.Maze
             for (int r = row; r < row + height; r++)
             {
                 int currentCell = dividingColumn + r * Width;
-                AddWall(currentCell, currentCell + 1);
+                AddWall(currentCell, currentCell + 1, preserveExistingCells);
             }
             int openPassageRow = row + RandomGenerator.Next(0, height - 1);
             int cellIndex = dividingColumn + openPassageRow * Width;
-            CarvePassage(cellIndex, cellIndex + 1);
+            CarvePassage(cellIndex, cellIndex + 1, preserveExistingCells);
             RecursiveDivision(column, row, dividingColumn - column + 1, height, preserveExistingCells);
             RecursiveDivision(dividingColumn + 1, row, column + width - dividingColumn - 1, height, preserveExistingCells);
         }
@@ -127,8 +127,8 @@ namespace CrawfisSoftware.Collections.Maze
         /// <inheritdoc/>
         public override void CreateMaze(bool preserveExistingCells = false)
         {
-            this.OpenRegion(0, Width * Height - 1);
-            WallBoundary(0, Width * Height - 1);
+            this.OpenRegion(0, Width * Height - 1, preserveExistingCells);
+            WallBoundary(0, Width * Height - 1, preserveExistingCells);
             RecursiveDivision(0, 0, Width, Height, preserveExistingCells);
         }
 

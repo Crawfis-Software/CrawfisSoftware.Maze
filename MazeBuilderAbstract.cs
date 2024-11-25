@@ -188,36 +188,24 @@ namespace CrawfisSoftware.Collections.Maze
             return false;
         }
 
-        /// <summary>
-        /// Remove all directions in the specified region.
-        /// </summary>
-        /// <param name="lowerLeftCell">The lower-left corner of the region to fix.</param>
-        /// <param name="upperRightCell">The upper-right corner of the region to fix.</param>
-        /// <remarks>May lead to possible inconsistent neighbor directions.</remarks>
-        /// <seealso>MakeBidirectionallyConsistent</seealso>
-        public void BlockRegion(int lowerLeftCell, int upperRightCell)
+        /// <inheritdoc/>
+        public void BlockRegion(int lowerLeftCell, int upperRightCell, bool preserveExistingCells = false)
         {
-            FillRegion(lowerLeftCell, upperRightCell, Direction.None);
+            FillRegion(lowerLeftCell, upperRightCell, Direction.None, preserveExistingCells);
         }
 
-        /// <summary>
-        /// Add passages to all neighbors within the specified region
-        /// </summary>
-        /// <param name="lowerLeftCell">The lower-left corner of the region to fix.</param>
-        /// <param name="upperRightCell">The upper-right corner of the region to fix.</param>
-        /// <remarks>May lead to possible inconsistent neighbor directions.</remarks>
-        /// <seealso>MakeBidirectionallyConsistent</seealso>
-        public void OpenRegion(int lowerLeftCell, int upperRightCell)
+        /// <inheritdoc/>
+        public void OpenRegion(int lowerLeftCell, int upperRightCell, bool preserveExistingCells = false)
         {
             // Todo: Add preserveCells logic. 
             Direction dirs = Direction.N | Direction.E | Direction.S | Direction.W;
             // Todo: Add Undefined logic.
             dirs |= Direction.Undefined;
-            FillRegion(lowerLeftCell, upperRightCell, dirs);
+            FillRegion(lowerLeftCell, upperRightCell, dirs, preserveExistingCells);
         }
 
         /// <inheritdoc/>
-        public void FillRegion(int lowerLeftCell, int upperRightCell, Direction dirs)
+        public void FillRegion(int lowerLeftCell, int upperRightCell, Direction dirs, bool preserveExistingCells = false)
         {
             // Todo: Add preserveCells logic. Lots of ways to do this: Add dirs, set dirs, set dirs if Undefined, preserve undefined, ...
             // Bug: upperRightCell is non-inclusive, so would need to be out of bounds to reach the right-edge or 
@@ -237,7 +225,8 @@ namespace CrawfisSoftware.Collections.Maze
             {
                 for (int column = currentColumn; column <= endColumn; column++)
                 {
-                    directions[column, row] = dirs;
+                    SetCell(column, row, dirs);
+                    //directions[column, row] = dirs;
                 }
             }
         }
@@ -257,22 +246,25 @@ namespace CrawfisSoftware.Collections.Maze
             int col;
             for (col = lowerLeftCell % Width; col <= upperRightCell % Width; col++)
             {
-                directions[col, row] = directions[col, row] & ~Direction.S;
+                SetCell(col, row, directions[col, row] & ~Direction.S, preserveExistingCells);
             }
             row = upperRightCell / Width;
             for (col = lowerLeftCell % Width; col <= upperRightCell % Width; col++)
             {
-                directions[col, row] = directions[col, row] & ~Direction.N;
+                SetCell(col, row, directions[col, row] & ~Direction.N, preserveExistingCells);
+                //directions[col, row] = directions[col, row] & ~Direction.N;
             }
             col = lowerLeftCell % Width;
             for (row = lowerLeftCell / Width; row <= upperRightCell / Width; row++)
             {
-                directions[col, row] = directions[col, row] & ~Direction.W;
+                SetCell(col, row, directions[col, row] & ~Direction.W, preserveExistingCells);
+                //directions[col, row] = directions[col, row] & ~Direction.W;
             }
             col = upperRightCell % Width;
             for (row = lowerLeftCell / Width; row <= upperRightCell / Width; row++)
             {
-                directions[col, row] = directions[col, row] & ~Direction.E;
+                SetCell(col, row, directions[col, row] & ~Direction.E, preserveExistingCells);
+                //directions[col, row] = directions[col, row] & ~Direction.E;
             }
         }
 
@@ -393,7 +385,7 @@ namespace CrawfisSoftware.Collections.Maze
                         }
                     //else if (column > 0)
                     //    directions[column - 1, row] &= ~Direction.E;
-                    if ((row < Height) && (dir & Direction.N) == Direction.N)
+                    if ((row < (Height - 1)) && (dir & Direction.N) == Direction.N)
                         if (carvingMissingPassages)
                         {
                             directions[column, row + 1] |= Direction.S;
@@ -500,9 +492,11 @@ namespace CrawfisSoftware.Collections.Maze
         }
 
         /// <inheritdoc/>
-        public void SetCell(int i, int j, Direction dirs)
+        public void SetCell(int i, int j, Direction dirs, bool preserveExistingCells = false)
         {
-            directions[i, j] = dirs;
+            bool cellsCanBeModified = !preserveExistingCells || ((directions[i, j] & Direction.Undefined) == Direction.Undefined);
+            if (cellsCanBeModified)
+                directions[i, j] = dirs;
         }
 
         /// <inheritdoc/>
@@ -511,11 +505,18 @@ namespace CrawfisSoftware.Collections.Maze
             directions[i, j] |= dirs;
         }
 
+        /// <summary>
+        /// Get the underlying Directions as a 2D array
+        /// </summary>
         protected Direction[,] Directions
         {
             get { return directions.Directions; }
         }
 
+        /// <summary>
+        /// Swap out the underlying data storage with the new set of Directions.
+        /// </summary>
+        /// <param name="newDirections">A 2D array of Directions (which should be the same size as the original)</param>
         protected void ReplaceDirections(Direction[,] newDirections)
         {
             directions.ReplaceDirections(newDirections);
