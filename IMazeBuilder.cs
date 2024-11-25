@@ -49,14 +49,18 @@ namespace CrawfisSoftware.Collections.Maze
         /// </summary>
         /// <param name="lowerLeftCell">The cell index of the lower-left corner of a rectangular region</param>
         /// <param name="upperRightCell">The cell index of the upper-right corner of a rectangular region</param>
-        void BlockRegion(int lowerLeftCell, int upperRightCell);
+        /// <param name="preserveExistingCells">Boolean indicating whether to only replace maze cells that are undefined.
+        /// Default is false.</param>
+        void BlockRegion(int lowerLeftCell, int upperRightCell, bool preserveExistingCells = false);
 
         /// <summary>
         /// Add all edges to neighbors within the specified rectangle.
         /// </summary>
         /// <param name="lowerLeftCell">The cell index of the lower-left corner of a rectangular region</param>
         /// <param name="upperRightCell">The cell index of the upper-right corner of a rectangular region</param>
-        void OpenRegion(int lowerLeftCell, int upperRightCell);
+        /// <param name="preserveExistingCells">Boolean indicating whether to only replace maze cells that are undefined.
+        /// Default is false.</param>
+        void OpenRegion(int lowerLeftCell, int upperRightCell, bool preserveExistingCells = false);
 
         /// <summary>
         /// Build the maze based on the maze builder configuration
@@ -80,7 +84,7 @@ namespace CrawfisSoftware.Collections.Maze
         /// <param name="selectedRow">Neighboring row index</param>
         /// <param name="preserveExistingCells">Boolean indicating whether to only replace maze cells that are undefined.
         /// Default is false.</param>
-        /// <returns></returns>
+        /// <returns>True if the wall was able to be added.</returns>
         bool AddWall(int currentColumn, int currentRow, int selectedColumn, int selectedRow, bool preserveExistingCells = false);
 
         /// <summary>
@@ -100,9 +104,11 @@ namespace CrawfisSoftware.Collections.Maze
         /// <param name="lowerLeftCell">The lower-left corner of the region to fix.</param>
         /// <param name="upperRightCell">The upper-right corner of the region to fix.</param>
         /// <param name="dirs">List of directions to set each cell to.</param>
+        /// <param name="preserveExistingCells">Boolean indicating whether to only replace maze cells that are undefined.
+        /// Default is false.</param>
         /// <remarks>May lead to possible inconsistent neighbor directions.</remarks>
         /// <seealso>MakeBidirectionallyConsistent</seealso>
-        void FillRegion(int lowerLeftCell, int upperRightCell, Direction dirs);
+        void FillRegion(int lowerLeftCell, int upperRightCell, Direction dirs, bool preserveExistingCells = false);
 
         /// <summary>
         /// Set all directions in the maze to Direction.Undefined
@@ -172,7 +178,9 @@ namespace CrawfisSoftware.Collections.Maze
         /// <param name="i">The column index</param>
         /// <param name="j">The row index</param>
         /// <param name="dirs">The cell value including all directions</param>
-        void SetCell(int i, int j, Direction dirs);
+        /// <param name="preserveExistingCells">Boolean indicating whether to only replace maze cells that are undefined.
+        /// Default is false.</param>
+        void SetCell(int i, int j, Direction dirs, bool preserveExistingCells = false);
 
         /// <summary>
         /// Add the direction(s) to this cell w/o any safeguards
