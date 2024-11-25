@@ -9,32 +9,27 @@ namespace CrawfisSoftware.Collections.Maze
     /// </summary>
     /// <typeparam name="N">The type used for node labels</typeparam>
     /// <typeparam name="E">The type used for edge weights</typeparam>
-    public class MazeBuilderRecursiveBacktracker<N, E> : MazeBuilderAbstract<N, E>
+    public class MazeBuilderRecursiveBacktracker<N, E>
     {
+        private MazeBuilderAbstract<N, E> _mazeBuilder;
         private bool[,] visited;
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="width">The width of the desired maze</param>
-        /// <param name="height">The height of the desired maze</param>
-        /// <param name="nodeAccessor">A function to retrieve any node labels</param>
-        /// <param name="edgeAccessor">A function to retrieve any edge weights</param>
-        public MazeBuilderRecursiveBacktracker(int width, int height, GetGridLabel<N> nodeAccessor = null, GetEdgeLabel<E> edgeAccessor = null)
-            : base(width, height, nodeAccessor, edgeAccessor)
-        {
-            visited = new bool[Width, Height];
-        }
 
         /// <summary>
         /// Constructor, Takes an existing maze builder (derived from MazeBuilderAbstract) and copies the state over.
         /// </summary>
         /// <param name="mazeBuilder">A maze builder</param>
-        public MazeBuilderRecursiveBacktracker(MazeBuilderAbstract<N, E> mazeBuilder) : base(mazeBuilder)
+        public MazeBuilderRecursiveBacktracker(MazeBuilderAbstract<N, E> mazeBuilder)
         {
-            visited = new bool[Width, Height];
+            _mazeBuilder = mazeBuilder;
+            visited = new bool[_mazeBuilder.Width, _mazeBuilder.Height];
         }
-        private void RecursiveBackTracker(bool preserveExistingCells = true)
+        /// <summary>
+        /// Create a maze using the Recursive Backtracker algorithm.
+        /// </summary>
+        /// <param name="preserveExistingCells">Boolean indicating whether to only replace maze cells that are undefined. Default is false.</param>
+        public void CreateMaze(bool preserveExistingCells = true)
         {
+            RecursiveBackTracker(_mazeBuilder.StartCell, preserveExistingCells);
         }
 
         private void RecursiveBackTracker(int startingNode, bool preserveExistingCells = true)
@@ -42,17 +37,17 @@ namespace CrawfisSoftware.Collections.Maze
             Stack<int> currentPath = new Stack<int>();
             currentPath.Push(startingNode);
             List<int> neighbors = new List<int>(4);
-            visited[startingNode % Width, startingNode / Width] = true;
+            visited[startingNode % _mazeBuilder.Width, startingNode / _mazeBuilder.Width] = true;
 
             while (currentPath.Count > 0)
             {
                 int currentNode = currentPath.Peek();
                 neighbors.Clear();
                 // Select neighbors who have not been visited.
-                foreach (int neighbor in grid.Neighbors(currentNode))
+                foreach (int neighbor in _mazeBuilder.Grid.Neighbors(currentNode))
                 {
-                    int row = neighbor / Width;
-                    int column = neighbor % Width;
+                    int row = neighbor / _mazeBuilder.Width;
+                    int column = neighbor % _mazeBuilder.Width;
                     if (!visited[column, row])
                     {
                         neighbors.Add(neighbor);
@@ -62,10 +57,10 @@ namespace CrawfisSoftware.Collections.Maze
                 int nextNode = -1;
                 while (!pathCarved && neighbors.Count > 0)
                 {
-                    int randomNeighbor = RandomGenerator.Next(neighbors.Count);
+                    int randomNeighbor = _mazeBuilder.RandomGenerator.Next(neighbors.Count);
                     nextNode = neighbors[randomNeighbor];
-                    pathCarved = CarvePassage(currentNode, nextNode, preserveExistingCells);
-                    visited[nextNode % Width, nextNode / Width] = true;
+                    pathCarved = _mazeBuilder.CarvePassage(currentNode, nextNode, preserveExistingCells);
+                    visited[nextNode % _mazeBuilder.Width, nextNode / _mazeBuilder.Width] = true;
                     neighbors.RemoveAt(randomNeighbor);
                 }
                 if (pathCarved)
@@ -77,16 +72,6 @@ namespace CrawfisSoftware.Collections.Maze
                     currentPath.Pop();
                 }
             }
-        }
-
-        /// <inheritdoc/>
-        public override void CreateMaze(bool preserveExistingCells = true)
-        {
-            // Todo: Fix preserveExistingCells = false or throw an error
-            RecursiveBackTracker(StartCell, preserveExistingCells);
-            // Clear all Undefined flags, since maze generation should touch all cells.
-            // Todo: Not true, as "grid" may be masked to certain edges.
-            //RemoveUndefines();
         }
     }
 }

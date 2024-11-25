@@ -29,7 +29,13 @@ namespace CrawfisSoftware.Collections.Maze
 
         /// <inheritdoc/>
         public int Height { get; protected set; }
+        /// <summary>
+        /// Get the order of cells that were changed during the maze creation process (if enabled).
+        /// </summary>
         public IList<int> TraversalOrder { get { return _cellChangedOrder; } }
+        /// <summary>
+        /// Get or set whether to keep track of the order of cells that were changed during the maze creation process.
+        /// </summary>
         public bool KeepTrackOfChanges
         {
             get { return _keepTrackOfChanges; }
@@ -48,6 +54,9 @@ namespace CrawfisSoftware.Collections.Maze
             }
         }
 
+        /// <summary>
+        /// Get the underlying grid data structure
+        /// </summary>
         public Grid<N, E> Grid { get { return grid; } }
 
         /// <summary>

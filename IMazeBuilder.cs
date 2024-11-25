@@ -10,6 +10,15 @@ namespace CrawfisSoftware.Collections.Maze
     public interface IMazeBuilder<N, E>
     {
         /// <summary>
+        /// Get the width in the number of grid cells
+        /// </summary>
+        public int Width { get; }
+
+        /// <summary>
+        /// Get the height in the number of grid cells
+        /// </summary>
+        public int Height { get; }
+        /// <summary>
         /// The starting cell index for the maze. Cell indices go from bottom-left across a row to top-right.
         /// </summary>
         int StartCell { get; }
