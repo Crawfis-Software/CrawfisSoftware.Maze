@@ -36,8 +36,9 @@ namespace CrawfisSoftware.Collections.Maze
         /// <typeparam name="E">The type used for edge weights in the maze.</typeparam>
         /// <param name="maze">The maze.</param>
         /// <param name="stampSet">A stamp set with Direction as the associated type for id's.</param>
+        /// <param name="ignoreUndefinedDirection">If true, undefined directions will be ignored.</param>
         /// <returns>An OccupancyGrid.</returns>
-        public static OccupancyGrid ReplaceDirectionsWithStamps<N, E>(Maze<N, E> maze, StampSet<Direction> stampSet)
+        public static OccupancyGrid ReplaceDirectionsWithStamps<N, E>(Maze<N, E> maze, StampSet<Direction> stampSet, bool ignoreUndefinedDirection = true)
         {
             int width = stampSet.Width * maze.Width;
             int height = stampSet.Height * maze.Height;
@@ -46,7 +47,9 @@ namespace CrawfisSoftware.Collections.Maze
             {
                 for (int column = 0; column < maze.Width; column++)
                 {
-                    var stamp = stampSet.GetStamp(maze.GetDirection(column, row));
+                    Direction direction = maze.GetDirection(column, row);
+                    if (ignoreUndefinedDirection) direction = direction & ~Direction.Undefined;
+                    var stamp = stampSet.GetStamp(direction);
                     GridUtility.StampInto(newMaze, stamp, stampSet.Width * column, stampSet.Height * row);
                 }
             }
@@ -112,6 +115,47 @@ namespace CrawfisSoftware.Collections.Maze
                     return ReplaceDirectionsWithStamps(maze, stampSet);
                     //break;
             }
+        }
+        /// <summary>
+        /// Carve openings based on the list of compressed vertical and horizontal edge flags for each row
+        /// </summary>
+        /// <param name="mazeBuilder">An existing maze builder to use in the carving process</param>
+        /// <param name="solidBlocks">2D array matching the maze builder's width and height.
+        /// A value of true implies this cell is a solid block. Passages will be carved from non-solid
+        /// blocks to adjacent non-solid blocks.</param>
+        public static void CarveOpenings(MazeBuilderAbstract<int, int> mazeBuilder, bool[,] solidBlocks)
+        {
+
+            for (int row = 0; row < mazeBuilder.Height - 1; row++)
+            {
+                for (int column = 0; column < mazeBuilder.Width - 1; column++)
+                {
+                    if (!solidBlocks[column, row])
+                    {
+                        if (!solidBlocks[column, row + 1])
+                        {
+                            mazeBuilder.CarvePassage(column, row, column, row + 1);
+                        }
+                        if (!solidBlocks[column + 1, row])
+                        {
+                            mazeBuilder.CarvePassage(column, row, column + 1, row);
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Convert an OccupancyGrid to a Maze.
+        /// </summary>
+        /// <param name="cells">An <c>OccupancyGrid</c>.</param>
+        /// <returns>A <c>Maze</c>.</returns>
+        public static Maze<int, int> ConvertOccupancyGridToMaze(this OccupancyGrid cells)
+        {
+            var mazeBuilder = new MazeBuilderExplicit<int, int>(cells.Width, cells.Height);
+            CarveOpenings(mazeBuilder, cells.GridValues);
+            Maze<int, int> maze = mazeBuilder.GetMaze();
+            return maze;
         }
     }
 }
