@@ -12,6 +12,10 @@ namespace CrawfisSoftware.Collections.Maze
     /// <typeparam name="E">The type used for edge weights</typeparam>
     public class Maze<N, E> : IIndexedGraph<N, E>, ITransposeIndexedGraph<N, E>
     {
+        /// <summary>
+        /// Get the grid that is the basis for the maze
+        /// </summary>
+        public Grid<N, E> Grid { get { return grid; } }
         /// <value>
         /// Get the width in the number of grid cells
         /// </value>
