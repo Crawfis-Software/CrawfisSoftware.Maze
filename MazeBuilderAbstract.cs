@@ -290,7 +290,7 @@ namespace CrawfisSoftware.Collections.Maze
         }
 
         /// <inheritdoc/>
-        public void RemoveDeadEnds(bool preserveExistingCells = false)
+        public void RemoveDeadEnds(int maxCount = int.MaxValue, bool preserveExistingCells = false)
         {
             var deadEnds = new List<(int col1, int row1, int col2, int row2)>();
             for (int row = 0; row < Height; row++)
@@ -318,9 +318,13 @@ namespace CrawfisSoftware.Collections.Maze
                             break;
                     }
                 }
+                int count = 0;
                 foreach (var deadEnd in deadEnds)
                 {
                     AddWall(deadEnd.col1, deadEnd.row1, deadEnd.col2, deadEnd.row2, preserveExistingCells);
+                    count++;
+                    if (count >= maxCount)
+                        break;
                 }
             }
         }

@@ -128,8 +128,9 @@ namespace CrawfisSoftware.Collections.Maze
         /// Remove dead-ends (implementation specific - one pass or many passes).
         /// Replaces dead-ends by blocking the only passage creating an empty cell
         /// </summary>
+        /// <param name="maxCount">Maximum number of Dead-ends to trim.</param>
         /// <param name="preserveExistingCells"></param>
-        void RemoveDeadEnds(bool preserveExistingCells = false);
+        void RemoveDeadEnds(int maxCount = int.MaxValue, bool preserveExistingCells = false);
 
         /// <summary>
         /// Remove Direction.Undefined for all cells that have been defined
