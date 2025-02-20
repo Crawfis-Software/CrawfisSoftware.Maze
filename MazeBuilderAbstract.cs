@@ -290,7 +290,7 @@ namespace CrawfisSoftware.Collections.Maze
         }
 
         /// <inheritdoc/>
-        public void RemoveDeadEnds(bool preserveExistingCells = false)
+        public void RemoveDeadEnds(int maxCount = int.MaxValue, bool preserveExistingCells = false)
         {
             var deadEnds = new List<(int col1, int row1, int col2, int row2)>();
             for (int row = 0; row < Height; row++)
@@ -318,9 +318,13 @@ namespace CrawfisSoftware.Collections.Maze
                             break;
                     }
                 }
+                int count = 0;
                 foreach (var deadEnd in deadEnds)
                 {
                     AddWall(deadEnd.col1, deadEnd.row1, deadEnd.col2, deadEnd.row2, preserveExistingCells);
+                    count++;
+                    if (count >= maxCount)
+                        break;
                 }
             }
         }
@@ -344,10 +348,30 @@ namespace CrawfisSoftware.Collections.Maze
             {
                 for (int column = 0; column < Width; column++)
                 {
-                    if (directions[column, row] != Direction.Undefined)
-                        directions[column, row] &= ~Direction.Undefined;
+                    FreezeCellIfUndefined(row, column);
                 }
             }
+        }
+
+        /// <summary>
+        /// Remove the Undefined (freeze) the specified cell if it has a Direction set.
+        /// </summary>
+        /// <param name="row">A row index</param>
+        /// <param name="column">A column index</param>
+        public void FreezeCellIfUndefined(int row, int column)
+        {
+            if (directions[column, row] != Direction.Undefined)
+                RemoveUndefine(row, column);
+        }
+
+        /// <summary>
+        /// Remove the Undefined flag from the specified cell.
+        /// </summary>
+        /// <param name="row">A row index</param>
+        /// <param name="column">A column index</param>
+        public void RemoveUndefine(int row, int column)
+        {
+            directions[column, row] &= ~Direction.Undefined;
         }
 
         /// <inheritdoc/>

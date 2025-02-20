@@ -45,23 +45,50 @@ namespace CrawfisSoftware.Collections.Maze
                     }
                     if (incomingCellIndex != -1)
                     {
-                        IList<int> neighborDirs = mazeBuilder.Grid.Neighbors(column + row * Width).ToList();
-                        foreach (var neighborIndex in neighborDirs.Shuffle<int>(mazeBuilder.RandomGenerator))
-                        {
-                            if (neighborIndex == incomingCellIndex) continue;
-                            if (carveNeighbors)
-                            {
-                                if (mazeBuilder.CarvePassage(column + row * Width, neighborIndex, preserveExistingCells)) break;
-                            }
-                            else
-                            {
-                                // This will lead to an inconsistent edge, which is useful is certain situations.
-                                var directionToCarve = DirectionExtensions.GetEdgeDirection(column + row * Width, neighborIndex, Width);
-                                mazeBuilder.AddDirectionExplicitly(column, row, directionToCarve);
-                                break;
-                            }
-                        }
+                        TryCarveRandomDirection(mazeBuilder, row, column, preserveExistingCells, carveNeighbors);
                     }
+                }
+            }
+        }
+        /// <summary>
+        /// Provides a braid for the maze, randomly connecting dead-end cell to a neighbor. 
+        /// </summary>
+        /// <typeparam name="N">The type used for node labels</typeparam>
+        /// <typeparam name="E">The type used for edge weights</typeparam>
+        /// <param name="mazeBuilder">the underlying MazeBuilder</param>
+        /// <param name="numberToMerge">The number of dead ends to try to merge.</param>
+        /// <param name="preserveExistingCells">Boolean indicating whether to only replace maze cells that are undefined.</param>
+        /// <param name="carveNeighbors">True to keep the underlying maze consistent. False to just modify the dead-end cell.</param>
+        public static void MergeRandomDeadEnds<N, E>(this MazeBuilderAbstract<N, E> mazeBuilder, int numberToMerge, bool preserveExistingCells = false, bool carveNeighbors = true)
+        {
+            int Width = mazeBuilder.Width;
+            foreach (var deadEnd in mazeBuilder.GetMaze().DeadEnds().ToList().Shuffle(mazeBuilder.RandomGenerator))
+            {
+                if (numberToMerge-- <= 0) break;
+                TryCarveRandomDirection(mazeBuilder, deadEnd.Row, deadEnd.Column, preserveExistingCells, carveNeighbors);
+            }
+        }
+
+        public static void TryCarveRandomDirection<N, E>(MazeBuilderAbstract<N, E> mazeBuilder, int row, int column, bool preserveExistingCells = false, bool carveNeighbors = true)
+        {
+            int width = mazeBuilder.Width;
+            IList<int> neighborDirs = mazeBuilder.Grid.Neighbors(column + row * width).ToList();
+            Direction direction = mazeBuilder.GetDirection(column, row);
+            int index = column + width * row;
+            foreach (var neighborIndex in neighborDirs.Shuffle<int>(mazeBuilder.RandomGenerator))
+            {
+                Direction neighborDirection = DirectionExtensions.GetEdgeDirection(index, neighborIndex, width);
+                if ((direction & neighborDirection) == neighborDirection) continue; // Direction already exists.
+                if (carveNeighbors)
+                {
+                    if (mazeBuilder.CarvePassage(column + row * width, neighborIndex, preserveExistingCells)) break;
+                }
+                else
+                {
+                    // This will lead to an inconsistent edge, which is useful is certain situations.
+                    var directionToCarve = DirectionExtensions.GetEdgeDirection(column + row * width, neighborIndex, width);
+                    mazeBuilder.AddDirectionExplicitly(column, row, directionToCarve);
+                    break;
                 }
             }
         }
