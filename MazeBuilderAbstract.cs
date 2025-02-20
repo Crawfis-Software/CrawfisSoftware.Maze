@@ -348,10 +348,30 @@ namespace CrawfisSoftware.Collections.Maze
             {
                 for (int column = 0; column < Width; column++)
                 {
-                    if (directions[column, row] != Direction.Undefined)
-                        directions[column, row] &= ~Direction.Undefined;
+                    FreezeCellIfUndefined(row, column);
                 }
             }
+        }
+
+        /// <summary>
+        /// Remove the Undefined (freeze) the specified cell if it has a Direction set.
+        /// </summary>
+        /// <param name="row">A row index</param>
+        /// <param name="column">A column index</param>
+        public void FreezeCellIfUndefined(int row, int column)
+        {
+            if (directions[column, row] != Direction.Undefined)
+                RemoveUndefine(row, column);
+        }
+
+        /// <summary>
+        /// Remove the Undefined flag from the specified cell.
+        /// </summary>
+        /// <param name="row">A row index</param>
+        /// <param name="column">A column index</param>
+        public void RemoveUndefine(int row, int column)
+        {
+            directions[column, row] &= ~Direction.Undefined;
         }
 
         /// <inheritdoc/>
