@@ -4,11 +4,11 @@ using System.Collections.Generic;
 
 namespace CrawfisSoftware.Maze
 {
-    /// <summary>
-    /// Generate a Maze using depth-first search (Recursive Backtracking)
-    /// </summary>
-    /// <typeparam name="N">The type used for node labels</typeparam>
-    /// <typeparam name="E">The type used for edge weights</typeparam>
+    ///// <summary>
+    ///// Generate a Maze using depth-first search (Recursive Backtracking)
+    ///// </summary>
+    ///// <typeparam name="N">The type used for node labels</typeparam>
+    ///// <typeparam name="E">The type used for edge weights</typeparam>
     //public class MazeBuilderRecursiveBacktracker<N, E>
     //{
     //    private MazeBuilderAbstract<N, E> _mazeBuilder;

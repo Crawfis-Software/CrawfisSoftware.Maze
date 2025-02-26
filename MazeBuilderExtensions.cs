@@ -211,6 +211,25 @@ namespace CrawfisSoftware.Maze
         }
 
         /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="N"></typeparam>
+        /// <typeparam name="E"></typeparam>
+        /// <param name="mazeBuilder">The IMazeBuilder to use for carving.</param>
+        /// <param name="directions">A 2D array of Direction's to initialize the mazeBuilder from.</param>
+        public static void SetDirections<N, E>(this IMazeBuilder<N, E> mazeBuilder, Direction[,] directions)
+        {
+            for (int i = 0; i < directions.GetLength(0); i++)
+            {
+                for (int j = 0; j < directions.GetLength(1); j++)
+                {
+                    mazeBuilder.SetCell(i, j, directions[i, j]);
+                }
+            }
+        }
+
+
+        /// <summary>
         /// Add walls (inconsistently currently) to the boundary of the define rectangle.
         /// </summary>
         /// <param name="mazeBuilder">The IMazeBuilder to use for carving.</param>

@@ -152,7 +152,7 @@ namespace CrawfisSoftware.Maze
         /// <returns>A <c>Maze</c>.</returns>
         public static Maze<int, int> ConvertOccupancyGridToMaze(this OccupancyGrid cells)
         {
-            var mazeBuilder = new MazeBuilderExplicit<int, int>(cells.Width, cells.Height);
+            var mazeBuilder = new MazeBuilder<int, int>(cells.Width, cells.Height);
             CarveOpenings(mazeBuilder, cells.GridValues);
             Maze<int, int> maze = mazeBuilder.GetMaze();
             return maze;

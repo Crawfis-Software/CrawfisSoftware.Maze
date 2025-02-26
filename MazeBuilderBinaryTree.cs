@@ -3,11 +3,11 @@ using CrawfisSoftware.Maze;
 
 namespace CrawfisSoftware.Maze
 {
-    /// <summary>
-    /// Create a maze using the Binary Tree algorithm
-    /// </summary>
-    /// <typeparam name="N"></typeparam>
-    /// <typeparam name="E"></typeparam>
+    ///// <summary>
+    ///// Create a maze using the Binary Tree algorithm
+    ///// </summary>
+    ///// <typeparam name="N"></typeparam>
+    ///// <typeparam name="E"></typeparam>
     //public class MazeBuilderBinaryTree<N, E>
     //{
     //    private MazeBuilderAbstract<N, E> _mazeBuilder;

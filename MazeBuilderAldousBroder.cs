@@ -6,9 +6,9 @@ using System.Linq;
 
 namespace CrawfisSoftware.Maze
 {
-    /// <summary>
-    /// Create a maze using the Aldous Broder algorithm
-    /// </summary>
+    ///// <summary>
+    ///// Create a maze using the Aldous Broder algorithm
+    ///// </summary>
     //public class MazeBuilderAldousBroder<N, E>
     //{
     //    private MazeBuilderAbstract<N, E> _mazeBuilder;

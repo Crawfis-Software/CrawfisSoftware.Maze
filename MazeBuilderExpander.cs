@@ -8,6 +8,7 @@ namespace CrawfisSoftware.Maze
     /// </summary>
     public static class MazeBuilderExpander
     {
+        /// <summary>
         /// Expand an existing MazeBuilder to a new one having wider openings, walls, and/or borders
         /// </summary>
         /// <typeparam name="N">The type used for node labels</typeparam>
@@ -19,7 +20,7 @@ namespace CrawfisSoftware.Maze
         /// <returns>A new IMazeBuilder.</returns>
         /// <remarks>Note: The Start and End cells will be set to the interior of the maze corresponding to the mapped cell location previously. 
         /// Use one of the path carving algorithms to create an exit out of the boundary.</remarks>
-        public static IMazeBuilder<N, E> ExpandMaze<N, E>(this IMazeBuilder<N, E> mazeBuilder, int numberOfOpeningTiles, int numberOfWallTiles, int numberOfBorderTiles)
+        public static void ExpandMaze<N, E>(this IMazeBuilder<N, E> mazeBuilder, int numberOfOpeningTiles, int numberOfWallTiles, int numberOfBorderTiles)
         {
             int width = mazeBuilder.Width;
             int height = mazeBuilder.Height;
@@ -37,7 +38,8 @@ namespace CrawfisSoftware.Maze
             width = width + width * numberOfOpeningTiles + width * numberOfWallTiles + 2 * numberOfBorderTiles;
             height = height + height * numberOfOpeningTiles + height * numberOfWallTiles + 2 * numberOfBorderTiles;
             var newDirections = ExpandDirections(mazeBuilder, width, height, numberOfOpeningTiles, numberOfWallTiles, numberOfBorderTiles);
-            return new MazeBuilderExplicit<N, E>(newDirections);
+            var expandedMazeBuilder = new MazeBuilder<N, E>(width, height);
+            expandedMazeBuilder.SetDirections(newDirections);
         }
 
         private static Direction[,] ExpandDirections<N, E>(IMazeBuilder<N, E> mazeBuilder, int width, int height, int _numberOfOpeningTiles, int _numberOfWallTiles, int _numberOfBorderTiles)

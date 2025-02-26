@@ -23,7 +23,7 @@ namespace CrawfisSoftware.Maze
         /// <remarks>The NodeAccessor and EdgeAccessor's are not preserved by default.</remarks>
         public static Maze<N, E> Inverse<N, E>(this Maze<N, E> maze, bool removeUndefines = false, GetGridLabel<N> nodeAccessor = null, GetEdgeLabel<E> edgeAccessor = null)
         {
-            var mazeBuilder = new MazeBuilderExplicit<N, E>(maze.Width, maze.Height);
+            var mazeBuilder = new MazeBuilder<N, E>(maze.Width, maze.Height);
             Direction allDirections = Direction.None;
             //foreach (Direction dir in Enum.GetValues<Direction>()) allDirections |= dir; // Generic version not available in .Net Standard 2.1
             foreach (var dir in Enum.GetValues(typeof(Direction))) allDirections |= (Direction)dir;

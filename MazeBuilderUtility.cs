@@ -1,4 +1,5 @@
 ﻿using CrawfisSoftware.Collections.Graph;
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -63,8 +64,8 @@ namespace CrawfisSoftware.Maze
         /// <returns>A new maze</returns>
         public static Maze<int, int> CreateMaze(int width, int height, IList<Direction> directions)
         {
-            return MazeBuilderUtility<int, int>.CreateMaze(width, height, directions, 
-                MazeBuilderUtility<int,int>.DummyNodeValues, MazeBuilderUtility<int, int>.DummyEdgeValues);
+            return MazeBuilderUtility<int, int>.CreateMaze(width, height, directions,
+                MazeBuilderUtility<int, int>.DummyNodeValues, MazeBuilderUtility<int, int>.DummyEdgeValues);
         }
 
         /// <summary>
@@ -78,7 +79,7 @@ namespace CrawfisSoftware.Maze
         /// <returns>A new maze</returns>
         public static Maze<N, E> CreateMaze(int width, int height, IList<Direction> directions, GetGridLabel<N> nodeAccessor, GetEdgeLabel<E> edgeAccessor)
         {
-            var mazeBuilder = new MazeBuilderExplicit<N, E>(width, height, nodeAccessor, edgeAccessor);
+            var mazeBuilder = new MazeBuilder<N, E>(width, height, nodeAccessor, edgeAccessor);
             int i = 0;
             int j = 0;
             foreach (var dir in directions)
@@ -105,7 +106,7 @@ namespace CrawfisSoftware.Maze
         {
             int width = directions.GetLength(0);
             int height = directions.GetLength(1);
-            var mazeBuilder = new MazeBuilderExplicit<N, E>(width, height, nodeAccessor, edgeAccessor);
+            var mazeBuilder = new MazeBuilder<N, E>(width, height, nodeAccessor, edgeAccessor);
             for (int i = 0; i < width; i++)
             {
                 for (int j = 0; j < height; j++)

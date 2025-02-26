@@ -120,16 +120,40 @@ namespace CrawfisSoftware.Maze
         /// <param name="row">A row index</param>
         /// <param name="column">A column index</param>
         void FreezeCellIfUndefined(int row, int column);
+
+        /// <summary>
+        /// Remove any Directions in the specified cell.
+        /// </summary>
+        /// <param name="i">The column index</param>
+        /// <param name="j">The row index</param>
+        /// <param name="dirs">A Direction (or set of Direction flags) to remove.</param>
+        /// <param name="preserveExistingCells">Boolean indicating whether to only replace maze cells that are undefined.
+        /// Default is false.</param>
         void RemoveDirections(int i, int j, Direction dirs, bool preserveExistingCells = false);
+
+        /// <summary>
+        /// Remove the direction(s) to this cell w/o any safeguards
+        /// </summary>
+        /// <param name="i">The column index</param>
+        /// <param name="j">The row index</param>
+        /// <param name="dirs">A Direction (or set of Direction flags) to remove.</param>
         void RemoveDirectionsExplicitly(int i, int j, Direction dirs);
 
+        /// <summary>
+        /// Add the specified direction to the cell.
+        /// </summary>
+        /// <param name="i">The column index</param>
+        /// <param name="j">The row index</param>
+        /// <param name="dirs">A Direction (or set of Direction flags) to add.</param>
+        /// <param name="preserveExistingCells">Boolean indicating whether to only replace maze cells that are undefined.
+        /// Default is false.</param>
         void AddDirections(int i, int j, Direction dirs, bool preserveExistingCells = false);
         /// <summary>
         /// Add the direction(s) to this cell w/o any safeguards
         /// </summary>
         /// <param name="i">The column index</param>
         /// <param name="j">The row index</param>
-        /// <param name="dirs">The directions to add</param>
+        /// <param name="dirs">A Direction (or set of Direction flags) to add.</param>
         void AddDirectionExplicitly(int i, int j, Direction dirs);
     }
 }
