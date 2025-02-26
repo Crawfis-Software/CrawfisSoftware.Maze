@@ -1,43 +1,28 @@
 ﻿using CrawfisSoftware.Collections.Graph;
+using CrawfisSoftware.Collections.Maze;
 
 using System.Collections.Generic;
 using System.Linq;
 
-namespace CrawfisSoftware.Collections.Maze
+namespace CrawfisSoftware.Maze
 {
     /// <summary>
-    /// Create a maze using the Aldous Broder algorithm
+    /// Extensions for IMazeBuilder for various perfect maze (spanning tree) algorithms.
     /// </summary>
-    public class MazeBuilderAldousBroder<N, E>
+    // todo: .Net Standard 3.0 and .Net 8.0 support partial static classes.
+    // When Unity supports 3.0 we can make these partial and have the name w/o numbers.
+    public static /*partial*/ class PerfectMazes1
     {
-        private MazeBuilderAbstract<N, E> _mazeBuilder;
-
         /// <summary>
-        /// Constructor, Takes an existing maze builder (derived from MazeBuilderAbstract) and copies the state over.
-        /// </summary>
-        public MazeBuilderAldousBroder(MazeBuilderAbstract<N, E> mazeBuilder)
-        {
-            _mazeBuilder = mazeBuilder;
-        }
-
-        /// <summary>
-        /// Create a maze using the Aldous Broder algorithm
+        /// Create a perfect maze using the Aldous Broder algorithm, which is a
+        /// random walk and may take a while.
         /// </summary>
         /// <param name="mazeBuilder">A maze builder</param>
         /// <param name="preserveExistingCells">Boolean indicating whether to only replace maze cells that are undefined.
         /// Default is false.</param>
         /// <typeparam name="N">The type used for node labels</typeparam>
         /// <typeparam name="E">The type used for edge weights</typeparam>
-        public static void CarveMaze<N,E>(IMazeBuilder<N, E> mazeBuilder, bool preserveExistingCells = false)
-        {
-            AldousBroder<N, E>(mazeBuilder, preserveExistingCells);
-        }
-        public void CreateMaze(bool preserveExistingCells = false)
-        {
-            AldousBroder<N, E>(_mazeBuilder, preserveExistingCells);
-        }
-
-        private static void AldousBroder<N,E>(IMazeBuilder<N, E> mazeBuilder, bool preserveExistingCells = false) // Random Walk, may take an infinite amount of time.
+        public static void AldousBroder<N, E>(this IMazeBuilder<N, E> mazeBuilder, bool preserveExistingCells = false)
         {
             int numberOfNodes = mazeBuilder.Grid.NumberOfNodes;
             int unvisited = numberOfNodes - 1;

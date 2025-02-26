@@ -204,20 +204,16 @@ namespace CrawfisSoftware.Collections.Maze
         }
 
         /// <inheritdoc/>
-        public void OpenRegion(int lowerLeftCell, int upperRightCell, bool preserveExistingCells = false)
+        public void OpenRegion(int lowerLeftCell, int upperRightCell, bool preserveExistingCells = false, bool markAsUndefined = true)
         {
-            // Todo: Add preserveCells logic. 
             Direction dirs = Direction.N | Direction.E | Direction.S | Direction.W;
-            // Todo: Add Undefined logic.
-            dirs |= Direction.Undefined;
+            if(markAsUndefined) dirs |= Direction.Undefined;
             FillRegion(lowerLeftCell, upperRightCell, dirs, preserveExistingCells);
         }
 
         /// <inheritdoc/>
         public void FillRegion(int lowerLeftCell, int upperRightCell, Direction dirs, bool preserveExistingCells = false)
         {
-            // Todo: Add preserveCells logic. Lots of ways to do this: Add dirs, set dirs, set dirs if Undefined, preserve undefined, ...
-            // Bug: upperRightCell is non-inclusive, so would need to be out of bounds to reach the right-edge or 
             int currentRow = lowerLeftCell / Width;
             int currentColumn = lowerLeftCell % Width;
             int endRow = upperRightCell / Width;
@@ -234,7 +230,7 @@ namespace CrawfisSoftware.Collections.Maze
             {
                 for (int column = currentColumn; column <= endColumn; column++)
                 {
-                    SetCell(column, row, dirs);
+                    SetCell(column, row, dirs, preserveExistingCells);
                     //directions[column, row] = dirs;
                 }
             }
@@ -247,33 +243,32 @@ namespace CrawfisSoftware.Collections.Maze
         /// <param name="upperRightCell">The upper -right cell index.</param>
         /// <param name="preserveExistingCells">Boolean indicating whether to only replace maze cells that are undefined.
         /// Default is false.</param>
-        public void WallBoundary(int lowerLeftCell, int upperRightCell, bool preserveExistingCells = false)
+        public void WallBoundary(bool preserveExistingCells = false)
         {
+            int lowerLeftCell = 0;
+            int upperRightCell = Width * Height - 1;
             int lowerRightCell = upperRightCell % Width + Width * (int)(lowerLeftCell / Width);
             int upperLeftCell = lowerLeftCell % Width + Width * (int)(upperRightCell / Width);
             int row = lowerLeftCell / Width;
             int col;
             for (col = lowerLeftCell % Width; col <= upperRightCell % Width; col++)
             {
-                SetCell(col, row, directions[col, row] & ~Direction.S, preserveExistingCells);
+                RemoveDirections(col, row, ~Direction.S, preserveExistingCells);
             }
             row = upperRightCell / Width;
             for (col = lowerLeftCell % Width; col <= upperRightCell % Width; col++)
             {
-                SetCell(col, row, directions[col, row] & ~Direction.N, preserveExistingCells);
-                //directions[col, row] = directions[col, row] & ~Direction.N;
+                RemoveDirections(col, row, ~Direction.N, preserveExistingCells);
             }
             col = lowerLeftCell % Width;
             for (row = lowerLeftCell / Width; row <= upperRightCell / Width; row++)
             {
-                SetCell(col, row, directions[col, row] & ~Direction.W, preserveExistingCells);
-                //directions[col, row] = directions[col, row] & ~Direction.W;
+                RemoveDirections(col, row, ~Direction.W, preserveExistingCells);
             }
             col = upperRightCell % Width;
             for (row = lowerLeftCell / Width; row <= upperRightCell / Width; row++)
             {
-                SetCell(col, row, directions[col, row] & ~Direction.E, preserveExistingCells);
-                //directions[col, row] = directions[col, row] & ~Direction.E;
+                RemoveDirections(col, row, ~Direction.E, preserveExistingCells);
             }
         }
 
@@ -532,6 +527,21 @@ namespace CrawfisSoftware.Collections.Maze
                 directions[i, j] = dirs;
         }
 
+        public void RemoveDirections(int i, int j, Direction dirs, bool preserveExistingCells = false)
+        {
+            Direction possibleDirection = directions[i, j] & ~dirs;
+            SetCell(i, j, possibleDirection, preserveExistingCells);
+        }
+        public void RemoveDirectionsExplicitly(int i, int j, Direction dirs)
+        {
+            directions[i, j] &= ~dirs;
+        }
+
+        public void AddDirections(int i, int j, Direction dirs, bool preserveExistingCells = false)
+        {
+            Direction possibleDirection = directions[i, j] | dirs;
+            SetCell(i, j, possibleDirection, preserveExistingCells);
+        }
         /// <inheritdoc/>
         public void AddDirectionExplicitly(int i, int j, Direction dirs)
         {

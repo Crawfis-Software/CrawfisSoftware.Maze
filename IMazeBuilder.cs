@@ -32,6 +32,7 @@ namespace CrawfisSoftware.Collections.Maze
         /// Get or set the random number generator that concrete maze builders may use.
         /// </summary>
         System.Random RandomGenerator { get; set; }
+        Grid<N, E> Grid { get; }
 
         /// <summary>
         /// Add an edge from <paramref name="currentCell"/> to <paramref name="targetCell"/> and vice versa.
@@ -69,7 +70,8 @@ namespace CrawfisSoftware.Collections.Maze
         /// <param name="upperRightCell">The cell index of the upper-right corner of a rectangular region</param>
         /// <param name="preserveExistingCells">Boolean indicating whether to only replace maze cells that are undefined.
         /// Default is false.</param>
-        void OpenRegion(int lowerLeftCell, int upperRightCell, bool preserveExistingCells = false);
+        /// <param name="markAsUndefined">If true (default), cells are also marked as Undefined (aka unfrozen).</param>
+        void OpenRegion(int lowerLeftCell, int upperRightCell, bool preserveExistingCells = false, bool markAsUndefined = true);
 
         /// <summary>
         /// Build the maze based on the maze builder configuration
@@ -219,5 +221,6 @@ namespace CrawfisSoftware.Collections.Maze
         /// <param name="endRow">upper-right row inclusive</param>
         /// <param name="carvingMissingPassages">If true, fix inconsistencies by opening up both sides. If false, wall up  both sides.</param>
         void MakeBidirectionallyConsistent(int currentColumn, int currentRow, int endColumn, int endRow, bool carvingMissingPassages = true);
+        Direction GetDirection(int column, int row);
     }
 }
