@@ -1,10 +1,11 @@
-﻿using CrawfisSoftware.Collections.Graph;
+﻿using CrawfisSoftware.Collections;
+using CrawfisSoftware.Collections.Graph;
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace CrawfisSoftware.Collections.Maze
+namespace CrawfisSoftware.Maze
 {
     /// <summary>
     /// Given an existing maze builder, extensions to carve more passages that may cause loops or braid a perfect maze.
@@ -19,7 +20,7 @@ namespace CrawfisSoftware.Collections.Maze
         /// <param name="mazeBuilder">the underlying MazeBuilder</param>
         /// <param name="preserveExistingCells">Boolean indicating whether to only replace maze cells that are undefined.</param>
         /// <param name="carveNeighbors">True to keep the underlying maze consistent. False to just modify the dead-end cell.</param>
-        public static void MergeDeadEndsRandomly<N, E>(this MazeBuilderAbstract<N, E> mazeBuilder, bool preserveExistingCells = false, bool carveNeighbors = true)
+        public static void MergeDeadEndsRandomly<N, E>(this IMazeBuilder<N, E> mazeBuilder, bool preserveExistingCells = false, bool carveNeighbors = true)
         {
             int Width = mazeBuilder.Width;
             for (int row = 0; row < mazeBuilder.Height; row++)
@@ -59,7 +60,7 @@ namespace CrawfisSoftware.Collections.Maze
         /// <param name="numberToMerge">The number of dead ends to try to merge.</param>
         /// <param name="preserveExistingCells">Boolean indicating whether to only replace maze cells that are undefined.</param>
         /// <param name="carveNeighbors">True to keep the underlying maze consistent. False to just modify the dead-end cell.</param>
-        public static void MergeRandomDeadEnds<N, E>(this MazeBuilderAbstract<N, E> mazeBuilder, int numberToMerge, bool preserveExistingCells = false, bool carveNeighbors = true)
+        public static void MergeRandomDeadEnds<N, E>(this IMazeBuilder<N, E> mazeBuilder, int numberToMerge, bool preserveExistingCells = false, bool carveNeighbors = true)
         {
             int Width = mazeBuilder.Width;
             foreach (var deadEnd in mazeBuilder.GetMaze().DeadEnds().ToList().Shuffle(mazeBuilder.RandomGenerator))
@@ -69,7 +70,7 @@ namespace CrawfisSoftware.Collections.Maze
             }
         }
 
-        public static void TryCarveRandomDirection<N, E>(MazeBuilderAbstract<N, E> mazeBuilder, int row, int column, bool preserveExistingCells = false, bool carveNeighbors = true)
+        public static void TryCarveRandomDirection<N, E>(IMazeBuilder<N, E> mazeBuilder, int row, int column, bool preserveExistingCells = false, bool carveNeighbors = true)
         {
             int width = mazeBuilder.Width;
             IList<int> neighborDirs = mazeBuilder.Grid.Neighbors(column + row * width).ToList();
@@ -106,7 +107,7 @@ namespace CrawfisSoftware.Collections.Maze
         /// <param name="keepCarvingPredicate">A predicate to stop the carving based on the number of walls carved, the current score and the edge.</param>
         /// <param name="preserveExistingCells">Boolean indicating whether to only replace maze cells that are undefined.
         /// Default is false.</param>
-        public static void MergeAdjacentCells<N, E>(this MazeBuilderAbstract<N, E> mazeBuilder, MazeMetricsComputations<N, E> mazeMetricsComputations,
+        public static void MergeAdjacentCells<N, E>(this IMazeBuilder<N, E> mazeBuilder, MazeMetricsComputations<N, E> mazeMetricsComputations,
             Func<IIndexedEdge<E>, MazeCellMetrics, MazeCellMetrics, float> computeWallScore,
             float thresholdToRemove, bool sortResults,
             Func<int, float, IIndexedEdge<E>, bool> keepCarvingPredicate, bool preserveExistingCells = false)

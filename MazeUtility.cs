@@ -3,7 +3,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace CrawfisSoftware.Collections.Maze
+namespace CrawfisSoftware.Maze
 {
     /// <summary>
     /// Static methods extending the Maze class.

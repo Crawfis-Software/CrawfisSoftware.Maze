@@ -1,5 +1,5 @@
 ﻿using CrawfisSoftware.Collections.Graph;
-using CrawfisSoftware.Collections.Maze;
+using CrawfisSoftware.Maze;
 
 namespace CrawfisSoftware.Maze
 {

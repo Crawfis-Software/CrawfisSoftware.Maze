@@ -3,7 +3,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace CrawfisSoftware.Collections.Maze
+namespace CrawfisSoftware.Maze
 {
     /// <summary>
     /// A grid with some edges blocked and others open

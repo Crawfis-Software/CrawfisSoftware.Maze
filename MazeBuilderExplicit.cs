@@ -1,6 +1,6 @@
 ﻿using CrawfisSoftware.Collections.Graph;
 
-namespace CrawfisSoftware.Collections.Maze
+namespace CrawfisSoftware.Maze
 {
     /// <summary>
     /// Create a maze by explicitly setting each cell
@@ -29,9 +29,22 @@ namespace CrawfisSoftware.Collections.Maze
         {
         }
 
-        /// <inheritdoc/>
-        public override void CreateMaze(bool preserveExistingCells)
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="directions">A 2D array of Direction's to initialize the mazeBuilder from.</param>
+        /// <param name="nodeAccessor">A function to retrieve any node labels</param>
+        /// <param name="edgeAccessor">A function to retrieve any edge weights</param>
+        public MazeBuilderExplicit(Direction[,] directions, GetGridLabel<N> nodeAccessor = null, GetEdgeLabel<E> edgeAccessor = null)
+            : base(directions.GetLength(0), directions.GetLength(1), nodeAccessor, edgeAccessor)
         {
+            for (int i = 0; i < directions.GetLength(0); i++)
+            {
+                for (int j = 0; j < directions.GetLength(1); j++)
+                {
+                    SetCell(i, j, directions[i, j]);
+                }
+            }
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using CrawfisSoftware.Collections.Graph;
 
-namespace CrawfisSoftware.Collections.Maze
+namespace CrawfisSoftware.Maze
 {
     /// <summary>
     /// Modify a Maze Builder based on maze metrics.

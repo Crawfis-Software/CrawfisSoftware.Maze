@@ -1,10 +1,10 @@
-﻿using CrawfisSoftware.Collections.Maze;
+﻿using CrawfisSoftware.Maze;
 
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace CrawfisSoftware.Maze
+namespace CrawfisSoftware.Maze.PerfectMazes
 {
     /// <summary>
     /// Extensions for IMazeBuilder for various perfect maze (spanning tree) algorithms.
@@ -24,6 +24,8 @@ namespace CrawfisSoftware.Maze
         /// <typeparam name="E">The type used for edge weights</typeparam>
         public static void RecursiveDivision<N, E>(this IMazeBuilder<N, E> mazeBuilder, bool preserveExistingCells = false)
         {
+            var mazeBuilderRD = new MazeBuilderRecursiveDivision<N, E>(mazeBuilder);
+            mazeBuilderRD.CarveMaze(preserveExistingCells);
         }
     }
 }

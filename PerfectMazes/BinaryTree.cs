@@ -1,7 +1,7 @@
 ﻿using CrawfisSoftware.Collections.Graph;
-using CrawfisSoftware.Collections.Maze;
+using CrawfisSoftware.Maze;
 
-namespace CrawfisSoftware.Maze
+namespace CrawfisSoftware.Maze.PerfectMazes
 {
     /// <summary>
     /// Extensions for IMazeBuilder for various perfect maze (spanning tree) algorithms.

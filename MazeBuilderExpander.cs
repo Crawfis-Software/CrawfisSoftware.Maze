@@ -1,102 +1,57 @@
 ﻿using CrawfisSoftware.Collections.Graph;
 using CrawfisSoftware.Maze;
 
-namespace CrawfisSoftware.Collections.Maze
+namespace CrawfisSoftware.Maze
 {
     /// <summary>
-    /// Expand an existing MazeBuilder to have wider opening, and/or wider walls, and/or a border
+    /// Extension methods to expand a given Maze Builder.
     /// </summary>
-    /// <typeparam name="N">The type used for node labels</typeparam>
-    /// <typeparam name="E">The type used for edge weights</typeparam>
-    public class MazeBuilderExpander<N, E> : MazeBuilderAbstract<N, E>
+    public static class MazeBuilderExpander
     {
-        private int _numberOfWallTiles = 0;
-        private int _numberOfOpeningTiles = 0;
-        private int _numberOfBorderTiles = 0;
-        private MazeBuilderAbstract<N, E> _originalMazeBuilder;
-
-        /// <summary>
-        /// Constructor.
+        /// Expand an existing MazeBuilder to a new one having wider openings, walls, and/or borders
         /// </summary>
-        /// <param name="mazeBuilder">A previous MazeBuilder</param>
-        public MazeBuilderExpander(MazeBuilderAbstract<N, E> mazeBuilder) : base(mazeBuilder)
-        {
-            _originalMazeBuilder = mazeBuilder;
-        }
-
-        /// <summary>
-        /// Set the size of the wall thickness in terms of the number of cells The default wall size is 0.
-        /// </summary>
-        /// <param name="numberOfTilesToExpandBy">The number of cells to expand each wall to.</param>
-        public void ExpandWalls(int numberOfTilesToExpandBy)
-        {
-            if (numberOfTilesToExpandBy < 0)
-            {
-                throw new System.ArgumentOutOfRangeException("Wall expansion needs to be zero or positive.");
-            }
-            _numberOfWallTiles = numberOfTilesToExpandBy;
-        }
-
-
-        /// <summary>
-        /// Increase the opening thickness in terms of the number of cells. The default opening size is 1.
-        /// </summary>
-        /// <param name="numberOfTilesToExpandBy">The number of cells to expand each opening to.</param>
-        public void ExpandOpenings(int numberOfTilesToExpandBy)
-        {
-            if (numberOfTilesToExpandBy < 0)
-            {
-                throw new System.ArgumentOutOfRangeException("Wall expansion needs to be zero or positive.");
-            }
-            _numberOfOpeningTiles = numberOfTilesToExpandBy;
-        }
-
-
-        /// <summary>
-        /// Set the size of a border on all sides in terms of the number of cells (default is 0).
-        /// </summary>
-        /// <param name="numberOfTilesToExpandBy">The number of cells for the border.</param>
+        /// <typeparam name="N">The type used for node labels</typeparam>
+        /// <typeparam name="E">The type used for edge weights</typeparam>
+        /// <param name="mazeBuilder"></param>
+        /// <param name="numberOfOpeningTiles">The number of cells to expand each opening to.</param>
+        /// <param name="numberOfWallTiles">The number of cells to expand each wall to.</param>
+        /// <param name="numberOfBorderTiles">The number of cells for the border.</param>
+        /// <returns>A new IMazeBuilder.</returns>
         /// <remarks>Note: The Start and End cells will be set to the interior of the maze corresponding to the mapped cell location previously. 
         /// Use one of the path carving algorithms to create an exit out of the boundary.</remarks>
-        public void AddBorder(int numberOfTilesToExpandBy)
+        public static IMazeBuilder<N, E> ExpandMaze<N, E>(this IMazeBuilder<N, E> mazeBuilder, int numberOfOpeningTiles, int numberOfWallTiles, int numberOfBorderTiles)
         {
-            if (numberOfTilesToExpandBy < 0)
-            {
-                throw new System.ArgumentOutOfRangeException("Wall expansion needs to be zero or positive.");
-            }
-            _numberOfBorderTiles = numberOfTilesToExpandBy;
+            int width = mazeBuilder.Width;
+            int height = mazeBuilder.Height;
+            int startCell = mazeBuilder.StartCell;
+            int endCell = mazeBuilder.EndCell;
+            int startColumn = startCell % width;
+            int startRow = startCell / width;
+            int endColumn = endCell % width;
+            int endRow = endCell / width;
+
+            startCell = numberOfBorderTiles + startColumn * (numberOfOpeningTiles + numberOfWallTiles) + numberOfOpeningTiles / 2
+                + numberOfBorderTiles + width * startRow * (numberOfOpeningTiles + numberOfWallTiles) + width * numberOfOpeningTiles / 2;
+            endCell = numberOfBorderTiles + endColumn * (numberOfOpeningTiles + numberOfWallTiles) + numberOfOpeningTiles / 2
+                + numberOfBorderTiles + width * endRow * (numberOfOpeningTiles + numberOfWallTiles) + width * numberOfOpeningTiles / 2;
+            width = width + width * numberOfOpeningTiles + width * numberOfWallTiles + 2 * numberOfBorderTiles;
+            height = height + height * numberOfOpeningTiles + height * numberOfWallTiles + 2 * numberOfBorderTiles;
+            var newDirections = ExpandDirections(mazeBuilder, width, height, numberOfOpeningTiles, numberOfWallTiles, numberOfBorderTiles);
+            return new MazeBuilderExplicit<N, E>(newDirections);
         }
 
-        /// <inheritdoc/>
-        public override void CreateMaze(bool preserveExistingCells = false)
+        private static Direction[,] ExpandDirections<N, E>(IMazeBuilder<N, E> mazeBuilder, int width, int height, int _numberOfOpeningTiles, int _numberOfWallTiles, int _numberOfBorderTiles)
         {
-            int startColumn = StartCell % Width;
-            int startRow = StartCell / Width;
-            int endColumn = EndCell % Width;
-            int endRow = EndCell / Width;
-            this.StartCell = _numberOfBorderTiles + startColumn * (_numberOfOpeningTiles + _numberOfWallTiles) + _numberOfOpeningTiles / 2
-                + _numberOfBorderTiles + Width * startRow * (_numberOfOpeningTiles + _numberOfWallTiles) + Width * _numberOfOpeningTiles / 2;
-            this.EndCell = _numberOfBorderTiles + endColumn * (_numberOfOpeningTiles + _numberOfWallTiles) + _numberOfOpeningTiles / 2
-                + _numberOfBorderTiles + Width * endRow * (_numberOfOpeningTiles + _numberOfWallTiles) + Width * _numberOfOpeningTiles / 2;
-            Width = Width + Width * _numberOfOpeningTiles + Width * _numberOfWallTiles + 2 * _numberOfBorderTiles;
-            Height = Height + Height * _numberOfOpeningTiles + Height * _numberOfWallTiles + 2 * _numberOfBorderTiles;
-            grid = new Grid<N, E>(Width, Height, nodeFunction, edgeFunction);
-            var newDirections = ExpandDirections(this.Directions);
-            this.ReplaceDirections(newDirections);
-        }
-
-        private Direction[,] ExpandDirections(Direction[,] directions)
-        {
-            var newDirections = new Direction[Width, Height];
-            for (int row = _numberOfBorderTiles; row < Height - _numberOfBorderTiles; row++)
+            var newDirections = new Direction[width, height];
+            for (int row = _numberOfBorderTiles; row < height - _numberOfBorderTiles; row++)
             {
                 int expansionSize = (1 + _numberOfOpeningTiles + _numberOfWallTiles);
                 int oldRow = (row - _numberOfBorderTiles) / expansionSize;
-                for (int column = _numberOfBorderTiles; column < Width - _numberOfBorderTiles; column++)
+                for (int column = _numberOfBorderTiles; column < width - _numberOfBorderTiles; column++)
                 {
                     newDirections[column, row] = Direction.None;
                     int oldColumn = (column - _numberOfBorderTiles) / expansionSize;
-                    Direction direction = directions[oldColumn, oldRow];
+                    Direction direction = mazeBuilder.GetDirection(oldColumn, oldRow);
                     if ((direction | Direction.Undefined) == (Direction.None | Direction.Undefined)) continue;
                     if ((column - _numberOfBorderTiles) % expansionSize == 0)
                     {

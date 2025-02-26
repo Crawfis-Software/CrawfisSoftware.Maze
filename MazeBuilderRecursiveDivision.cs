@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace CrawfisSoftware.Collections.Maze
+namespace CrawfisSoftware.Maze
 {
     /// <summary>
     /// Create a maze using the Recursive Division algorithm
@@ -13,7 +13,7 @@ namespace CrawfisSoftware.Collections.Maze
     /// <typeparam name="E">The type used for edge weights</typeparam>
     public class MazeBuilderRecursiveDivision<N, E>
     {
-        private MazeBuilderAbstract<N, E> _mazeBuilder;
+        private IMazeBuilder<N, E> _mazeBuilder;
         /// <summary>
         /// A function to determine whether to split horizontally or vertically.
         /// It takes in the width and height of the region and returns true if it
@@ -40,7 +40,7 @@ namespace CrawfisSoftware.Collections.Maze
         /// Constructor, Takes an existing maze builder (derived from MazeBuilderAbstract) and copies the state over.
         /// </summary>
         /// <param name="mazeBuilder">A maze builder</param>
-        public MazeBuilderRecursiveDivision(MazeBuilderAbstract<N, E> mazeBuilder)
+        public MazeBuilderRecursiveDivision(IMazeBuilder<N, E> mazeBuilder)
         {
             _mazeBuilder = mazeBuilder;
             this.SplitHorizontalOrVertical = SplitLargestArea;
@@ -52,9 +52,9 @@ namespace CrawfisSoftware.Collections.Maze
         /// Create a maze using the Recursive Division algorithm.
         /// </summary>
         /// <param name="preserveExistingCells">Boolean indicating whether to only replace maze cells that are undefined. Default is false.</param>
-        public void CreateMaze(bool preserveExistingCells = false)
+        public void CarveMaze(bool preserveExistingCells = false)
         {
-            _mazeBuilder.OpenRegion(0, _mazeBuilder.Width *_mazeBuilder.Height - 1, preserveExistingCells);
+            _mazeBuilder.OpenRegion(0, _mazeBuilder.Width * _mazeBuilder.Height - 1, preserveExistingCells);
             _mazeBuilder.WallBoundary(preserveExistingCells);
             RecursiveDivision(0, 0, _mazeBuilder.Width, _mazeBuilder.Height, preserveExistingCells);
         }
