@@ -54,7 +54,7 @@ namespace CrawfisSoftware.Collections.Maze
         /// <param name="preserveExistingCells">Boolean indicating whether to only replace maze cells that are undefined. Default is false.</param>
         public void CreateMaze(bool preserveExistingCells = false)
         {
-            _mazeBuilder.OpenRegion(0, _mazeBuilder.Width _mazeBuilder.Height - 1, preserveExistingCells);
+            _mazeBuilder.OpenRegion(0, _mazeBuilder.Width *_mazeBuilder.Height - 1, preserveExistingCells);
             _mazeBuilder.WallBoundary(preserveExistingCells);
             RecursiveDivision(0, 0, _mazeBuilder.Width, _mazeBuilder.Height, preserveExistingCells);
         }
