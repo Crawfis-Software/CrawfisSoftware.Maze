@@ -13,7 +13,7 @@ namespace CrawfisSoftware.Maze
         /// <param name="mazeBuilder">The maze builder to modify.</param>
         /// <param name="metricsComputations">The metrics computations for the maze.</param>
         /// <param name="maxDeadEndLength">Length in number of cells.</param>
-        public static void TrimDeadEnds<N, E>(this MazeBuilderAbstract<N, E> mazeBuilder, MazeMetricsComputations<N, E> metricsComputations, int maxDeadEndLength)
+        public static void TrimDeadEnds<N, E>(this IMazeBuilder<N, E> mazeBuilder, MazeMetricsComputations<N, E> metricsComputations, int maxDeadEndLength)
         {
             for (int row = 0; row < mazeBuilder.Height; row++)
             {
@@ -55,7 +55,7 @@ namespace CrawfisSoftware.Maze
         /// <param name="metricsComputations">The metrics computations for the maze.</param>
         /// <param name="branchId">The solution path cell id.</param>
         /// <param name="maxDeadEndLength">Length in number of cells.</param>
-        public static void TrimDeadEnds<N, E>(this MazeBuilderAbstract<N, E> mazeBuilder, MazeMetricsComputations<N, E> metricsComputations, int branchId, int maxDeadEndLength)
+        public static void TrimDeadEnds<N, E>(this IMazeBuilder<N, E> mazeBuilder, MazeMetricsComputations<N, E> metricsComputations, int branchId, int maxDeadEndLength)
         {
             for (int row = 0; row < mazeBuilder.Height; row++)
             {

@@ -10,7 +10,7 @@ namespace CrawfisSoftware.Maze
     /// <typeparam name="E">The type of the edge labels in the corresponding graph.</typeparam>
     public class MazePathCost<N, E> : GridPathComparer<N, E>
     {
-        private MazeBuilderAbstract<N, E> _maze;
+        private IMazeBuilder<N, E> _maze;
         int _width;
 
         /// <summary>
@@ -29,7 +29,7 @@ namespace CrawfisSoftware.Maze
         /// Constructor.
         /// </summary>
         /// <param name="mazeBuilder">The underlying maze builder, <c>MazeBuilderAbstract</c>.</param>
-        public MazePathCost(MazeBuilderAbstract<N, E> mazeBuilder) : base(mazeBuilder.Grid, null, 1)
+        public MazePathCost(IMazeBuilder<N, E> mazeBuilder) : base(mazeBuilder.Grid, null, 1)
         {
             _maze = mazeBuilder;
             _width = mazeBuilder.Width;
