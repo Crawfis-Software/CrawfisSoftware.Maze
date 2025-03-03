@@ -82,6 +82,34 @@ namespace CrawfisSoftware.Maze
         }
 
         /// <summary>
+        /// Add a wall (block) in the specified direction.
+        /// </summary>
+        /// <param name="mazeBuilder">The IMazeBuilder to use.</param>
+        /// <param name="currentColumn">Column index of the cell.</param>
+        /// <param name="currentRow">Row index of the row.</param>
+        /// <param name="directionToBlock">A single direction to block</param>
+        /// <param name="preserveExistingCells">Boolean indicating whether to only replace maze cells that are undefined.
+        /// Default is false.</param>
+        /// <return>Returns true if the operation was successful.</return>
+        public static bool BlockDirectionally<N, E>(this IMazeBuilder<N, E> mazeBuilder, int currentColumn, int currentRow, Direction directionToBlock, bool preserveExistingCells = false)
+        {
+            int cellIndex = currentRow * mazeBuilder.Width + currentColumn;
+            switch (directionToBlock)
+            {
+                case Direction.None:
+                    break;
+                case Direction.W:
+                    return AddWall(mazeBuilder, cellIndex, cellIndex - 1, preserveExistingCells);
+                case Direction.N:
+                    return AddWall(mazeBuilder, cellIndex, cellIndex + mazeBuilder.Width, preserveExistingCells);
+                case Direction.E:
+                    return AddWall(mazeBuilder, cellIndex, cellIndex + 1, preserveExistingCells);
+                case Direction.S:
+                    return AddWall(mazeBuilder, cellIndex, cellIndex - mazeBuilder.Width, preserveExistingCells);
+            }
+            return false;
+        }
+        /// <summary>
         /// Remove any edge from <paramref name="currentCell"/> to <paramref name="targetCell"/> and vice versa.
         /// </summary>
         /// <param name="mazeBuilder">The IMazeBuilder to use for carving.</param>
@@ -271,9 +299,11 @@ namespace CrawfisSoftware.Maze
         /// </summary>
         /// <param name="mazeBuilder">The IMazeBuilder to use for carving.</param>
         /// <param name="maxCount">Maximum number of Dead-ends to trim.</param>
-        /// <param name="preserveExistingCells"></param>
-        public static void RemoveDeadEnds<N, E>(this IMazeBuilder<N, E> mazeBuilder, int maxCount = int.MaxValue, bool preserveExistingCells = false)
+        /// <param name="preserveExistingCells">Boolean indicating whether to only replace maze cells that are undefined.
+        /// Default is false.</param>
+        public static int RemoveDeadEnds<N, E>(this IMazeBuilder<N, E> mazeBuilder, int maxCount = int.MaxValue, bool preserveExistingCells = false)
         {
+            int count = 0;
             var deadEnds = new List<(int col1, int row1, int col2, int row2)>();
             for (int row = 0; row < mazeBuilder.Height; row++)
             {
@@ -300,7 +330,6 @@ namespace CrawfisSoftware.Maze
                             break;
                     }
                 }
-                int count = 0;
                 foreach (var deadEnd in deadEnds)
                 {
                     mazeBuilder.AddWall(deadEnd.col1, deadEnd.row1, deadEnd.col2, deadEnd.row2, preserveExistingCells);
@@ -309,6 +338,7 @@ namespace CrawfisSoftware.Maze
                         break;
                 }
             }
+            return count;
         }
 
         /// <summary>
