@@ -1,7 +1,7 @@
 ﻿using CrawfisSoftware.Collections.Graph;
 using System;
 
-namespace CrawfisSoftware.Collections.Maze
+namespace CrawfisSoftware.Maze
 {
     /// <summary>
     /// Encoding for maze's that can prescribe the "direction" from the start (Entrance to an exit). Alternative exits from main paths.

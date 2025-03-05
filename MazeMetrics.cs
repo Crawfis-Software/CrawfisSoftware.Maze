@@ -1,7 +1,8 @@
 ﻿using CrawfisSoftware.Collections.Path;
+
 using System;
 
-namespace CrawfisSoftware.Collections.Maze
+namespace CrawfisSoftware.Maze
 {
     /// <summary>
     /// Metrics on the overall Maze.
@@ -11,7 +12,7 @@ namespace CrawfisSoftware.Collections.Maze
         /// <summary>
         /// The solution path and metrics on it.
         /// </summary>
-        public GridPathMetrics<int,int> SolutionPathMetric;
+        public GridPathMetrics<int, int> SolutionPathMetric;
         /// <summary>
         /// Count of the number of dead-end cells.
         /// </summary>
@@ -46,7 +47,7 @@ namespace CrawfisSoftware.Collections.Maze
         /// <remarks>This is dependent on how the Branch level is defined per cell and the algorithmic choice for what a branch means. Currently implementation has a main branch for each dead-end (recursively).</remarks>
         public Nullable<int> MaxBranchLevel;
         /// <summary>
-        /// The maximum distance any ded-end cell is from the solution path.
+        /// The maximum distance any dead-end cell is from the solution path.
         /// </summary>
         public Nullable<int> MaxDeadEndLength;
         /// <summary>

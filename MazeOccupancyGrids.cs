@@ -3,7 +3,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace CrawfisSoftware.Collections.Maze
+namespace CrawfisSoftware.Maze
 {
     /// <summary>
     /// Predefined OccupancyGrid stamp styles (tile styles).
@@ -123,7 +123,7 @@ namespace CrawfisSoftware.Collections.Maze
         /// <param name="solidBlocks">2D array matching the maze builder's width and height.
         /// A value of true implies this cell is a solid block. Passages will be carved from non-solid
         /// blocks to adjacent non-solid blocks.</param>
-        public static void CarveOpenings(MazeBuilderAbstract<int, int> mazeBuilder, bool[,] solidBlocks)
+        public static void CarveOpenings(IMazeBuilder<int, int> mazeBuilder, bool[,] solidBlocks)
         {
 
             for (int row = 0; row < mazeBuilder.Height - 1; row++)
@@ -152,7 +152,7 @@ namespace CrawfisSoftware.Collections.Maze
         /// <returns>A <c>Maze</c>.</returns>
         public static Maze<int, int> ConvertOccupancyGridToMaze(this OccupancyGrid cells)
         {
-            var mazeBuilder = new MazeBuilderExplicit<int, int>(cells.Width, cells.Height);
+            var mazeBuilder = new MazeBuilder<int, int>(cells.Width, cells.Height);
             CarveOpenings(mazeBuilder, cells.GridValues);
             Maze<int, int> maze = mazeBuilder.GetMaze();
             return maze;

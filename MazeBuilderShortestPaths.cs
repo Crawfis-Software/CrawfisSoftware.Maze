@@ -2,7 +2,7 @@
 
 using System;
 
-namespace CrawfisSoftware.Collections.Maze
+namespace CrawfisSoftware.Maze
 {
     /// <summary>
     /// Craft a "maze" by carving specific paths.
@@ -11,7 +11,7 @@ namespace CrawfisSoftware.Collections.Maze
     /// <typeparam name="E">The type used for edge weights</typeparam>
     public class MazeBuilderShortestPaths<N, E>
     {
-        private MazeBuilderAbstract<N, E> _mazeBuilder;
+        private IMazeBuilder<N, E> _mazeBuilder;
         /// <summary>
         /// Static function that can be assigned to the EdgeFunction. This one just returns the edge's value when the Edge Type is a float.
         /// </summary>
@@ -57,7 +57,7 @@ namespace CrawfisSoftware.Collections.Maze
         /// Constructor initialized with a prior MazeBuilder.
         /// </summary>
         /// <param name="mazeBuilder">A maze builder.</param>
-        public MazeBuilderShortestPaths(MazeBuilderAbstract<N, E> mazeBuilder)
+        public MazeBuilderShortestPaths(IMazeBuilder<N, E> mazeBuilder)
         {
             _mazeBuilder = mazeBuilder;
             EdgeFunction = ConstantOfOne;
@@ -101,7 +101,7 @@ namespace CrawfisSoftware.Collections.Maze
         {
             int width = _mazeBuilder.Width;
             int height = _mazeBuilder.Height;
-            var pathQuery = new Graph.SourceShortestPaths<N, E>(_mazeBuilder.Grid, targetCell, EdgeComparerUsingGetEdgeLabel);
+            var pathQuery = new SourceShortestPaths<N, E>(_mazeBuilder.Grid, targetCell, EdgeComparerUsingGetEdgeLabel);
             for (int row = 0; row < height; row++)
             {
                 for (int column = 0; column < width; column++)

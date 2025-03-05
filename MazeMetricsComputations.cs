@@ -1,10 +1,12 @@
-﻿using CrawfisSoftware.Collections.Graph;
+﻿using CrawfisSoftware.Collections;
+using CrawfisSoftware.Collections.Graph;
 using CrawfisSoftware.Collections.Path;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace CrawfisSoftware.Collections.Maze
+namespace CrawfisSoftware.Maze
 {
     /// <summary>
     /// Computes metrics on a maze and allows for easy access to both global metrics and per cell metrics.
@@ -128,7 +130,7 @@ namespace CrawfisSoftware.Collections.Maze
                 distances[cellIndex] = 0;
             }
 
-            var mazeEnumerator = new IndexedGraphEdgeEnumerator<N,E>(_maze, new QueueAdaptor<IIndexedEdge<E>>());
+            var mazeEnumerator = new IndexedGraphEdgeEnumerator<N, E>(_maze, new QueueAdaptor<IIndexedEdge<E>>());
             foreach (var edge in mazeEnumerator.TraverseNodes(_overallMetrics.SolutionPathMetric.Path))
             {
                 // Set the "To" node's distance to one plus the "From" node's distance.
@@ -148,7 +150,7 @@ namespace CrawfisSoftware.Collections.Maze
         {
             if (!_isSolutionPathComputed) ComputeSolutionPath();
             int[] distances = new int[_width * _height];
-            var grid = new Graph.Grid<int, int>(_width, _height, new GetGridLabel<int>((i, j) => { return 1; }), new GetEdgeLabel<int>((i, j, v) => { return 1; }));
+            var grid = new Grid<int, int>(_width, _height, new GetGridLabel<int>((i, j) => { return 1; }), new GetEdgeLabel<int>((i, j, v) => { return 1; }));
             var gridEnumerator = new IndexedGraphEdgeEnumerator<int, int>(grid, new QueueAdaptor<IIndexedEdge<int>>());
             foreach (var edge in gridEnumerator.TraverseNodes(_overallMetrics.SolutionPathMetric.Path))
             {
@@ -210,7 +212,7 @@ namespace CrawfisSoftware.Collections.Maze
                 {
                     branchLevel += 1;
                     maxBranchLevel = Math.Max(maxBranchLevel, branchLevel);
-                    if(!setBranchRootToSolution)
+                    if (!setBranchRootToSolution)
                     {
                         currentBranchRoot = from;
                         currentBranchEdge = fromEdge;
@@ -371,7 +373,7 @@ namespace CrawfisSoftware.Collections.Maze
             {
                 int cellIndex = cell.Row * _width + cell.Column;
                 if (ignoreSolutionPath && _isSolutionPathComputed)
-                    if(_overallMetrics.SolutionPathMetric.Path.Contains(cellIndex)) continue;
+                    if (_overallMetrics.SolutionPathMetric.Path.Contains(cellIndex)) continue;
 
                 var directions = _maze.GetDirection(cell.Column, cell.Row);
                 if (((directions & Direction.W) == Direction.W) && _leftEdgeFlows[cellIndex] == EdgeFlow.PrimaryExit)
