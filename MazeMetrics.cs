@@ -2,7 +2,7 @@
 
 using System;
 
-namespace CrawfisSoftware.Collections.Maze
+namespace CrawfisSoftware.Maze
 {
     /// <summary>
     /// Metrics on the overall Maze.
