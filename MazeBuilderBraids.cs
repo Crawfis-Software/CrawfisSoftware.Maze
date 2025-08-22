@@ -1,5 +1,5 @@
-﻿using CrawfisSoftware.Collections;
-using CrawfisSoftware.Collections.Graph;
+﻿using CrawfisSoftware.Collections.Graph;
+using CrawfisSoftware.Extensions;
 
 using System;
 using System.Collections.Generic;
