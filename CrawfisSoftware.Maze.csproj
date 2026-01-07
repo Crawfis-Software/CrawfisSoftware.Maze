@@ -1,27 +1,31 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
-    <OutputType>Library</OutputType>
-    <RootNamespace>CrawfisSoftware.Maze</RootNamespace>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
-    <DocumentationFile>$(SolutionDir)Documentation\CrawfisSoftware.Maze.xml</DocumentationFile>
-    <AssemblyVersion></AssemblyVersion>
-    <BaseOutputPath>$(SolutionDir)\bin\</BaseOutputPath>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DocumentationFile>$(SolutionDir)Documentation\CrawfisSoftware.Maze.xml</DocumentationFile>
-    <OutputPath>$(SolutionDir)bin\Debug\</OutputPath>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RepositoryUrl>https://github.com/Crawfis-Software/CrawfisSoftware.Maze</RepositoryUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageIcon>icon.png</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <Description>Standard library for CrawfisSoftware.Maze.</Description>
+    <Company>Crawfis Software</Company>
+    <PackageProjectUrl>https://github.com/Crawfis-Software</PackageProjectUrl>
+    <Copyright>Copyright (c) Crawfis Software 2026</Copyright>
+    <Authors>Crawfis Software</Authors>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <LangVersion>10.0</LangVersion>
+    <RepositoryType>git</RepositoryType>
+    <PackageId>CrawfisSoftware.Maze</PackageId>
+    <Nullable>enable</Nullable>
+    <TargetFrameworks>netstandard2.1;net8.0</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Remove="GridTraversalExtensions.cs" />
-    <Compile Remove="StampSet.cs" />
+    <None Include="README.md" Pack="true" PackagePath="\" />
+    <None Include="icon.png" Pack="true" PackagePath="\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Collections\CrawfisSoftware.Collections.csproj" />
-    <ProjectReference Include="..\..\Paths\CrawfisSoftware.Path.csproj" />
-    <ProjectReference Include="..\Graph\CrawfisSoftware.Graph.csproj" />
-    <ProjectReference Include="..\Grid\CrawfisSoftware.Grid.csproj" />
-    <ProjectReference Include="..\IGraph\CrawfisSoftware.IGraph.csproj" />
+    <PackageReference Include="CrawfisSoftware.Collections" Version="0.1.*" />
+    <PackageReference Include="CrawfisSoftware.Path" Version="0.1.*" />
+    <PackageReference Include="CrawfisSoftware.Graph" Version="0.1.*" />
+    <PackageReference Include="CrawfisSoftware.Grid" Version="0.1.*" />
+    <PackageReference Include="CrawfisSoftware.IGraph" Version="0.1.*" />
   </ItemGroup>
 </Project>
