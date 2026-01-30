@@ -1,6 +1,6 @@
 ﻿using CrawfisSoftware.Collections;
 using CrawfisSoftware.Collections.Graph;
-using CrawfisSoftware.Collections.Path;
+using CrawfisSoftware.Path;
 
 using System;
 using System.Collections.Generic;

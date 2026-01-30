@@ -1,4 +1,4 @@
-﻿using CrawfisSoftware.Collections.Path;
+﻿using CrawfisSoftware.Path;
 
 using System;
 
